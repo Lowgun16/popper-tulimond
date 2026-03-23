@@ -12,65 +12,71 @@ export function usePortalTransforms() {
     offset: ["start start", "end end"],
   });
 
-  // Smooth the scroll for the scale — prevents jitter on fast scrolls
+  // Spring-smooth the progress used for the storefront scale only
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 80,
     damping: 25,
     restDelta: 0.001,
   });
 
-  // Background zoom: ramps up then settles back to flat as portal resolves
-  const bgScale = useTransform(
+  // ── Storefront (exterior) ──────────────────────────────
+  const storefrontScale = useTransform(
     smoothProgress,
-    [0, 0.1, 0.65, 0.85, 1],
-    [1, 1, 2.8, 1.2, 1.0]
+    [0, 0.1, 0.7],
+    [1.0, 1.0, 2.2]
+  );
+  const storefrontOpacity = useTransform(
+    scrollYProgress,
+    [0.75, 0.9],
+    [1, 0]
   );
 
-  // Vignette: closes then reopens
+  // ── Inside store (interior) ───────────────────────────
+  const insideClipPath = useTransform(
+    scrollYProgress,
+    [0.6, 0.9],
+    ["circle(0% at 50% 50%)", "circle(150% at 50% 50%)"]
+  );
+
+  // ── Vignette ──────────────────────────────────────────
   const vignetteOpacity = useTransform(
     scrollYProgress,
     [0.2, 0.5, 0.7, 1.0],
     [0, 1, 1, 0]
   );
 
-  // Hero content exit: fades up and out
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.25], ["0%", "-15%"]);
+  // ── "Dressed in Power." flying text ───────────────────
+  const dressingOpacity = useTransform(
+    scrollYProgress,
+    [0.25, 0.32, 0.58, 0.72],
+    [0, 1, 1, 0]
+  );
+  const dressingY = useTransform(
+    scrollYProgress,
+    [0.25, 0.72],
+    ["20%", "-30%"]
+  );
 
-  // Flying text transforms
-  const heritageX = useTransform(scrollYProgress, [0.25, 0.75], ["0vw", "-120vw"]);
-  const heritageOpacity = useTransform(scrollYProgress, [0.25, 0.3, 0.7, 0.75], [0, 1, 1, 0]);
-
-  const craftX = useTransform(scrollYProgress, [0.3, 0.75], ["0vw", "120vw"]);
-  const craftOpacity = useTransform(scrollYProgress, [0.3, 0.35, 0.7, 0.75], [0, 1, 1, 0]);
-
-  const powerY = useTransform(scrollYProgress, [0.35, 0.75], ["0vh", "-100vh"]);
-  const powerOpacity = useTransform(scrollYProgress, [0.35, 0.4, 0.65, 0.72], [0, 1, 1, 0]);
-
-  const tulimondScale = useTransform(scrollYProgress, [0.3, 0.75], [0.5, 4]);
-  const tulimondOpacity = useTransform(scrollYProgress, [0.3, 0.38, 0.6, 0.72], [0, 1, 1, 0]);
-
+  // ── PT monogram ───────────────────────────────────────
   const ptScale = useTransform(scrollYProgress, [0.25, 0.85], [1, 6]);
-  const ptOpacity = useTransform(scrollYProgress, [0.25, 0.32, 0.65, 0.75], [0, 0.3, 0.3, 0]);
+  const ptOpacity = useTransform(
+    scrollYProgress,
+    [0.25, 0.32, 0.65, 0.75],
+    [0, 0.3, 0.3, 0]
+  );
 
-  // Collection section entrance
+  // ── Collection section entrance ───────────────────────
   const collectionOpacity = useTransform(scrollYProgress, [0.82, 1.0], [0, 1]);
   const collectionY = useTransform(scrollYProgress, [0.82, 1.0], ["4%", "0%"]);
 
   return {
     containerRef,
-    bgScale,
+    storefrontScale,
+    storefrontOpacity,
+    insideClipPath,
     vignetteOpacity,
-    heroOpacity,
-    heroY,
-    heritageX,
-    heritageOpacity,
-    craftX,
-    craftOpacity,
-    powerY,
-    powerOpacity,
-    tulimondScale,
-    tulimondOpacity,
+    dressingOpacity,
+    dressingY,
     ptScale,
     ptOpacity,
     collectionOpacity,
