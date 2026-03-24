@@ -1,0 +1,302 @@
+// src/components/CollectionOverlay.tsx
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { type MotionValue, useMotionValueEvent } from "framer-motion";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MODEL_INVENTORY
+// Edit names, prices, and colorways here. Do not touch layout below this block.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type AccessType = "public" | "vault";
+
+interface OutfitItem {
+  id: string;
+  name: string;
+  collection: string;
+  colorway: string;
+  price: string;
+  type: AccessType;
+  dotPosition: string; // Full Tailwind literal — must be a static string, no runtime assembly
+}
+
+interface ModelSlot {
+  id: string;
+  position: string;  // Absolute position within overlay
+  scale: string;     // Tailwind scale class for depth illusion
+  outfit: OutfitItem[];
+}
+
+const MODEL_INVENTORY: ModelSlot[] = [
+  {
+    id: "lounge-model",
+    position: "left-[10%] bottom-[5%]",
+    scale: "scale-[0.9]",
+    outfit: [
+      {
+        id: "lounge-showstopper",
+        name: "The Showstopper",
+        collection: "The Constable",
+        colorway: "Ivory",
+        price: "$1,200",
+        type: "public",
+        dotPosition: "top-[40%] left-[50%]",
+      },
+      {
+        id: "lounge-heartbreaker",
+        name: "The Heartbreaker",
+        collection: "The Constable",
+        colorway: "Dark Grey",
+        price: "$1,400",
+        type: "vault",
+        dotPosition: "top-[22%] left-[45%]",
+      },
+    ],
+  },
+  {
+    id: "center-model",
+    position: "left-[40%] bottom-[2%]",
+    scale: "scale-[1.0]",
+    outfit: [
+      {
+        id: "center-showstopper",
+        name: "The Showstopper",
+        collection: "The Constable",
+        colorway: "Ivory",
+        price: "$1,500",
+        type: "public",
+        dotPosition: "top-[38%] left-[50%]",
+      },
+      {
+        id: "center-heartbreaker",
+        name: "The Heartbreaker",
+        collection: "The Constable",
+        colorway: "Dark Grey",
+        price: "$1,600",
+        type: "vault",
+        dotPosition: "top-[58%] left-[40%]",
+      },
+    ],
+  },
+  {
+    id: "vault-model",
+    position: "right-[25%] bottom-[8%]",
+    scale: "scale-[0.8]",
+    outfit: [
+      {
+        id: "vault-showstopper",
+        name: "The Showstopper",
+        collection: "The Constable",
+        colorway: "Ivory",
+        price: "$980",
+        type: "public",
+        dotPosition: "top-[40%] left-[50%]",
+      },
+      {
+        id: "vault-heartbreaker",
+        name: "The Heartbreaker",
+        collection: "The Constable",
+        colorway: "Dark Grey",
+        price: "$1,100",
+        type: "vault",
+        dotPosition: "top-[30%] left-[42%]",
+      },
+    ],
+  },
+  {
+    id: "rack-model",
+    position: "right-[5%] bottom-[5%]",
+    scale: "scale-[0.9]",
+    outfit: [
+      {
+        id: "rack-showstopper",
+        name: "The Showstopper",
+        collection: "The Constable",
+        colorway: "Ivory",
+        price: "$1,100",
+        type: "public",
+        dotPosition: "top-[55%] left-[50%]",
+      },
+      {
+        id: "rack-heartbreaker",
+        name: "The Heartbreaker",
+        collection: "The Constable",
+        colorway: "Dark Grey",
+        price: "$1,300",
+        type: "vault",
+        dotPosition: "top-[65%] left-[40%]",
+      },
+    ],
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HoverCard
+// ─────────────────────────────────────────────────────────────────────────────
+
+function HoverCard({ item, visible }: { item: OutfitItem; visible: boolean }) {
+  const isVault = item.type === "vault";
+
+  return (
+    <div
+      className="absolute left-6 top-1/2 z-30 w-48 transition-[opacity,transform] duration-500 pointer-events-none"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: `translateY(-50%) translateX(${visible ? "0px" : "16px"})`,
+      }}
+    >
+      <div className="bg-black/80 backdrop-blur-md border border-white/10 p-3 rounded-sm">
+        {/* Collection eyebrow — inline style required: .type-eyebrow hardcodes color:gold in globals.css */}
+        <p className="type-eyebrow mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+          {item.collection}
+        </p>
+
+        <p className="text-xs text-white mb-1">{item.name}</p>
+        <p className="text-[10px] text-white/50 mb-2">{item.colorway}</p>
+        <p className="text-xs font-bold text-white/90 mb-3">{item.price}</p>
+
+        {isVault ? (
+          <>
+            <p
+              className="text-[9px] tracking-widest uppercase mb-2"
+              style={{ color: "#D4B896" }}
+            >
+              Vault Access Required
+            </p>
+            <div className="w-full text-center text-[9px] tracking-widest uppercase py-2 border border-white/10 text-white/20 rounded-sm select-none">
+              Members Only
+            </div>
+          </>
+        ) : (
+          <div className="w-full text-center text-[9px] tracking-widest uppercase py-2 border border-white/30 text-white/70 rounded-sm select-none transition-colors duration-300">
+            Add to Cart
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PulseDot
+// ─────────────────────────────────────────────────────────────────────────────
+
+function PulseDot({ item, hovered }: { item: OutfitItem; hovered: boolean }) {
+  const isVault = item.type === "vault";
+  // #D4B896 = rgba(212,184,150) — single authoritative champagne gold, consistent with keyframes
+  const dotColor = isVault ? "#D4B896" : "#FFFFFF";
+  const glowColor = isVault ? "rgba(212,184,150,0.6)" : "rgba(255,255,255,0.8)";
+  const animation = isVault
+    ? "pulse-champagne 2s ease-in-out infinite"
+    : "pulse-white 2s ease-in-out infinite";
+
+  return (
+    <div className={`absolute ${item.dotPosition}`}>
+      <div className="relative">
+        <div
+          className="w-3 h-3 rounded-full cursor-pointer"
+          style={{
+            backgroundColor: dotColor,
+            boxShadow: `0 0 15px ${glowColor}`,
+            animation,
+          }}
+        />
+        <HoverCard item={item} visible={hovered} />
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ModelStage
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface ModelStageProps {
+  slot: ModelSlot;
+  index: number;
+  revealed: boolean;
+}
+
+function ModelStage({ slot, index, revealed }: ModelStageProps) {
+  const [hovered, setHovered] = useState(false);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Clean up pending leave timer on unmount to prevent setState on unmounted component.
+  useEffect(() => {
+    return () => clearTimeout(leaveTimer.current);
+  }, []);
+
+  // Small leave-delay lets the cursor travel from silhouette to hover card
+  // without the card blinking out mid-transit.
+  const handleEnter = () => {
+    clearTimeout(leaveTimer.current);
+    setHovered(true);
+  };
+  const handleLeave = () => {
+    leaveTimer.current = setTimeout(() => setHovered(false), 120);
+  };
+
+  return (
+    <div
+      className={`absolute pointer-events-auto transition-opacity duration-700 ${slot.position} ${slot.scale}`}
+      style={{
+        opacity: revealed ? 1 : 0,
+        transitionDelay: `${index * 150}ms`,
+      }}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      <div className="relative w-48 h-[80vh] flex items-end justify-center">
+        {/* Silhouette placeholder */}
+        <div
+          className="w-full h-full bg-white/10 border border-white/5 backdrop-blur-sm rounded-t-full transition-all duration-500"
+          style={{
+            transform: hovered ? "scale(1.05)" : "scale(1)",
+            borderColor: hovered ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)",
+          }}
+        >
+          <span className="absolute bottom-10 w-full text-center text-[10px] tracking-[0.3em] text-white/20 uppercase">
+            {slot.id}
+          </span>
+        </div>
+
+        {/* Pulse dots — one per outfit item */}
+        {slot.outfit.map((item) => (
+          <PulseDot key={item.id} item={item} hovered={hovered} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CollectionOverlay — exported default
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface Props {
+  opacity: MotionValue<number>;
+}
+
+export default function CollectionOverlay({ opacity }: Props) {
+  const [active, setActive] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+
+  useMotionValueEvent(opacity, "change", (v) => {
+    // Gate pointer-events — matches AtelierNav pattern exactly
+    setActive(v > 0.05);
+    // Stagger trigger — fires once when nav opacity reaches full
+    if (!revealed && v >= 0.99) setRevealed(true);
+  });
+
+  return (
+    <div
+      className="absolute inset-0 z-20"
+      style={{ pointerEvents: active ? "auto" : "none" }}
+    >
+      {MODEL_INVENTORY.map((slot, index) => (
+        <ModelStage key={slot.id} slot={slot} index={index} revealed={revealed} />
+      ))}
+    </div>
+  );
+}

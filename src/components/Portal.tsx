@@ -6,6 +6,7 @@ import { useAnimate } from "framer-motion";
 import { usePortalTransforms } from "@/hooks/usePortalTransforms";
 import PortalBackground from "@/components/PortalBackground";
 import AtelierNav from "@/components/AtelierNav";
+import CollectionOverlay from "@/components/CollectionOverlay";
 
 export default function Portal() {
   const t = usePortalTransforms();
@@ -53,6 +54,9 @@ export default function Portal() {
           insideFilter={t.insideFilter}
           showInside={t.showInside}
         />
+
+        {/* Model Stage — staggered silhouettes with pulse dots, reveals after walk-in */}
+        <CollectionOverlay opacity={t.navOpacity} />
 
         {/* Editorial nav — ghost overlay, reveals only once inside */}
         <AtelierNav opacity={t.navOpacity} />

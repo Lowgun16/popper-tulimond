@@ -183,6 +183,23 @@ body {
 }
 
 /* ─────────────────────────────────────────
+   Pulse Animations — Model Stage dots
+   Delivered via inline style= props (not Tailwind animate-* utilities)
+   so they are immune to Tailwind v4 content-scan purge.
+───────────────────────────────────────── */
+@keyframes pulse-white {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0    rgba(255,255,255,0.7); }
+  70%  { transform: scale(1);    box-shadow: 0 0 0 10px rgba(255,255,255,0);   }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0    rgba(255,255,255,0);   }
+}
+
+@keyframes pulse-champagne {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0    rgba(212,184,150,0.7); }
+  70%  { transform: scale(1);    box-shadow: 0 0 0 10px rgba(212,184,150,0);   }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0    rgba(212,184,150,0);   }
+}
+
+/* ─────────────────────────────────────────
    Divider Utility
 ───────────────────────────────────────── */
 .divider-gold {
