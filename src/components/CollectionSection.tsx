@@ -18,9 +18,6 @@ export default function CollectionSection({ opacity, y }: Props) {
         The Collection
       </p>
       <div className="divider-gold mx-auto mb-10" />
-      <h2 className="type-display" style={{ color: "var(--color-parchment)" }}>
-        Welcome to the World.
-      </h2>
       <p className="type-body mt-6 max-w-md" style={{ opacity: 0.6 }}>
         Each piece carries the weight of intention. Explore the full Popper Tulimond collection.
       </p>

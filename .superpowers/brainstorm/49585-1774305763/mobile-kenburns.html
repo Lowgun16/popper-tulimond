@@ -1,0 +1,267 @@
+<style>
+  body { background: #1a1917; color: #F2EDE4; font-family: Georgia, serif; }
+  .eyebrow { color: #C4A456; font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 8px; }
+  h2 { font-style: italic; font-weight: 300; font-size: 1.6rem; margin: 0 0 4px; }
+  .subtitle { color: rgba(242,237,228,0.5); font-size: 0.8rem; margin-bottom: 24px; }
+
+  .phone-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+
+  .stage-card { background: #0f0e0d; border: 1px solid #2e2c2a; border-radius: 4px; overflow: hidden; }
+  .stage-header { background: #1e1c1a; padding: 6px 10px; font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: #C4A456; display: flex; justify-content: space-between; }
+  .stage-pct { color: rgba(196,164,86,0.5); }
+
+  /* Phone shell */
+  .phone-wrap { padding: 10px; display: flex; justify-content: center; }
+  .phone { width: 72px; height: 156px; border: 2px solid #3A3835; border-radius: 10px; overflow: hidden; background: #272625; position: relative; }
+
+  /* Storefront image simulation — letterboxed */
+  .letterbox-top { background: #272625; height: 32px; width: 100%; }
+  .letterbox-bot { background: #272625; flex: 1; width: 100%; }
+
+  /* The actual storefront strip: 72px wide, 48px tall (3:2 ratio) */
+  .sf-strip {
+    width: 100%;
+    height: 48px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .sf-inner {
+    /* Full 3:2 image — 72px wide, 48px tall → shows full width */
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: linear-gradient(160deg, #2A2A2A 0%, #1A1A1A 100%);
+    transform-origin: 73% 50%;
+  }
+  .sf-door {
+    position: absolute;
+    right: 3%; top: 8%; width: 18%; height: 84%;
+    background: linear-gradient(135deg, #6A4020 0%, #3A1A08 60%, #5A3018 100%);
+    border: 1px solid #8B5A30;
+  }
+  .sf-text {
+    position: absolute;
+    left: 5%; top: 30%;
+    font-style: italic; font-size: 5px; color: rgba(196,164,86,0.7);
+    white-space: nowrap; line-height: 1.4;
+  }
+  .sf-seal {
+    position: absolute;
+    left: 22%; top: 55%; width: 14px; height: 14px;
+    background: rgba(196,164,86,0.2);
+    border-radius: 50%;
+  }
+  .keepout {
+    position: absolute; right: 0; top: 40%;
+    font-size: 3px; color: rgba(242,237,228,0.3);
+    border: 1px solid rgba(242,237,228,0.15);
+    padding: 1px 2px; letter-spacing: 0.05em;
+  }
+
+  /* Inside store strip */
+  .inside-strip {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #3A2510 0%, #6A4820 50%, #8A5830 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5px; color: rgba(196,164,86,0.4); letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Phone layout = flex column */
+  .phone-col { display: flex; flex-direction: column; height: 100%; }
+
+  /* Stage-specific transforms */
+  /* S1: 0% — full wall, no zoom */
+  .s1 .sf-inner { transform: scale(1.0) translateX(0%); }
+  .s1 .inside-strip { clip-path: inset(5% 70% 3% 5% round 1px); filter: blur(4px); }
+
+  /* S2: 30% — starting to zoom + pan */
+  .s2 .sf-inner { transform: scale(1.4) translateX(-14%); transform-origin: 73% 50%; }
+  .s2 .inside-strip { clip-path: inset(5% 70% 3% 5% round 1px); filter: blur(4px); }
+
+  /* S3: 70% — zoomed in, door opening */
+  .s3 .sf-inner { transform: scale(2.1) translateX(-38%); transform-origin: 73% 50%; }
+  .s3 .inside-strip { clip-path: inset(5% 25% 3% 30% round 1px); filter: blur(2px); }
+
+  /* S4: 100% — inside, nav visible */
+  .s4 .sf-inner { transform: scale(2.5) translateX(-55%); opacity: 0; transform-origin: 73% 50%; }
+  .s4 .inside-strip { clip-path: inset(0% 0% 0% 0%); filter: blur(0); }
+
+  /* Nav overlay */
+  .atelier-nav {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; flex-direction: column; align-items: center; padding: 6px 4px 4px;
+    z-index: 10; gap: 3px;
+  }
+  .nav-logo { font-style: italic; font-size: 6px; color: #F2EDE4; letter-spacing: 0.03em; }
+  .nav-links { display: flex; gap: 5px; font-size: 3.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(242,237,228,0.7); }
+
+  .stage-desc { padding: 8px 10px; font-size: 0.67rem; color: rgba(242,237,228,0.6); line-height: 1.5; border-top: 1px solid #1e1c1a; }
+  .stage-desc strong { color: #F2EDE4; font-style: italic; font-weight: 300; display: block; margin-bottom: 2px; font-size: 0.75rem; }
+
+  /* Math table */
+  .math-table { background: #0f0e0d; border: 1px solid #2e2c2a; border-radius: 3px; overflow: hidden; margin-bottom: 20px; }
+  .math-row { display: grid; grid-template-columns: 160px 1fr 1fr; border-bottom: 1px solid #1e1c1a; }
+  .math-row:last-child { border-bottom: none; }
+  .math-row.header { background: #1a1917; }
+  .mc { padding: 7px 12px; font-size: 0.68rem; line-height: 1.5; }
+  .mc.lbl { color: #C4A456; font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; }
+  .mc.key { color: #F2EDE4; }
+  .mc.val { font-family: monospace; font-size: 0.65rem; color: rgba(196,164,86,0.9); }
+  .mc.note { font-size: 0.62rem; color: rgba(242,237,228,0.45); }
+
+  .confirm-row { text-align: center; }
+  .confirm-btn { display: inline-block; border: 1px solid rgba(196,164,86,0.6); padding: 9px 28px; color: #C4A456; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; }
+  .confirm-btn:hover { background: rgba(196,164,86,0.08); }
+</style>
+
+<p class="eyebrow">Mobile Ken Burns — Revised Layout</p>
+<h2>Full wall → pan right → land on door</h2>
+<p class="subtitle">object-contain shows full width at load. Scale + translateX pan the camera toward the door as you scroll. Obsidian fills the letterbox.</p>
+
+<div class="phone-row">
+
+  <div class="stage-card">
+    <div class="stage-header"><span>Load</span><span class="stage-pct">0%</span></div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-col s1">
+          <div class="letterbox-top"></div>
+          <div class="sf-strip">
+            <div class="inside-strip">interior</div>
+            <div class="sf-inner">
+              <span class="sf-text">Popper<br>Tulimond</span>
+              <div class="sf-seal"></div>
+              <div class="sf-door"></div>
+              <div class="keepout">KEEP<br>OUT</div>
+            </div>
+          </div>
+          <div class="letterbox-bot"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-desc">
+      <strong>Full wall visible</strong>
+      object-contain: 100% width, 3:2 ratio. Popper Tulimond text + door both in frame. Obsidian letterbox top &amp; bottom.
+    </div>
+  </div>
+
+  <div class="stage-card">
+    <div class="stage-header"><span>Scrolling</span><span class="stage-pct">30%</span></div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-col s2">
+          <div class="letterbox-top"></div>
+          <div class="sf-strip">
+            <div class="inside-strip">interior</div>
+            <div class="sf-inner">
+              <span class="sf-text">Popper<br>Tulimond</span>
+              <div class="sf-seal"></div>
+              <div class="sf-door"></div>
+              <div class="keepout">KEEP<br>OUT</div>
+            </div>
+          </div>
+          <div class="letterbox-bot"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-desc">
+      <strong>Camera advancing</strong>
+      Scale 1.4×, pan right −14%. Brand text drifts off-left as door approaches center.
+    </div>
+  </div>
+
+  <div class="stage-card">
+    <div class="stage-header"><span>Threshold</span><span class="stage-pct">70%</span></div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-col s3">
+          <div class="letterbox-top"></div>
+          <div class="sf-strip" style="position:relative">
+            <div class="inside-strip" style="clip-path:inset(5% 25% 3% 30% round 1px);filter:blur(2px)">interior</div>
+            <div class="sf-inner" style="transform:scale(2.1) translateX(-38%);transform-origin:73% 50%">
+              <span class="sf-text">Popper<br>Tulimond</span>
+              <div class="sf-seal"></div>
+              <div class="sf-door"></div>
+              <div class="keepout">KEEP<br>OUT</div>
+            </div>
+          </div>
+          <div class="letterbox-bot"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-desc">
+      <strong>Door fills frame</strong>
+      Scale 2.1×, pan −38%. Door centered. Clip-path cracks open from door shape. Interior bleeds in with lens blur.
+    </div>
+  </div>
+
+  <div class="stage-card">
+    <div class="stage-header"><span>Inside</span><span class="stage-pct">100%</span></div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-col s4">
+          <div class="letterbox-top" style="background:transparent"></div>
+          <div class="sf-strip" style="position:relative;height:156px;margin-top:-32px">
+            <div class="inside-strip" style="clip-path:none;filter:none;font-size:6px">Interior</div>
+            <div class="sf-inner" style="opacity:0"></div>
+            <div class="atelier-nav">
+              <span class="nav-logo">Popper Tulimond</span>
+              <div class="nav-links"><span>Collection</span><span>Lookbook</span><span>About</span></div>
+            </div>
+          </div>
+          <div class="letterbox-bot" style="background:transparent"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-desc">
+      <strong>Full bleed inside</strong>
+      Interior fills viewport. Storefront gone. Editorial nav fades in at top.
+    </div>
+  </div>
+
+</div>
+
+<div class="math-table">
+  <div class="math-row header">
+    <div class="mc lbl">Property</div>
+    <div class="mc lbl">Mobile (portrait)</div>
+    <div class="mc lbl">Desktop</div>
+  </div>
+  <div class="math-row">
+    <div class="mc key">object-fit</div>
+    <div class="mc val">contain + object-[50%_12%]</div>
+    <div class="mc val">cover + object-center</div>
+  </div>
+  <div class="math-row">
+    <div class="mc key">Scale range</div>
+    <div class="mc val">1.0 → 2.5 (0–80% scroll)</div>
+    <div class="mc val">1.0 → 2.4 (0–82% scroll)</div>
+  </div>
+  <div class="math-row">
+    <div class="mc key">translateX</div>
+    <div class="mc val">0% → −55% (pan to door)</div>
+    <div class="mc val">0 (no pan)</div>
+  </div>
+  <div class="math-row">
+    <div class="mc key">Clip-path start</div>
+    <div class="mc val">inset(5% 25% 3% 30%) at 70%↑</div>
+    <div class="mc val">inset(8% 3% 3% 77%) at 60%↑</div>
+  </div>
+  <div class="math-row">
+    <div class="mc key">Spring</div>
+    <div class="mc val">stiffness:140 damping:30</div>
+    <div class="mc val">stiffness:80 damping:25</div>
+  </div>
+  <div class="math-row">
+    <div class="mc key">Viewport height</div>
+    <div class="mc val" style="color:#C4A456">100dvh (both)</div>
+    <div class="mc val" style="color:#C4A456">100dvh (both)</div>
+  </div>
+</div>
+
+<div class="confirm-row">
+  <div class="confirm-btn" data-choice="approve" onclick="toggleSelect(this)">Approve — Build This</div>
+</div>

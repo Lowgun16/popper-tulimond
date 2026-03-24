@@ -1,0 +1,117 @@
+<style>
+  body { background: #1a1917; color: #F2EDE4; font-family: Georgia, serif; }
+  .eyebrow { color: #C4A456; font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 8px; }
+  h2 { font-style: italic; font-weight: 300; font-size: 1.7rem; margin: 0 0 6px; }
+  .subtitle { color: rgba(242,237,228,0.55); font-size: 0.82rem; margin-bottom: 28px; }
+
+  .checklist {
+    background: #0f0e0d;
+    border: 1px solid #2e2c2a;
+    border-radius: 3px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+  }
+  .check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid #1e1c1a;
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+  .check-row:last-child { border-bottom: none; }
+  .check { color: #C4A456; flex-shrink: 0; font-size: 0.85rem; }
+  .check-label { color: #F2EDE4; }
+  .check-detail { color: rgba(242,237,228,0.5); font-size: 0.72rem; margin-top: 1px; }
+
+  .spec-card {
+    background: #0f0e0d;
+    border: 1px solid #2e2c2a;
+    border-radius: 3px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+  .spec-card h3 {
+    color: #C4A456;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-style: normal;
+    font-weight: 400;
+    margin: 0 0 12px;
+  }
+  .code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.68rem;
+    color: rgba(242,237,228,0.7);
+    line-height: 1.8;
+    white-space: pre;
+  }
+  .highlight { color: #C4A456; }
+</style>
+
+<p class="eyebrow">Atelier First — Built</p>
+<h2>Live at localhost:3000</h2>
+<p class="subtitle">Scroll the page to walk through the door. Nav appears only once you're inside.</p>
+
+<div class="checklist">
+  <div class="check-row">
+    <span class="check">✓</span>
+    <div>
+      <div class="check-label">Hero section deleted</div>
+      <div class="check-detail">page.tsx now renders Portal only. Hero.tsx untouched but unused.</div>
+    </div>
+  </div>
+  <div class="check-row">
+    <span class="check">✓</span>
+    <div>
+      <div class="check-label">Storefront flush to top — zero gap</div>
+      <div class="check-detail">Removed flex-col from body, storefront fills viewport edge-to-edge.</div>
+    </div>
+  </div>
+  <div class="check-row">
+    <span class="check">✓</span>
+    <div>
+      <div class="check-label">Fast zoom (1.0× → 2.4×) over 82% of scroll range</div>
+      <div class="check-detail">Spring-smoothed for camera inertia feeling.</div>
+    </div>
+  </div>
+  <div class="check-row">
+    <span class="check">✓</span>
+    <div>
+      <div class="check-label">Door clip-path opens 60–90% scroll</div>
+      <div class="check-detail">inset(8% 3% 3% 77%) → inset(0% 0% 0% 0%) targeting actual door, right side.</div>
+    </div>
+  </div>
+  <div class="check-row">
+    <span class="check">✓</span>
+    <div>
+      <div class="check-label">Lens-depth blur 5px → 0px</div>
+      <div class="check-detail">Applied to inside-store layer during opening. Simulates lens focus as you pass through.</div>
+    </div>
+  </div>
+  <div class="check-row">
+    <span class="check">✓</span>
+    <div>
+      <div class="check-label">Parallax: zoom faster than reveal</div>
+      <div class="check-detail">Storefront zooms 0–82%. Door opens 60–90%. The lag creates physical depth.</div>
+    </div>
+  </div>
+  <div class="check-row">
+    <span class="check">✓</span>
+    <div>
+      <div class="check-label">Option B editorial nav — 93–100% fade-in</div>
+      <div class="check-detail">Fixed, centered, no background. Logo + Collection / Lookbook / About / Contact. Pointer events disabled until visible.</div>
+    </div>
+  </div>
+</div>
+
+<div class="spec-card">
+  <h3>Transform Map</h3>
+  <div class="code"><span class="highlight">storefrontScale</span>   smoothProgress [0, 0.82]   → [1.0, 2.4]
+<span class="highlight">storefrontOpacity</span>  scrollYProgress [0.75, 0.92] → [1, 0]
+<span class="highlight">insideClipPath</span>     scrollYProgress [0.60, 0.90] → door → full
+<span class="highlight">insideFilter</span>       scrollYProgress [0.60, 0.90] → blur(5px) → blur(0px)
+<span class="highlight">navOpacity</span>         scrollYProgress [0.93, 1.00] → [0, 1]</div>
+</div>

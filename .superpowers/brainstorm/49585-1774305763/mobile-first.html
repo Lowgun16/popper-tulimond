@@ -1,0 +1,260 @@
+<style>
+  body { background: #1a1917; color: #F2EDE4; font-family: Georgia, serif; }
+  .eyebrow { color: #C4A456; font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 8px; }
+  h2 { font-style: italic; font-weight: 300; font-size: 1.6rem; margin: 0 0 4px; }
+  .subtitle { color: rgba(242,237,228,0.5); font-size: 0.8rem; margin-bottom: 24px; }
+
+  /* ── DEVICE SPLIT ── */
+  .device-split { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 28px; }
+
+  .device { background: #0f0e0d; border: 1px solid #2e2c2a; border-radius: 4px; overflow: hidden; }
+  .device-label { background: #2e2c2a; padding: 6px 12px; font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: #C4A456; display: flex; justify-content: space-between; }
+  .device-sub { color: rgba(196,164,86,0.5); }
+
+  /* Phone simulation */
+  .phone-shell {
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+  }
+  .phone-screen {
+    width: 70px;
+    height: 150px;
+    border: 2px solid #3A3835;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    background: #111;
+  }
+
+  /* Desktop screen sim */
+  .desktop-screen {
+    height: 150px;
+    border-top: 1px solid #3A3835;
+    overflow: hidden;
+    position: relative;
+    background: #111;
+  }
+
+  /* Image crop simulation */
+  .wall { background: linear-gradient(160deg, #2A2A2A 0%, #1A1A1A 100%); width: 100%; height: 100%; position: relative; }
+  .door-shape {
+    position: absolute;
+    background: linear-gradient(135deg, #6A4020 0%, #3A1A08 60%, #5A3018 100%);
+    border: 1px solid #8B5A30;
+  }
+  .brand-text {
+    position: absolute;
+    font-style: italic;
+    color: rgba(196,164,86,0.6);
+    font-size: 6px;
+    white-space: nowrap;
+    transform-origin: left center;
+  }
+  .keep-out-label {
+    position: absolute;
+    font-size: 4px;
+    color: rgba(242,237,228,0.4);
+    border: 1px solid rgba(242,237,228,0.2);
+    padding: 1px 2px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Mobile BEFORE: object-center — door off screen */
+  .phone-before .wall {
+    width: 230px;           /* image is 230% of phone width */
+    position: absolute;
+    left: -80px;            /* cropped to center */
+    top: 0; bottom: 0;
+  }
+  .phone-before .door-shape { right: 20px; top: 8%; width: 30px; height: 84%; }
+  .phone-before .brand-text { left: 10px; top: 38%; font-size: 5px; }
+  .phone-before .keep-out-label { right: 2px; top: 45%; }
+
+  /* Viewport crop indicator */
+  .viewport-mask {
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 3px rgba(255,80,80,0.6);
+    pointer-events: none;
+  }
+  .door-crop-warning {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: rgba(255,80,80,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5px;
+    color: rgba(255,120,120,0.8);
+    letter-spacing: 0;
+    text-align: center;
+    border-left: 1px solid rgba(255,80,80,0.4);
+  }
+
+  /* Mobile AFTER: object-position 75% — door in center */
+  .phone-after .wall {
+    width: 230px;
+    position: absolute;
+    left: -130px;           /* shifted right to show door */
+    top: 0; bottom: 0;
+  }
+  .phone-after .door-shape { right: 20px; top: 8%; width: 30px; height: 84%; }
+  .phone-after .brand-text { left: 10px; top: 38%; font-size: 5px; }
+  .phone-after .keep-out-label { right: 2px; top: 45%; }
+
+  .door-visible-box {
+    position: absolute;
+    top: 8%; bottom: 2%;
+    left: 23px; right: 2px;
+    border: 1px dashed rgba(196,164,86,0.5);
+    pointer-events: none;
+  }
+
+  /* Desktop: object-center — door on right */
+  .desktop-viewport .wall { width: 100%; height: 100%; }
+  .desktop-viewport .door-shape { right: 3%; top: 8%; width: 15%; height: 84%; }
+  .desktop-viewport .brand-text { left: 5%; top: 45%; font-size: 8px; }
+  .desktop-viewport .keep-out-label { right: 0; top: 45%; font-size: 5px; }
+
+  /* Clip-path visualization */
+  .clip-viz {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* ── CHANGES TABLE ── */
+  .changes { margin-bottom: 24px; }
+  .change-row {
+    display: grid;
+    grid-template-columns: 2fr 3fr 3fr;
+    gap: 0;
+    border-bottom: 1px solid #1e1c1a;
+  }
+  .change-row:first-child { background: #1e1c1a; }
+  .change-cell {
+    padding: 8px 12px;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    border-right: 1px solid #1e1c1a;
+  }
+  .change-cell:last-child { border-right: none; }
+  .change-cell.header { font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: #C4A456; font-family: 'Courier New', monospace; }
+  .change-cell .label { color: #F2EDE4; font-weight: 400; display: block; margin-bottom: 2px; }
+  .change-cell .old { color: rgba(242,237,228,0.4); font-size: 0.65rem; font-family: monospace; text-decoration: line-through; }
+  .change-cell .new-val { color: #C4A456; font-size: 0.65rem; font-family: monospace; }
+
+  .confirm-btn {
+    display: inline-block;
+    border: 1px solid rgba(196,164,86,0.6);
+    padding: 9px 28px;
+    color: #C4A456;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .confirm-btn:hover { background: rgba(196,164,86,0.08); }
+</style>
+
+<p class="eyebrow">Mobile-First Pass</p>
+<h2>5 Targeted Changes</h2>
+<p class="subtitle">99% mobile traffic. Every change below serves the thumb, not the cursor.</p>
+
+<!-- Device comparison -->
+<div class="device-split">
+  <div>
+    <div class="device">
+      <div class="device-label"><span>Mobile Before</span><span class="device-sub">object-center ✗</span></div>
+      <div class="phone-shell">
+        <div class="phone-screen">
+          <div class="phone-before">
+            <div class="wall">
+              <span class="brand-text">Popper Tulimond</span>
+              <div class="door-shape"></div>
+              <div class="keep-out-label">KEEP OUT</div>
+            </div>
+          </div>
+          <div class="door-crop-warning">door<br>off<br>screen</div>
+          <div class="viewport-mask"></div>
+        </div>
+      </div>
+    </div>
+    <div class="device" style="margin-top:10px">
+      <div class="device-label"><span>Mobile After</span><span class="device-sub">object-[75%] ✓</span></div>
+      <div class="phone-shell">
+        <div class="phone-screen">
+          <div class="phone-after">
+            <div class="wall">
+              <span class="brand-text">Popper</span>
+              <div class="door-shape"></div>
+              <div class="keep-out-label">KEEP OUT</div>
+            </div>
+          </div>
+          <div class="door-visible-box"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="device">
+    <div class="device-label"><span>Desktop</span><span class="device-sub">object-center (unchanged)</span></div>
+    <div class="desktop-screen">
+      <div class="desktop-viewport">
+        <div class="wall">
+          <span class="brand-text">Popper Tulimond</span>
+          <div class="door-shape"></div>
+          <div class="keep-out-label">KEEP<br>OUT</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:10px 12px; font-size:0.7rem; color:rgba(242,237,228,0.5); border-top:1px solid #1e1c1a;">
+      Door stays at right 15% of viewport. Clip-path: <span style="color:#C4A456;font-family:monospace;font-size:0.65rem">inset(8% 3% 3% 77%)</span> unchanged.
+    </div>
+  </div>
+</div>
+
+<!-- Changes table -->
+<div class="changes">
+  <div style="background:#0f0e0d;border:1px solid #2e2c2a;border-radius:3px;overflow:hidden;">
+    <div class="change-row">
+      <div class="change-cell header">Change</div>
+      <div class="change-cell header">Before</div>
+      <div class="change-cell header">After</div>
+    </div>
+    <div class="change-row">
+      <div class="change-cell"><span class="label">Clip-path (mobile)</span></div>
+      <div class="change-cell"><span class="old">inset(8% 3% 3% 77%)</span><br><span style="font-size:0.62rem;color:rgba(242,237,228,0.4)">door off-screen</span></div>
+      <div class="change-cell"><span class="new-val">inset(5% 38% 3% 28%)</span><br><span style="font-size:0.62rem;color:rgba(242,237,228,0.4)">centered on door</span></div>
+    </div>
+    <div class="change-row">
+      <div class="change-cell"><span class="label">Spring (touch tuning)</span></div>
+      <div class="change-cell"><span class="old">stiffness:80 damping:25</span><br><span style="font-size:0.62rem;color:rgba(242,237,228,0.4)">sluggish on flicks</span></div>
+      <div class="change-cell"><span class="new-val">stiffness:140 damping:30</span><br><span style="font-size:0.62rem;color:rgba(242,237,228,0.4)">mobile / <span style="color:rgba(196,164,86,0.6)">80/25</span> desktop</span></div>
+    </div>
+    <div class="change-row">
+      <div class="change-cell"><span class="label">Viewport height</span></div>
+      <div class="change-cell"><span class="old">h-screen (100vh)</span><br><span style="font-size:0.62rem;color:rgba(242,237,228,0.4)">address bar causes jump</span></div>
+      <div class="change-cell"><span class="new-val">h-[100dvh]</span><br><span style="font-size:0.62rem;color:rgba(242,237,228,0.4)">dynamic, no bar shift</span></div>
+    </div>
+    <div class="change-row">
+      <div class="change-cell"><span class="label">Interior image load</span></div>
+      <div class="change-cell"><span class="old">renders at mount</span><br><span style="font-size:0.62rem;color:rgba(242,237,228,0.4)">wastes bandwidth on load</span></div>
+      <div class="change-cell"><span class="new-val">deferred until scroll &gt;35%</span><br><span style="font-size:0.62rem;color:rgba(242,237,228,0.4)">storefront loads first</span></div>
+    </div>
+    <div class="change-row" style="border-bottom:none">
+      <div class="change-cell"><span class="label">Nav (mobile)</span></div>
+      <div class="change-cell"><span class="old">pt-10, small links</span><br><span style="font-size:0.62rem;color:rgba(242,237,228,0.4)">link tap targets too small</span></div>
+      <div class="change-cell"><span class="new-val">larger logo, py-3 tap targets</span><br><span style="font-size:0.62rem;color:rgba(242,237,228,0.4)">min 44px touch height</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center">
+  <div class="confirm-btn" data-choice="approve" onclick="toggleSelect(this)">Approve — Build It</div>
+</div>

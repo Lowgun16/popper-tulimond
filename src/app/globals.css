@@ -1,26 +1,192 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────
+   Design Tokens — Popper Tulimond
+   Dark Heritage Luxury
+───────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Core */
+  --color-gold:         #C4A456;
+  --color-gold-light:   #D4BC7A;
+  --color-gold-dark:    #8B6F2A;
+  --color-seal:         #8E2020;
+  --color-seal-dark:    #5A1010;
+
+  /* Surfaces */
+  --color-obsidian:     #272625;
+  --color-obsidian-mid: #3A3835;
+  --color-obsidian-soft:#4A4744;
+  --color-parchment:    #F2EDE4;
+  --color-cream:        #EDE6D6;
+  --color-ash:          #3A3835;
+
+  /* Fonts */
+  --font-display: var(--font-display);
+  --font-title:   var(--font-title);
+  --font-body:    var(--font-body);
 }
 
+/* ─────────────────────────────────────────
+   Tailwind v4 Theme Registration
+───────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Colors */
+  --color-gold:           var(--color-gold);
+  --color-gold-light:     var(--color-gold-light);
+  --color-gold-dark:      var(--color-gold-dark);
+  --color-seal:           var(--color-seal);
+  --color-seal-dark:      var(--color-seal-dark);
+  --color-obsidian:       var(--color-obsidian);
+  --color-obsidian-mid:   var(--color-obsidian-mid);
+  --color-obsidian-soft:  var(--color-obsidian-soft);
+  --color-parchment:      var(--color-parchment);
+  --color-cream:          var(--color-cream);
+  --color-ash:            var(--color-ash);
+
+  /* Fonts */
+  --font-display: var(--font-display);
+  --font-title:   var(--font-title);
+  --font-body:    var(--font-body);
+
+  /* Letter spacing */
+  --tracking-luxury:  0.2em;
+  --tracking-wide:    0.1em;
+  --tracking-tight:   -0.02em;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─────────────────────────────────────────
+   Base Styles
+───────────────────────────────────────── */
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-obsidian);
+  color: var(--color-parchment);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─────────────────────────────────────────
+   Typography Scale
+───────────────────────────────────────── */
+
+/* Display — hero editorial headlines */
+.type-display {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  line-height: 1.0;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-parchment);
+}
+
+/* Heading — section titles, brand name */
+.type-heading {
+  font-family: var(--font-title), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-luxury);
+  text-transform: uppercase;
+}
+
+/* Gold heading variant */
+.type-heading-gold {
+  font-family: var(--font-title), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-luxury);
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+/* Eyebrow — small label above headlines */
+.type-eyebrow {
+  font-family: var(--font-title), Georgia, serif;
+  font-weight: 400;
+  font-size: 0.65rem;
+  letter-spacing: var(--tracking-luxury);
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+/* Body — paragraph copy */
+.type-body {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--color-cream);
+}
+
+/* Caption — fine print, tags */
+.type-caption {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 300;
+  font-size: 0.6875rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-obsidian-soft);
+}
+
+/* ─────────────────────────────────────────
+   Gold Gradient Utility
+───────────────────────────────────────── */
+.text-gold-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--color-gold-dark)  0%,
+    var(--color-gold)       40%,
+    var(--color-gold-light) 60%,
+    var(--color-gold)       80%,
+    var(--color-gold-dark)  100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─────────────────────────────────────────
+   Breakpoint Asset Crossfade
+   Both layers live in the DOM at all times.
+   CSS opacity fades between them when the
+   viewport crosses 768px — no JS, no blink.
+───────────────────────────────────────── */
+.bp-mobile {
+  opacity: 1;
+  transition: opacity 500ms ease;
+}
+@media (min-width: 768px) {
+  .bp-mobile {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.bp-desktop {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 500ms ease;
+}
+@media (min-width: 768px) {
+  .bp-desktop {
+    opacity: 1;
+    pointer-events: none;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Divider Utility
+───────────────────────────────────────── */
+.divider-gold {
+  width: 3rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
 }
