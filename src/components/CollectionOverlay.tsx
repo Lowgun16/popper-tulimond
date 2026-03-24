@@ -23,16 +23,20 @@ interface OutfitItem {
 
 interface ModelSlot {
   id: string;
-  position: string;  // Absolute position within overlay
-  scale: string;     // Tailwind scale class for depth illusion
+  position: string;   // Responsive Tailwind position — includes sm:/md: breakpoints
+  scale: string;      // Desktop scale: "md:scale-[X]" — applied at md+ breakpoint
+  mobileScale: string;// Mobile scale: "scale-[X]" — base (mobile-first), overridden by scale
+  zIndex: number;     // Depth perception: center=30 (closest), vault=10 (furthest)
   outfit: OutfitItem[];
 }
 
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[10%] bottom-[5%]",
-    scale: "scale-[0.9]",
+    position: "left-[5%] sm:left-[7%] md:left-[10%] bottom-[5%]",
+    scale: "md:scale-[0.9]",
+    mobileScale: "scale-[0.6]",
+    zIndex: 20,
     outfit: [
       {
         id: "lounge-showstopper",
@@ -56,8 +60,10 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "center-model",
-    position: "left-[40%] bottom-[2%]",
-    scale: "scale-[1.0]",
+    position: "left-[35%] sm:left-[37%] md:left-[40%] bottom-[2%]",
+    scale: "md:scale-[1.0]",
+    mobileScale: "scale-[0.7]",
+    zIndex: 30,
     outfit: [
       {
         id: "center-showstopper",
@@ -81,8 +87,10 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "vault-model",
-    position: "right-[25%] bottom-[8%]",
-    scale: "scale-[0.8]",
+    position: "right-[18%] sm:right-[21%] md:right-[25%] bottom-[8%]",
+    scale: "md:scale-[0.8]",
+    mobileScale: "scale-[0.5]",
+    zIndex: 10,
     outfit: [
       {
         id: "vault-showstopper",
@@ -106,8 +114,10 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "rack-model",
-    position: "right-[5%] bottom-[5%]",
-    scale: "scale-[0.9]",
+    position: "right-[2%] sm:right-[3%] md:right-[5%] bottom-[5%]",
+    scale: "md:scale-[0.9]",
+    mobileScale: "scale-[0.6]",
+    zIndex: 20,
     outfit: [
       {
         id: "rack-showstopper",
@@ -239,15 +249,16 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
 
   return (
     <div
-      className={`absolute pointer-events-auto transition-opacity duration-700 ${slot.position} ${slot.scale}`}
+      className={`absolute pointer-events-auto transition-opacity duration-700 ${slot.position} ${slot.mobileScale} ${slot.scale}`}
       style={{
         opacity: revealed ? 1 : 0,
         transitionDelay: `${index * 150}ms`,
+        zIndex: slot.zIndex,
       }}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      <div className="relative w-48 h-[80vh] flex items-end justify-center">
+      <div className="relative w-24 sm:w-32 md:w-48 h-[80vh] flex items-end justify-center">
         {/* Silhouette placeholder */}
         <div
           className="w-full h-full bg-white/10 border border-white/5 backdrop-blur-sm rounded-t-full transition-all duration-500"
@@ -256,7 +267,7 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
             borderColor: hovered ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)",
           }}
         >
-          <span className="absolute bottom-10 w-full text-center text-[10px] tracking-[0.3em] text-white/20 uppercase">
+          <span className="absolute bottom-10 w-full text-center text-[10px] tracking-[0.3em] text-white/20 uppercase hidden md:block">
             {slot.id}
           </span>
         </div>
