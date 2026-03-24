@@ -33,7 +33,7 @@ interface ModelSlot {
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[5%] sm:left-[7%] md:left-[10%] bottom-[5%]",
+    position: "left-[5%] sm:left-[7%] md:left-[10%] bottom-0 md:bottom-[5%]",
     scale: "md:scale-[0.9]",
     mobileScale: "scale-[0.6]",
     zIndex: 20,
@@ -60,7 +60,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "center-model",
-    position: "left-[35%] sm:left-[37%] md:left-[40%] bottom-[2%]",
+    position: "left-[35%] sm:left-[37%] md:left-[40%] bottom-0 md:bottom-[2%]",
     scale: "md:scale-[1.0]",
     mobileScale: "scale-[0.7]",
     zIndex: 30,
@@ -87,7 +87,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "vault-model",
-    position: "right-[18%] sm:right-[21%] md:right-[25%] bottom-[8%]",
+    position: "right-[18%] sm:right-[21%] md:right-[25%] bottom-0 md:bottom-[8%]",
     scale: "md:scale-[0.8]",
     mobileScale: "scale-[0.5]",
     zIndex: 10,
@@ -114,7 +114,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "rack-model",
-    position: "right-[2%] sm:right-[3%] md:right-[5%] bottom-[5%]",
+    position: "right-[2%] sm:right-[3%] md:right-[5%] bottom-0 md:bottom-[5%]",
     scale: "md:scale-[0.9]",
     mobileScale: "scale-[0.6]",
     zIndex: 20,
@@ -192,7 +192,7 @@ function HoverCard({ item, visible }: { item: OutfitItem; visible: boolean }) {
 // PulseDot
 // ─────────────────────────────────────────────────────────────────────────────
 
-function PulseDot({ item, hovered }: { item: OutfitItem; hovered: boolean }) {
+function PulseDot({ item, hovered, tapped }: { item: OutfitItem; hovered: boolean; tapped: boolean }) {
   const isVault = item.type === "vault";
   // #D4B896 = rgba(212,184,150) — single authoritative champagne gold, consistent with keyframes
   const dotColor = isVault ? "#D4B896" : "#FFFFFF";
@@ -212,7 +212,7 @@ function PulseDot({ item, hovered }: { item: OutfitItem; hovered: boolean }) {
             animation,
           }}
         />
-        <HoverCard item={item} visible={hovered} />
+        <HoverCard item={item} visible={hovered || tapped} />
       </div>
     </div>
   );
@@ -230,6 +230,7 @@ interface ModelStageProps {
 
 function ModelStage({ slot, index, revealed }: ModelStageProps) {
   const [hovered, setHovered] = useState(false);
+  const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Clean up pending leave timer on unmount to prevent setState on unmounted component.
@@ -247,6 +248,14 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
     leaveTimer.current = setTimeout(() => setHovered(false), 120);
   };
 
+  // Tap: toggle primary item card (first outfit item). Works on mobile and desktop click.
+  const handleTap = () => {
+    const primaryId = slot.outfit[0].id;
+    setActiveItemId((prev) => (prev === primaryId ? null : primaryId));
+  };
+
+  const isActive = hovered || activeItemId !== null;
+
   return (
     <div
       className={`absolute pointer-events-auto transition-opacity duration-700 ${slot.position} ${slot.mobileScale} ${slot.scale}`}
@@ -258,14 +267,16 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      <div className="relative w-24 sm:w-32 md:w-48 h-[80vh] flex items-end justify-center">
+      <div className="relative w-24 sm:w-32 md:w-48 h-[50vh] sm:h-[55vh] md:h-[80vh] flex items-end justify-center">
         {/* Silhouette placeholder */}
         <div
-          className="w-full h-full bg-white/10 border border-white/5 backdrop-blur-sm rounded-t-full transition-all duration-500"
+          className="w-full h-full bg-white/10 border border-white/5 backdrop-blur-sm rounded-t-full transition-all duration-500 cursor-pointer"
           style={{
-            transform: hovered ? "scale(1.05)" : "scale(1)",
-            borderColor: hovered ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)",
+            transform: isActive ? "scale(1.05)" : "scale(1)",
+            borderColor: isActive ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)",
+            boxShadow: activeItemId ? "0 0 40px rgba(255,255,255,0.12), inset 0 0 60px rgba(255,255,255,0.04)" : "none",
           }}
+          onClick={handleTap}
         >
           <span className="absolute bottom-10 w-full text-center text-[10px] tracking-[0.3em] text-white/20 uppercase hidden md:block">
             {slot.id}
@@ -274,7 +285,7 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
 
         {/* Pulse dots — one per outfit item */}
         {slot.outfit.map((item) => (
-          <PulseDot key={item.id} item={item} hovered={hovered} />
+          <PulseDot key={item.id} item={item} hovered={hovered} tapped={activeItemId === item.id} />
         ))}
       </div>
     </div>
