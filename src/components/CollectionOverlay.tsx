@@ -1,8 +1,16 @@
 // src/components/CollectionOverlay.tsx
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, type MotionValue, useMotionValueEvent } from "framer-motion";
+import { useEffect, useRef, useState, useCallback } from "react";
+import {
+  motion,
+  type MotionValue,
+  useMotionValue,
+  useMotionValueEvent,
+} from "framer-motion";
+import { StudioInspector } from "./studio/StudioInspector";
+import { modelSlotToStudio, exportInventoryCode } from "./studio/studioUtils";
+import type { StudioSlot, StudioDot } from "./studio/studioTypes";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODEL_INVENTORY
@@ -14,7 +22,7 @@ const SHOW_VAULT_DOTS = false;
 
 type AccessType = "public" | "vault";
 
-interface OutfitItem {
+export interface OutfitItem {
   id: string;
   name: string;
   collection: string;
@@ -24,13 +32,13 @@ interface OutfitItem {
   dotPosition: string; // Full Tailwind literal — must be a static string, no runtime assembly
 }
 
-interface ModelSlot {
+export interface ModelSlot {
   id: string;
-  position: string;   // Responsive Tailwind position — includes sm:/md: breakpoints
-  scale: string;      // Desktop scale: "md:scale-[X]" — applied at md+ breakpoint
-  mobileScale: string;// Mobile scale: "scale-[X]" — base (mobile-first), overridden by scale
-  zIndex: number;     // Depth perception: center=40 (closest), vault=20 (furthest)
-  imageSrc: string;   // Path relative to /public
+  position: string;    // Responsive Tailwind position — includes sm:/md: breakpoints
+  scale: string;       // Desktop scale: "md:scale-[X]" — applied at md+ breakpoint
+  mobileScale: string; // Mobile scale: "scale-[X]" — base (mobile-first), overridden by scale
+  zIndex: number;      // Depth perception: center=40 (closest), vault=20 (furthest)
+  imageSrc: string;    // Path relative to /public
   outfit: OutfitItem[];
 }
 
@@ -153,8 +161,14 @@ const MODEL_INVENTORY: ModelSlot[] = [
 // HoverCard
 // ─────────────────────────────────────────────────────────────────────────────
 
-function HoverCard({ item, visible }: { item: OutfitItem; visible: boolean }) {
+function HoverCard({ item, visible }: { item: OutfitItem | StudioDot; visible: boolean }) {
   const isVault = item.type === "vault";
+
+  // Support both raw OutfitItem and StudioDot shapes
+  const name       = "name"       in item ? item.name       : "";
+  const collection = "collection" in item ? item.collection : "";
+  const colorway   = "colorway"   in item ? item.colorway   : "";
+  const price      = "price"      in item ? item.price      : "";
 
   return (
     <div
@@ -165,21 +179,16 @@ function HoverCard({ item, visible }: { item: OutfitItem; visible: boolean }) {
       }}
     >
       <div className="bg-black/80 backdrop-blur-md border border-white/10 p-3 rounded-sm">
-        {/* Collection eyebrow — inline style required: .type-eyebrow hardcodes color:gold in globals.css */}
         <p className="type-eyebrow mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>
-          {item.collection}
+          {collection}
         </p>
-
-        <p className="text-xs text-white mb-1">{item.name}</p>
-        <p className="text-[10px] text-white/50 mb-2">{item.colorway}</p>
-        <p className="text-xs font-bold text-white/90 mb-3">{item.price}</p>
+        <p className="text-xs text-white mb-1">{name}</p>
+        <p className="text-[10px] text-white/50 mb-2">{colorway}</p>
+        <p className="text-xs font-bold text-white/90 mb-3">{price}</p>
 
         {isVault ? (
           <>
-            <p
-              className="text-[9px] tracking-widest uppercase mb-2"
-              style={{ color: "#D4B896" }}
-            >
+            <p className="text-[9px] tracking-widest uppercase mb-2" style={{ color: "#D4B896" }}>
               Vault Access Required
             </p>
             <div className="w-full text-center text-[9px] tracking-widest uppercase py-2 border border-white/10 text-white/20 rounded-sm select-none">
@@ -201,44 +210,80 @@ function HoverCard({ item, visible }: { item: OutfitItem; visible: boolean }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface PulseDotProps {
-  item: OutfitItem;
+  // Normal mode
+  item?: OutfitItem;
+  // Studio mode
+  studioDot?: StudioDot;
   hovered: boolean;
   tapped: boolean;
   isEditMode: boolean;
+  isStudioMode: boolean;
   modelId: string;
   onDotDrop: (text: string) => void;
+  onStudioDotDrop?: (dotId: string, topPct: number, leftPct: number) => void;
 }
 
-function PulseDot({ item, hovered, tapped, isEditMode, modelId, onDotDrop }: PulseDotProps) {
-  const isVault = item.type === "vault";
-  // #D4B896 = rgba(212,184,150) — single authoritative champagne gold, consistent with keyframes
+function PulseDot({
+  item,
+  studioDot,
+  hovered,
+  tapped,
+  isEditMode,
+  isStudioMode,
+  modelId,
+  onDotDrop,
+  onStudioDotDrop,
+}: PulseDotProps) {
+  const dot = studioDot ?? item!;
+  const isVault = dot.type === "vault";
   const dotColor = isVault ? "#D4B896" : "#FFFFFF";
   const glowColor = isVault ? "rgba(212,184,150,0.6)" : "rgba(255,255,255,0.8)";
   const animation = isVault
     ? "pulse-champagne 2s ease-in-out infinite"
     : "pulse-white 2s ease-in-out infinite";
 
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: { point: { x: number; y: number } }) => {
+  const draggable = isEditMode || isStudioMode;
+
+  const handleDragEnd = (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: { point: { x: number; y: number } }
+  ) => {
     const target = event.target as HTMLElement;
     const container = target.closest(".model-container");
     if (!container) return;
     const rect = container.getBoundingClientRect();
     const x = ((info.point.x - rect.left) / rect.width) * 100;
     const y = ((info.point.y - rect.top) / rect.height) * 100;
-    const text = `${modelId} · ${item.id}: top-[${y.toFixed(1)}%] left-[${x.toFixed(1)}%]`;
-    console.log(text);
-    onDotDrop(text);
+
+    if (isStudioMode && onStudioDotDrop) {
+      onStudioDotDrop(dot.id, y, x);
+    } else {
+      const text = `${modelId} · ${dot.id}: top-[${y.toFixed(1)}%] left-[${x.toFixed(1)}%]`;
+      console.log(text);
+      onDotDrop(text);
+    }
   };
+
+  // In studio mode, position via inline style from studioDot percentages
+  const positionStyle = isStudioMode && studioDot
+    ? { position: "absolute" as const, top: `${studioDot.topPct}%`, left: `${studioDot.leftPct}%` }
+    : undefined;
+
+  const positionClass = !isStudioMode && item
+    ? `absolute z-20 ${item.dotPosition}`
+    : "absolute z-20";
 
   return (
     <motion.div
-      className={`absolute z-20 ${item.dotPosition}`}
-      drag={isEditMode}
+      className={positionClass}
+      style={positionStyle
+        ? { ...positionStyle, zIndex: 20, cursor: draggable ? "grab" : undefined }
+        : { cursor: draggable ? "grab" : undefined }}
+      drag={draggable}
       dragMomentum={false}
       dragElastic={0}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onDragEnd={handleDragEnd as any}
-      style={{ cursor: isEditMode ? "grab" : undefined }}
       whileDrag={{ cursor: "grabbing", scale: 1.5 }}
     >
       <div className="relative">
@@ -246,15 +291,14 @@ function PulseDot({ item, hovered, tapped, isEditMode, modelId, onDotDrop }: Pul
           className="w-3 h-3 rounded-full"
           style={{
             backgroundColor: dotColor,
-            boxShadow: isEditMode
+            boxShadow: draggable
               ? `0 0 0 2px rgba(212,184,150,0.8), 0 0 15px ${glowColor}`
               : `0 0 15px ${glowColor}`,
-            animation: isEditMode ? "none" : animation,
-            cursor: isEditMode ? "inherit" : "pointer",
+            animation: draggable ? "none" : animation,
+            cursor: draggable ? "inherit" : "pointer",
           }}
         />
-        {/* HoverCard suppressed in edit mode to avoid overlay clutter */}
-        {!isEditMode && <HoverCard item={item} visible={hovered || tapped} />}
+        {!draggable && <HoverCard item={dot} visible={hovered || tapped} />}
       </div>
     </motion.div>
   );
@@ -269,21 +313,42 @@ interface ModelStageProps {
   index: number;
   revealed: boolean;
   isEditMode: boolean;
+  isStudioMode: boolean;
+  studioSlot?: StudioSlot;
+  isSelected: boolean;
+  onSelect: () => void;
   onDotDrop: (text: string) => void;
+  onStudioDotDrop: (dotId: string, topPct: number, leftPct: number) => void;
+  onModelDragEnd: (slotId: string, offsetX: number, offsetY: number) => void;
+  onUpdateStudioSlot: (id: string, patch: Partial<StudioSlot>) => void;
 }
 
-function ModelStage({ slot, index, revealed, isEditMode, onDotDrop }: ModelStageProps) {
+function ModelStage({
+  slot,
+  index,
+  revealed,
+  isEditMode,
+  isStudioMode,
+  studioSlot,
+  isSelected,
+  onSelect,
+  onDotDrop,
+  onStudioDotDrop,
+  onModelDragEnd,
+  onUpdateStudioSlot,
+}: ModelStageProps) {
   const [hovered, setHovered] = useState(false);
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Clean up pending leave timer on unmount to prevent setState on unmounted component.
+  // Framer Motion drag offset values — reset to 0 after each drag to avoid accumulation
+  const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
+
   useEffect(() => {
     return () => clearTimeout(leaveTimer.current);
   }, []);
 
-  // Small leave-delay lets the cursor travel from silhouette to hover card
-  // without the card blinking out mid-transit.
   const handleEnter = () => {
     clearTimeout(leaveTimer.current);
     setHovered(true);
@@ -292,33 +357,187 @@ function ModelStage({ slot, index, revealed, isEditMode, onDotDrop }: ModelStage
     leaveTimer.current = setTimeout(() => setHovered(false), 120);
   };
 
-  // Tap: toggle primary item card. Suppressed in edit mode so drag doesn't fight tap.
   const handleTap = () => {
-    if (isEditMode) return;
+    if (isEditMode || isStudioMode) return;
     const primaryId = slot.outfit[0].id;
     setActiveItemId((prev) => (prev === primaryId ? null : primaryId));
   };
 
-  const isActive = hovered || activeItemId !== null;
+  // Scale handle — pointerdown on the corner grip
+  const handleScalePointerDown = (e: React.PointerEvent) => {
+    if (!studioSlot) return;
+    e.stopPropagation();
+    e.preventDefault();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startScale = studioSlot.scale;
 
+    const onMove = (me: PointerEvent) => {
+      // Drag right or up → larger; left or down → smaller
+      const delta = ((me.clientX - startX) - (me.clientY - startY)) / 200;
+      const newScale = Math.max(0.2, Math.min(2.5, startScale + delta));
+      onUpdateStudioSlot(studioSlot.id, { scale: newScale });
+    };
+
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  };
+
+  const isActive = hovered || activeItemId !== null;
+  const showBoundingBox = isStudioMode && isSelected && studioSlot;
+
+  // In studio mode: position/scale via inline style; otherwise Tailwind classes
+  const studioPositionStyle: React.CSSProperties = isStudioMode && studioSlot
+    ? {
+        position: "absolute",
+        left: `${studioSlot.leftPct}%`,
+        bottom: `${studioSlot.bottomPct}%`,
+        zIndex: studioSlot.zIndex,
+        transformOrigin: "bottom center",
+      }
+    : {};
+
+  const containerClass = isStudioMode
+    ? "bg-transparent pointer-events-auto transition-opacity duration-700 origin-bottom"
+    : `absolute bg-transparent pointer-events-auto transition-opacity duration-700 origin-bottom ${slot.position} ${slot.mobileScale} ${slot.scale}`;
+
+  const containerStyle: React.CSSProperties = {
+    opacity: revealed ? 1 : 0,
+    transitionDelay: `${index * 150}ms`,
+    ...(isStudioMode ? {} : { zIndex: slot.zIndex }),
+    ...studioPositionStyle,
+  };
+
+  // Dots to render
+  const dots = isStudioMode && studioSlot
+    ? studioSlot.dots.filter((d) => d.type === "public" || SHOW_VAULT_DOTS)
+    : slot.outfit.filter((item) => item.type === "public" || SHOW_VAULT_DOTS);
+
+  if (isStudioMode && studioSlot) {
+    // In studio mode: wrap in motion.div for drag-to-move
+    return (
+      <motion.div
+        className={containerClass}
+        style={{
+          ...containerStyle,
+          scale: studioSlot.scale,
+          cursor: isSelected ? "grab" : "pointer",
+          x: dragX,
+          y: dragY,
+        }}
+        drag={isSelected}
+        dragMomentum={false}
+        dragElastic={0}
+        dragConstraints={{ top: -2000, bottom: 2000, left: -2000, right: 2000 }}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onDragEnd={(_: any, info: { offset: { x: number; y: number } }) => {
+          onModelDragEnd(slot.id, info.offset.x, info.offset.y);
+          dragX.set(0);
+          dragY.set(0);
+        }}
+        onClick={() => {
+          if (!isSelected) onSelect();
+        }}
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+      >
+        <div
+          className="relative w-fit h-fit bg-transparent model-container"
+          style={{ transform: isSelected ? "none" : undefined }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={studioSlot.imageSrc}
+            alt={slot.id}
+            className="h-[40vh] md:h-[80vh] w-auto object-bottom origin-bottom select-none block"
+            style={{
+              filter: "brightness(0.6) contrast(1.1) saturate(0.7)",
+              background: "transparent",
+            }}
+            draggable={false}
+            loading="eager"
+          />
+
+          {/* Contact shadow */}
+          <div
+            className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none z-10"
+            style={{
+              background:
+                "radial-gradient(ellipse 90% 100% at 50% 100%, rgba(0,0,0,0.55) 0%, transparent 100%)",
+            }}
+          />
+
+          {/* Bounding box + scale handle */}
+          {showBoundingBox && (
+            <div
+              className="absolute inset-0 pointer-events-none z-30"
+              style={{
+                border: "1.5px solid rgba(212,184,150,0.75)",
+                boxShadow: "0 0 0 1px rgba(0,0,0,0.4) inset",
+              }}
+            >
+              {/* Scale handle — bottom-right corner */}
+              <div
+                className="absolute bottom-0 right-0 w-3 h-3 pointer-events-auto z-40 cursor-se-resize"
+                style={{
+                  background: "#D4B896",
+                  transform: "translate(50%, 50%)",
+                  boxShadow: "0 0 6px rgba(0,0,0,0.6)",
+                }}
+                onPointerDown={handleScalePointerDown}
+              />
+              {/* Scale readout */}
+              <div
+                className="absolute top-1 left-1 text-[8px] tracking-widest pointer-events-none"
+                style={{ color: "#D4B896" }}
+              >
+                {studioSlot.scale.toFixed(2)}×
+              </div>
+            </div>
+          )}
+
+          {/* Label */}
+          <span className="absolute bottom-10 w-full text-center text-[10px] tracking-[0.3em] text-white/20 uppercase hidden md:block z-20">
+            {slot.id}
+          </span>
+
+          {/* Dots */}
+          {(dots as StudioDot[]).map((dot) => (
+            <PulseDot
+              key={dot.id}
+              studioDot={dot}
+              hovered={hovered}
+              tapped={false}
+              isEditMode={false}
+              isStudioMode={true}
+              modelId={slot.id}
+              onDotDrop={onDotDrop}
+              onStudioDotDrop={onStudioDotDrop}
+            />
+          ))}
+        </div>
+      </motion.div>
+    );
+  }
+
+  // ── Normal (non-studio) mode — unchanged layout ──
   return (
     <div
-      className={`absolute bg-transparent pointer-events-auto transition-opacity duration-700 origin-bottom ${slot.position} ${slot.mobileScale} ${slot.scale}`}
-      style={{
-        opacity: revealed ? 1 : 0,
-        transitionDelay: `${index * 150}ms`,
-        zIndex: slot.zIndex,
-      }}
+      className={containerClass}
+      style={containerStyle}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      {/* Photo container — model-container class used by drag-end getBoundingClientRect() */}
       <div
         className="relative w-fit h-fit bg-transparent model-container cursor-pointer transition-transform duration-500"
         style={{ transform: isActive && !isEditMode ? "scale(1.03)" : "scale(1)" }}
         onClick={handleTap}
       >
-        {/* Live photography */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={slot.imageSrc}
@@ -334,15 +553,16 @@ function ModelStage({ slot, index, revealed, isEditMode, onDotDrop }: ModelStage
           loading="eager"
         />
 
-        {/* Contact shadow — anchors feet to the floor */}
+        {/* Contact shadow */}
         <div
           className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none z-10"
           style={{
-            background: "radial-gradient(ellipse 90% 100% at 50% 100%, rgba(0,0,0,0.55) 0%, transparent 100%)",
+            background:
+              "radial-gradient(ellipse 90% 100% at 50% 100%, rgba(0,0,0,0.55) 0%, transparent 100%)",
           }}
         />
 
-        {/* Tap glow — subtle highlight on active state */}
+        {/* Tap glow */}
         {activeItemId && !isEditMode && (
           <div
             className="absolute inset-0 pointer-events-none z-10"
@@ -350,7 +570,7 @@ function ModelStage({ slot, index, revealed, isEditMode, onDotDrop }: ModelStage
           />
         )}
 
-        {/* Edit mode overlay — dim grid hint */}
+        {/* Edit mode dashed border */}
         {isEditMode && (
           <div
             className="absolute inset-0 pointer-events-none z-10"
@@ -358,25 +578,25 @@ function ModelStage({ slot, index, revealed, isEditMode, onDotDrop }: ModelStage
           />
         )}
 
-        {/* Label — desktop only */}
+        {/* Label */}
         <span className="absolute bottom-10 w-full text-center text-[10px] tracking-[0.3em] text-white/20 uppercase hidden md:block z-20">
           {slot.id}
         </span>
 
-        {/* Pulse dots — filtered by SHOW_VAULT_DOTS; outfit[] supports unlimited items per model */}
-        {slot.outfit
-          .filter((item) => item.type === "public" || SHOW_VAULT_DOTS)
-          .map((item) => (
-            <PulseDot
-              key={item.id}
-              item={item}
-              hovered={hovered}
-              tapped={activeItemId === item.id}
-              isEditMode={isEditMode}
-              modelId={slot.id}
-              onDotDrop={onDotDrop}
-            />
-          ))}
+        {/* Pulse dots */}
+        {(dots as OutfitItem[]).map((item) => (
+          <PulseDot
+            key={item.id}
+            item={item}
+            hovered={hovered}
+            tapped={activeItemId === item.id}
+            isEditMode={isEditMode}
+            isStudioMode={false}
+            modelId={slot.id}
+            onDotDrop={onDotDrop}
+            onStudioDotDrop={() => {}}
+          />
+        ))}
       </div>
     </div>
   );
@@ -402,10 +622,15 @@ export default function CollectionOverlay({ opacity }: Props) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastIdRef = useRef(0);
 
+  // ── Studio Mode state ──
+  const [isStudioMode, setIsStudioMode] = useState(false);
+  const [studioSlots, setStudioSlots] = useState<StudioSlot[]>([]);
+  const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
+  const [copyConfirm, setCopyConfirm] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useMotionValueEvent(opacity, "change", (v) => {
-    // Gate pointer-events — matches AtelierNav pattern exactly
     setActive(v > 0.05);
-    // Stagger trigger — fires once when nav opacity reaches full
     if (!revealed && v >= 0.99) setRevealed(true);
   });
 
@@ -415,26 +640,162 @@ export default function CollectionOverlay({ opacity }: Props) {
     setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
   };
 
+  // ── Studio entry / exit ──
+  const enterStudio = () => {
+    setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
+    setSelectedModelId(null);
+    setIsEditMode(false);
+    setIsStudioMode(true);
+  };
+
+  const exitStudio = () => {
+    setIsStudioMode(false);
+    setSelectedModelId(null);
+  };
+
+  // ── Studio state updaters ──
+  const updateSlot = useCallback((id: string, patch: Partial<StudioSlot>) => {
+    setStudioSlots((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  }, []);
+
+  const updateDot = useCallback((slotId: string, dotId: string, patch: Partial<StudioDot>) => {
+    setStudioSlots((prev) =>
+      prev.map((s) =>
+        s.id === slotId
+          ? { ...s, dots: s.dots.map((d) => (d.id === dotId ? { ...d, ...patch } : d)) }
+          : s
+      )
+    );
+  }, []);
+
+  const addDot = useCallback((slotId: string) => {
+    const newDot: StudioDot = {
+      id: `${slotId}-dot-${Date.now()}`,
+      name: "New Item",
+      collection: "The Constable",
+      colorway: "Ivory",
+      price: "$0",
+      type: "public",
+      topPct: 40,
+      leftPct: 50,
+    };
+    setStudioSlots((prev) =>
+      prev.map((s) => (s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s))
+    );
+  }, []);
+
+  const removeDot = useCallback((slotId: string, dotId: string) => {
+    setStudioSlots((prev) =>
+      prev.map((s) =>
+        s.id === slotId ? { ...s, dots: s.dots.filter((d) => d.id !== dotId) } : s
+      )
+    );
+  }, []);
+
+  const swapImage = useCallback((slotId: string, imageSrc: string) => {
+    setStudioSlots((prev) => prev.map((s) => (s.id === slotId ? { ...s, imageSrc } : s)));
+  }, []);
+
+  const removeSlot = useCallback((slotId: string) => {
+    setStudioSlots((prev) => prev.filter((s) => s.id !== slotId));
+    setSelectedModelId((prev) => (prev === slotId ? null : prev));
+  }, []);
+
+  const copyCode = useCallback(() => {
+    const code = exportInventoryCode(studioSlots);
+    navigator.clipboard.writeText(code);
+    setCopyConfirm(true);
+    setTimeout(() => setCopyConfirm(false), 2500);
+  }, [studioSlots]);
+
+  // ── Model drag-to-reposition ──
+  const handleModelDragEnd = useCallback(
+    (slotId: string, offsetX: number, offsetY: number) => {
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const slot = studioSlots.find((s) => s.id === slotId);
+      if (!slot) return;
+
+      const deltaLeftPct   =  (offsetX / rect.width)  * 100;
+      const deltaBottomPct = -(offsetY / rect.height)  * 100; // invert Y
+
+      updateSlot(slotId, {
+        leftPct:   slot.leftPct   + deltaLeftPct,
+        bottomPct: slot.bottomPct + deltaBottomPct,
+      });
+    },
+    [studioSlots, updateSlot]
+  );
+
   return (
     <div
+      ref={containerRef}
       className="absolute inset-0 z-20"
       style={{ pointerEvents: active ? "auto" : "none" }}
     >
+      {/* Studio Inspector sidebar */}
+      {isStudioMode && (
+        <StudioInspector
+          slots={studioSlots}
+          selectedId={selectedModelId}
+          onUpdateSlot={updateSlot}
+          onUpdateDot={updateDot}
+          onAddDot={addDot}
+          onRemoveDot={removeDot}
+          onSwapImage={swapImage}
+          onRemoveSlot={removeSlot}
+          onCopyCode={copyCode}
+          copyConfirm={copyConfirm}
+        />
+      )}
+
+      {/* Models — always iterate MODEL_INVENTORY for raw slot shape;
+          look up matching StudioSlot by id for studio overrides */}
       {MODEL_INVENTORY.map((slot, index) => (
         <ModelStage
           key={slot.id}
           slot={slot}
           index={index}
           revealed={revealed}
-          isEditMode={isEditMode}
+          isEditMode={isEditMode && !isStudioMode}
+          isStudioMode={isStudioMode}
+          studioSlot={isStudioMode ? studioSlots.find((s) => s.id === slot.id) : undefined}
+          isSelected={selectedModelId === slot.id}
+          onSelect={() => setSelectedModelId(slot.id)}
           onDotDrop={handleDotDrop}
+          onStudioDotDrop={(dotId, topPct, leftPct) => updateDot(slot.id, dotId, { topPct, leftPct })}
+          onModelDragEnd={handleModelDragEnd}
+          onUpdateStudioSlot={updateSlot}
         />
       ))}
 
-      {/* Edit mode toggle button — fixed bottom-right, always on top */}
+      {/* Toggle button — Studio Mode / Exit Studio */}
       {active && (
         <button
-          className="fixed bottom-6 right-6 z-[100] text-[9px] tracking-widest uppercase px-3 py-2 transition-colors duration-300 pointer-events-auto"
+          className="fixed bottom-6 right-6 z-[201] text-[9px] tracking-widest uppercase px-4 py-2.5 transition-colors duration-300 pointer-events-auto"
+          style={{
+            border: `1px solid ${isStudioMode ? "#D4B896" : isEditMode ? "#D4B896" : "rgba(255,255,255,0.2)"}`,
+            color: isStudioMode ? "#D4B896" : isEditMode ? "#D4B896" : "rgba(255,255,255,0.4)",
+            background: "rgba(0,0,0,0.8)",
+            backdropFilter: "blur(8px)",
+          }}
+          onClick={() => {
+            if (isStudioMode) {
+              exitStudio();
+            } else {
+              enterStudio();
+            }
+          }}
+        >
+          {isStudioMode ? "✕  Exit Studio" : "⊙  Studio Mode"}
+        </button>
+      )}
+
+      {/* Legacy dot-edit toggle — only shown in normal mode */}
+      {active && !isStudioMode && (
+        <button
+          className="fixed bottom-6 right-36 z-[100] text-[9px] tracking-widest uppercase px-3 py-2 transition-colors duration-300 pointer-events-auto"
           style={{
             border: `1px solid ${isEditMode ? "#D4B896" : "rgba(255,255,255,0.2)"}`,
             color: isEditMode ? "#D4B896" : "rgba(255,255,255,0.4)",
@@ -447,7 +808,7 @@ export default function CollectionOverlay({ opacity }: Props) {
         </button>
       )}
 
-      {/* Toast coordinates — stack above the toggle button */}
+      {/* Toast coordinates */}
       <div className="fixed bottom-16 right-6 z-[100] flex flex-col gap-2 pointer-events-none">
         {toasts.map((toast) => (
           <div
