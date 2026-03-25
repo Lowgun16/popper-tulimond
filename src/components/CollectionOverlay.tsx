@@ -9,6 +9,9 @@ import { type MotionValue, useMotionValueEvent } from "framer-motion";
 // Edit names, prices, and colorways here. Do not touch layout below this block.
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Toggle vault dots globally — set true to re-enable champagne gold markers
+const SHOW_VAULT_DOTS = false;
+
 type AccessType = "public" | "vault";
 
 interface OutfitItem {
@@ -47,7 +50,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,200",
         type: "public",
-        dotPosition: "top-[50%] left-[50%]",
+        dotPosition: "top-[22%] left-[70%]",
       },
       {
         id: "lounge-heartbreaker",
@@ -75,7 +78,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,500",
         type: "public",
-        dotPosition: "top-[45%] left-[50%]",
+        dotPosition: "top-[38%] left-[35%]",
       },
       {
         id: "center-heartbreaker",
@@ -131,7 +134,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,100",
         type: "public",
-        dotPosition: "top-[50%] left-[50%]",
+        dotPosition: "top-[58%] left-[72%]",
       },
       {
         id: "rack-heartbreaker",
@@ -313,10 +316,12 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
           {slot.id}
         </span>
 
-        {/* Pulse dots — one per outfit item */}
-        {slot.outfit.map((item) => (
-          <PulseDot key={item.id} item={item} hovered={hovered} tapped={activeItemId === item.id} />
-        ))}
+        {/* Pulse dots — filtered by SHOW_VAULT_DOTS; outfit[] supports unlimited items per model */}
+        {slot.outfit
+          .filter((item) => item.type === "public" || SHOW_VAULT_DOTS)
+          .map((item) => (
+            <PulseDot key={item.id} item={item} hovered={hovered} tapped={activeItemId === item.id} />
+          ))}
       </div>
     </div>
   );
