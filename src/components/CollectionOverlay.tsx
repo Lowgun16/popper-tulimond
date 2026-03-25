@@ -34,7 +34,7 @@ interface ModelSlot {
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[-20%] md:left-[10%] bottom-[22%] md:bottom-[5%]",
+    position: "left-[-40%] md:left-[10%] bottom-[22%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
     mobileScale: "scale-[0.9]",
     zIndex: 30,
