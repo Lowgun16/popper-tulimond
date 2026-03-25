@@ -50,7 +50,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,200",
         type: "public",
-        dotPosition: "top-[22%] left-[70%]",
+        dotPosition: "top-[38%] left-[62%]",
       },
       {
         id: "lounge-heartbreaker",
@@ -78,7 +78,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,500",
         type: "public",
-        dotPosition: "top-[38%] left-[35%]",
+        dotPosition: "top-[42%] left-[38%]",
       },
       {
         id: "center-heartbreaker",
@@ -134,7 +134,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,100",
         type: "public",
-        dotPosition: "top-[58%] left-[72%]",
+        dotPosition: "top-[52%] left-[62%]",
       },
       {
         id: "rack-heartbreaker",
@@ -210,7 +210,7 @@ function PulseDot({ item, hovered, tapped }: { item: OutfitItem; hovered: boolea
     : "pulse-white 2s ease-in-out infinite";
 
   return (
-    <div className={`absolute ${item.dotPosition}`}>
+    <div className={`absolute z-20 ${item.dotPosition}`}>
       <div className="relative">
         <div
           className="w-3 h-3 rounded-full cursor-pointer"
