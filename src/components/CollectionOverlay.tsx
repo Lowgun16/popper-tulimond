@@ -34,9 +34,9 @@ interface ModelSlot {
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[-5%] md:left-[10%] bottom-[22%] md:bottom-[5%]",
+    position: "left-[-8%] md:left-[10%] bottom-[18%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
-    mobileScale: "scale-[1.1]",
+    mobileScale: "scale-[1.0]",
     zIndex: 30,
     imageSrc: "/model-lounge.png",
     outfit: [
@@ -62,9 +62,9 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "center-model",
-    position: "left-[12%] md:left-[40%] bottom-[28%] md:bottom-[2%]",
+    position: "left-[15%] md:left-[40%] bottom-[35%] md:bottom-[2%]",
     scale: "md:scale-[1.0]",
-    mobileScale: "scale-[1.0]",
+    mobileScale: "scale-[0.65]",
     zIndex: 20,
     imageSrc: "/model-center.png",
     outfit: [
@@ -75,7 +75,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,500",
         type: "public",
-        dotPosition: "top-[55%] left-[50%]",
+        dotPosition: "top-[50%] left-[50%]",
       },
       {
         id: "center-heartbreaker",
@@ -84,15 +84,15 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,600",
         type: "vault",
-        dotPosition: "top-[55%] left-[40%]",
+        dotPosition: "top-[50%] left-[40%]",
       },
     ],
   },
   {
     id: "vault-model",
-    position: "right-[18%] md:right-[25%] bottom-[42%] md:bottom-[8%]",
+    position: "right-[20%] md:right-[25%] bottom-[48%] md:bottom-[8%]",
     scale: "md:scale-[0.8]",
-    mobileScale: "scale-[0.6]",
+    mobileScale: "scale-[0.5]",
     zIndex: 10,
     imageSrc: "/model-vault.png",
     outfit: [
@@ -131,7 +131,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,100",
         type: "public",
-        dotPosition: "top-[55%] left-[50%]",
+        dotPosition: "top-[50%] left-[50%]",
       },
       {
         id: "rack-heartbreaker",
@@ -140,7 +140,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,300",
         type: "vault",
-        dotPosition: "top-[55%] left-[40%]",
+        dotPosition: "top-[50%] left-[40%]",
       },
     ],
   },
