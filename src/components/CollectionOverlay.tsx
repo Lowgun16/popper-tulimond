@@ -62,9 +62,9 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "center-model",
-    position: "right-[28%] md:left-[40%] bottom-[18%] md:bottom-[2%]",
+    position: "left-[45%] md:left-[40%] bottom-[18%] md:bottom-[2%]",
     scale: "md:scale-[1.0]",
-    mobileScale: "scale-[0.65]",
+    mobileScale: "scale-[1.0]",
     zIndex: 20,
     imageSrc: "/model-center.png",
     outfit: [
@@ -75,7 +75,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,500",
         type: "public",
-        dotPosition: "top-[40%] left-[50%]",
+        dotPosition: "top-[45%] left-[50%]",
       },
       {
         id: "center-heartbreaker",
@@ -84,7 +84,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,600",
         type: "vault",
-        dotPosition: "top-[40%] left-[40%]",
+        dotPosition: "top-[45%] left-[40%]",
       },
     ],
   },
