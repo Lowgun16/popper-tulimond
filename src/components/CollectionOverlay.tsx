@@ -34,9 +34,9 @@ interface ModelSlot {
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[1%] md:left-[10%] bottom-[22%] md:bottom-[5%]",
+    position: "left-[-15%] md:left-[10%] bottom-[22%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
-    mobileScale: "scale-[1.1]",
+    mobileScale: "scale-[0.9]",
     zIndex: 30,
     imageSrc: "/model-lounge.png",
     outfit: [
@@ -47,7 +47,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,200",
         type: "public",
-        dotPosition: "top-[50%] left-[50%]",
+        dotPosition: "top-[45%] left-[50%]",
       },
       {
         id: "lounge-heartbreaker",
@@ -56,7 +56,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,400",
         type: "vault",
-        dotPosition: "top-[50%] left-[45%]",
+        dotPosition: "top-[45%] left-[45%]",
       },
     ],
   },
