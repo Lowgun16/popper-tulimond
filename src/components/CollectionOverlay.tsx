@@ -34,9 +34,9 @@ interface ModelSlot {
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[-25%] md:left-[10%] bottom-[12%] md:bottom-[5%]",
+    position: "left-[-5%] md:left-[10%] bottom-[22%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
-    mobileScale: "scale-[1.6]",
+    mobileScale: "scale-[1.1]",
     zIndex: 30,
     imageSrc: "/model-lounge.png",
     outfit: [
@@ -62,9 +62,9 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "center-model",
-    position: "left-[12%] md:left-[40%] bottom-[35%] md:bottom-[2%]",
+    position: "left-[12%] md:left-[40%] bottom-[28%] md:bottom-[2%]",
     scale: "md:scale-[1.0]",
-    mobileScale: "scale-[0.9]",
+    mobileScale: "scale-[1.0]",
     zIndex: 20,
     imageSrc: "/model-center.png",
     outfit: [
@@ -90,7 +90,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "vault-model",
-    position: "right-[18%] md:right-[25%] bottom-[48%] md:bottom-[8%]",
+    position: "right-[18%] md:right-[25%] bottom-[42%] md:bottom-[8%]",
     scale: "md:scale-[0.8]",
     mobileScale: "scale-[0.6]",
     zIndex: 10,
@@ -118,9 +118,9 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "rack-model",
-    position: "right-[-20%] md:right-[5%] bottom-[25%] md:bottom-[5%]",
+    position: "right-[-5%] md:right-[5%] bottom-[25%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
-    mobileScale: "scale-[1.2]",
+    mobileScale: "scale-[0.8]",
     zIndex: 30,
     imageSrc: "/model-rack.png",
     outfit: [
@@ -289,6 +289,7 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
             background: "transparent",
           }}
           draggable={false}
+          loading="eager"
         />
 
         {/* Contact shadow — anchors feet to the floor */}
