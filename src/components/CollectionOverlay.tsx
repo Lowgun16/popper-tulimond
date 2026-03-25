@@ -1,6 +1,7 @@
 // src/components/CollectionOverlay.tsx
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { type MotionValue, useMotionValueEvent } from "framer-motion";
 
@@ -27,6 +28,7 @@ interface ModelSlot {
   scale: string;      // Desktop scale: "md:scale-[X]" — applied at md+ breakpoint
   mobileScale: string;// Mobile scale: "scale-[X]" — base (mobile-first), overridden by scale
   zIndex: number;     // Depth perception: center=30 (closest), vault=10 (furthest)
+  imageSrc: string;   // Path relative to /public
   outfit: OutfitItem[];
 }
 
@@ -37,6 +39,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
     scale: "md:scale-[0.9]",
     mobileScale: "scale-[0.5]",
     zIndex: 20,
+    imageSrc: "/model-lounge.png",
     outfit: [
       {
         id: "lounge-showstopper",
@@ -63,7 +66,8 @@ const MODEL_INVENTORY: ModelSlot[] = [
     position: "left-[35%] sm:left-[37%] md:left-[40%] bottom-[22%] md:bottom-[2%]",
     scale: "md:scale-[1.0]",
     mobileScale: "scale-[0.55]",
-    zIndex: 15,
+    zIndex: 30,
+    imageSrc: "/model-center.png",
     outfit: [
       {
         id: "center-showstopper",
@@ -91,6 +95,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
     scale: "md:scale-[0.8]",
     mobileScale: "scale-[0.45]",
     zIndex: 10,
+    imageSrc: "/model-vault.png",
     outfit: [
       {
         id: "vault-showstopper",
@@ -118,6 +123,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
     scale: "md:scale-[0.9]",
     mobileScale: "scale-[0.5]",
     zIndex: 25,
+    imageSrc: "/model-rack.png",
     outfit: [
       {
         id: "rack-showstopper",
@@ -267,21 +273,42 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      <div className="relative w-24 sm:w-32 md:w-48 h-[40vh] md:h-[80vh] flex items-end justify-center">
-        {/* Silhouette placeholder */}
+      {/* Photo container — relative required for Next.js Image fill */}
+      <div
+        className="relative w-24 sm:w-32 md:w-48 h-[40vh] md:h-[80vh] cursor-pointer transition-transform duration-500"
+        style={{ transform: isActive ? "scale(1.03)" : "scale(1)" }}
+        onClick={handleTap}
+      >
+        {/* Live photography */}
+        <Image
+          src={slot.imageSrc}
+          alt={slot.id}
+          fill
+          className="object-contain object-bottom select-none"
+          style={{ filter: "brightness(0.85) contrast(1.1) saturate(0.9)" }}
+          draggable={false}
+        />
+
+        {/* Contact shadow — anchors feet to the floor */}
         <div
-          className="w-full h-full md:bg-white/10 md:border md:border-white/5 md:backdrop-blur-sm rounded-t-full transition-all duration-500 cursor-pointer"
+          className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none z-10"
           style={{
-            transform: isActive ? "scale(1.05)" : "scale(1)",
-            borderColor: isActive ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)",
-            boxShadow: activeItemId ? "0 0 40px rgba(255,255,255,0.12), inset 0 0 60px rgba(255,255,255,0.04)" : "none",
+            background: "radial-gradient(ellipse 90% 100% at 50% 100%, rgba(0,0,0,0.55) 0%, transparent 100%)",
           }}
-          onClick={handleTap}
-        >
-          <span className="absolute bottom-10 w-full text-center text-[10px] tracking-[0.3em] text-white/20 uppercase hidden md:block">
-            {slot.id}
-          </span>
-        </div>
+        />
+
+        {/* Tap glow — subtle highlight on active state */}
+        {activeItemId && (
+          <div
+            className="absolute inset-0 pointer-events-none z-10"
+            style={{ boxShadow: "inset 0 0 50px rgba(255,255,255,0.07)" }}
+          />
+        )}
+
+        {/* Label — desktop only, below figure */}
+        <span className="absolute bottom-10 w-full text-center text-[10px] tracking-[0.3em] text-white/20 uppercase hidden md:block z-20">
+          {slot.id}
+        </span>
 
         {/* Pulse dots — one per outfit item */}
         {slot.outfit.map((item) => (
