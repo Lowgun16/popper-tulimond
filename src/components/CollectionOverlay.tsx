@@ -34,9 +34,9 @@ interface ModelSlot {
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[5%] sm:left-[7%] md:left-[10%] bottom-[8%] md:bottom-[5%]",
+    position: "left-[2%] md:left-[10%] bottom-[8%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
-    mobileScale: "scale-[2.5]",
+    mobileScale: "scale-[1.3]",
     zIndex: 20,
     imageSrc: "/model-lounge.png",
     outfit: [
@@ -47,7 +47,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,200",
         type: "public",
-        dotPosition: "top-[25%] left-[50%]",
+        dotPosition: "top-[45%] left-[50%]",
       },
       {
         id: "lounge-heartbreaker",
@@ -56,15 +56,15 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,400",
         type: "vault",
-        dotPosition: "top-[25%] left-[45%]",
+        dotPosition: "top-[45%] left-[45%]",
       },
     ],
   },
   {
     id: "center-model",
-    position: "left-[35%] sm:left-[37%] md:left-[40%] bottom-[15%] md:bottom-[2%]",
+    position: "left-[22%] md:left-[40%] bottom-[15%] md:bottom-[2%]",
     scale: "md:scale-[1.0]",
-    mobileScale: "scale-[2.8]",
+    mobileScale: "scale-[1.5]",
     zIndex: 30,
     imageSrc: "/model-center.png",
     outfit: [
@@ -75,7 +75,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,500",
         type: "public",
-        dotPosition: "top-[25%] left-[50%]",
+        dotPosition: "top-[45%] left-[50%]",
       },
       {
         id: "center-heartbreaker",
@@ -84,15 +84,15 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,600",
         type: "vault",
-        dotPosition: "top-[25%] left-[40%]",
+        dotPosition: "top-[45%] left-[40%]",
       },
     ],
   },
   {
     id: "vault-model",
-    position: "right-[18%] sm:right-[21%] md:right-[25%] bottom-[22%] md:bottom-[8%]",
+    position: "right-[15%] md:right-[25%] bottom-[22%] md:bottom-[8%]",
     scale: "md:scale-[0.8]",
-    mobileScale: "scale-[1.8]",
+    mobileScale: "scale-[1.0]",
     zIndex: 10,
     imageSrc: "/model-vault.png",
     outfit: [
@@ -103,7 +103,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$980",
         type: "public",
-        dotPosition: "top-[25%] left-[50%]",
+        dotPosition: "top-[45%] left-[50%]",
       },
       {
         id: "vault-heartbreaker",
@@ -112,15 +112,15 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,100",
         type: "vault",
-        dotPosition: "top-[25%] left-[42%]",
+        dotPosition: "top-[45%] left-[42%]",
       },
     ],
   },
   {
     id: "rack-model",
-    position: "right-[2%] sm:right-[3%] md:right-[5%] bottom-[10%] md:bottom-[5%]",
+    position: "right-[-5%] md:right-[5%] bottom-[10%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
-    mobileScale: "scale-[2.3]",
+    mobileScale: "scale-[1.2]",
     zIndex: 25,
     imageSrc: "/model-rack.png",
     outfit: [
@@ -131,7 +131,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,100",
         type: "public",
-        dotPosition: "top-[25%] left-[50%]",
+        dotPosition: "top-[45%] left-[50%]",
       },
       {
         id: "rack-heartbreaker",
@@ -140,7 +140,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,300",
         type: "vault",
-        dotPosition: "top-[25%] left-[40%]",
+        dotPosition: "top-[45%] left-[40%]",
       },
     ],
   },
@@ -274,7 +274,7 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
     >
       {/* Photo container — w-fit/h-fit lets scale drive apparent size, no clipping */}
       <div
-        className="relative w-fit h-fit bg-transparent cursor-pointer transition-transform duration-500"
+        className="relative w-fit h-fit bg-transparent border border-white/5 cursor-pointer transition-transform duration-500"
         style={{ transform: isActive ? "scale(1.03)" : "scale(1)" }}
         onClick={handleTap}
       >
