@@ -45,9 +45,10 @@ export interface ModelSlot {
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[-40%] md:left-[10%] bottom-[22%] md:bottom-[5%]",
-    scale: "md:scale-[0.9]",
-    mobileScale: "scale-[0.9]",
+    // displayName: "Lounge"
+    position: "left-[0.6%] md:left-[0.6%] bottom-[7.4%] md:bottom-[7.4%]",
+    scale: "md:scale-[0.88]",
+    mobileScale: "scale-[0.88]",
     zIndex: 30,
     imageSrc: "/model-lounge.png",
     outfit: [
@@ -58,7 +59,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,200",
         type: "public",
-        dotPosition: "top-[30%] left-[85%]",
+        dotPosition: "top-[30.0%] left-[85.0%]",
       },
       {
         id: "lounge-heartbreaker",
@@ -67,16 +68,17 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,400",
         type: "vault",
-        dotPosition: "top-[50%] left-[45%]",
+        dotPosition: "top-[50.0%] left-[45.0%]",
       },
     ],
   },
   {
     id: "center-model",
-    position: "left-[22%] md:left-[40%] bottom-[18%] md:bottom-[2%]",
-    scale: "md:scale-[1.0]",
-    mobileScale: "scale-[1.0]",
-    zIndex: 40,
+    // displayName: "Jerome"
+    position: "left-[34.2%] md:left-[34.2%] bottom-[16.4%] md:bottom-[16.4%]",
+    scale: "md:scale-[0.70]",
+    mobileScale: "scale-[0.70]",
+    zIndex: 29,
     imageSrc: "/model-center.png",
     outfit: [
       {
@@ -86,7 +88,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,500",
         type: "public",
-        dotPosition: "top-[35%] left-[45%]",
+        dotPosition: "top-[30.0%] left-[57.4%]",
       },
       {
         id: "center-heartbreaker",
@@ -95,15 +97,16 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,600",
         type: "vault",
-        dotPosition: "top-[45%] left-[40%]",
+        dotPosition: "top-[45.0%] left-[40.0%]",
       },
     ],
   },
   {
     id: "vault-model",
-    position: "right-[32%] md:right-[25%] bottom-[24%] md:bottom-[8%]",
-    scale: "md:scale-[0.8]",
-    mobileScale: "scale-[0.83]",
+    // displayName: "Jack"
+    position: "left-[24.3%] md:left-[24.3%] bottom-[9.3%] md:bottom-[9.3%]",
+    scale: "md:scale-[0.84]",
+    mobileScale: "scale-[0.84]",
     zIndex: 20,
     imageSrc: "/model-vault.png",
     outfit: [
@@ -114,7 +117,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$980",
         type: "public",
-        dotPosition: "top-[47%] left-[50%]",
+        dotPosition: "top-[35.0%] left-[51.6%]",  // was 350.0% (typo) → clamped to 35.0%
       },
       {
         id: "vault-heartbreaker",
@@ -123,15 +126,16 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,100",
         type: "vault",
-        dotPosition: "top-[47%] left-[42%]",
+        dotPosition: "top-[47.0%] left-[42.0%]",
       },
     ],
   },
   {
     id: "rack-model",
-    position: "right-[-5%] md:right-[5%] bottom-[25%] md:bottom-[5%]",
-    scale: "md:scale-[0.9]",
-    mobileScale: "scale-[0.8]",
+    // displayName: "Ethan"
+    position: "left-[63.4%] md:left-[63.4%] bottom-[8.0%] md:bottom-[8.0%]",
+    scale: "md:scale-[0.83]",
+    mobileScale: "scale-[0.83]",
     zIndex: 30,
     imageSrc: "/model-rack.png",
     outfit: [
@@ -142,7 +146,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,100",
         type: "public",
-        dotPosition: "top-[58%] left-[88%]",
+        dotPosition: "top-[58.0%] left-[88.0%]",
       },
       {
         id: "rack-heartbreaker",
@@ -151,7 +155,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,300",
         type: "vault",
-        dotPosition: "top-[50%] left-[40%]",
+        dotPosition: "top-[50.0%] left-[40.0%]",
       },
     ],
   },

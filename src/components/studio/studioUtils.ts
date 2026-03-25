@@ -1,5 +1,6 @@
 // src/components/studio/studioUtils.ts
 import type { StudioDot, StudioSlot, AccessType } from "./studioTypes";
+import { DEFAULT_SHADOW } from "./studioTypes";
 
 // ── Parsers ──────────────────────────────────────────────────────────────────
 
@@ -105,6 +106,7 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
     scale,
     zIndex: slot.zIndex,
     dots,
+    shadow: { ...DEFAULT_SHADOW },
   };
 }
 
