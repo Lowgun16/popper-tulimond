@@ -62,10 +62,10 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "center-model",
-    position: "left-[45%] md:left-[40%] bottom-[18%] md:bottom-[2%]",
+    position: "left-[32%] md:left-[40%] bottom-[18%] md:bottom-[2%]",
     scale: "md:scale-[1.0]",
     mobileScale: "scale-[1.0]",
-    zIndex: 20,
+    zIndex: 40,
     imageSrc: "/model-center.png",
     outfit: [
       {
@@ -93,7 +93,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
     position: "right-[20%] md:right-[25%] bottom-[33%] md:bottom-[8%]",
     scale: "md:scale-[0.8]",
     mobileScale: "scale-[0.6]",
-    zIndex: 10,
+    zIndex: 20,
     imageSrc: "/model-vault.png",
     outfit: [
       {
