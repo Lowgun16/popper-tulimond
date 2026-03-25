@@ -92,7 +92,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
     id: "vault-model",
     position: "right-[28%] md:right-[25%] bottom-[27%] md:bottom-[8%]",
     scale: "md:scale-[0.8]",
-    mobileScale: "scale-[0.7]",
+    mobileScale: "scale-[0.85]",
     zIndex: 20,
     imageSrc: "/model-vault.png",
     outfit: [
