@@ -34,9 +34,9 @@ interface ModelSlot {
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[-8%] md:left-[10%] bottom-[18%] md:bottom-[5%]",
+    position: "left-[1%] md:left-[10%] bottom-[22%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
-    mobileScale: "scale-[1.0]",
+    mobileScale: "scale-[1.1]",
     zIndex: 30,
     imageSrc: "/model-lounge.png",
     outfit: [
