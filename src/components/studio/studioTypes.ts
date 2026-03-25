@@ -15,6 +15,7 @@ export interface StudioDot {
 
 export interface StudioSlot {
   id: string;
+  displayName: string; // shown in bounding box label; editable alias
   imageSrc: string;
   leftPct: number;    // position as % of viewport width
   bottomPct: number;  // position as % of viewport height

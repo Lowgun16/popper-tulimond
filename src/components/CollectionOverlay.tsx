@@ -244,6 +244,10 @@ function PulseDot({
 
   const draggable = isEditMode || isStudioMode;
 
+  // Reset internal drag offset after each drop to prevent ghost-position accumulation
+  const dotDragX = useMotionValue(0);
+  const dotDragY = useMotionValue(0);
+
   const handleDragEnd = (
     event: MouseEvent | TouchEvent | PointerEvent,
     info: { point: { x: number; y: number } }
@@ -257,6 +261,10 @@ function PulseDot({
 
     if (isStudioMode && onStudioDotDrop) {
       onStudioDotDrop(dot.id, y, x);
+      // Reset Framer Motion's internal drag offset — new top/left% from state
+      // will position the dot correctly without the stale transform layered on top
+      dotDragX.set(0);
+      dotDragY.set(0);
     } else {
       const text = `${modelId} · ${dot.id}: top-[${y.toFixed(1)}%] left-[${x.toFixed(1)}%]`;
       console.log(text);
@@ -277,7 +285,7 @@ function PulseDot({
     <motion.div
       className={positionClass}
       style={positionStyle
-        ? { ...positionStyle, zIndex: 20, cursor: draggable ? "grab" : undefined }
+        ? { ...positionStyle, zIndex: 20, cursor: draggable ? "grab" : undefined, x: dotDragX, y: dotDragY }
         : { cursor: draggable ? "grab" : undefined }}
       drag={draggable}
       dragMomentum={false}
@@ -302,6 +310,66 @@ function PulseDot({
       </div>
     </motion.div>
   );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// useImageContentBounds — canvas alpha-scan to find tight non-transparent rect
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface ContentBounds {
+  leftPct: number;
+  topPct: number;
+  rightPct: number;  // inset from right (not absolute position)
+  bottomPct: number; // inset from bottom
+}
+
+function useImageContentBounds(src: string): ContentBounds | null {
+  const [bounds, setBounds] = useState<ContentBounds | null>(null);
+
+  useEffect(() => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return;
+
+    const img = new window.Image();
+    img.onload = () => {
+      // Scale down to max 512px for performance
+      const maxDim = 512;
+      const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.max(1, Math.floor(img.naturalWidth * scale));
+      const h = Math.max(1, Math.floor(img.naturalHeight * scale));
+      canvas.width = w;
+      canvas.height = h;
+      ctx.drawImage(img, 0, 0, w, h);
+
+      const data = ctx.getImageData(0, 0, w, h).data;
+      const ALPHA = 12; // threshold — ignore near-transparent fringe pixels
+
+      let minX = w, maxX = 0, minY = h, maxY = 0;
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          if (data[(y * w + x) * 4 + 3] > ALPHA) {
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+
+      if (maxX <= minX || maxY <= minY) return; // all transparent
+
+      setBounds({
+        leftPct:   (minX / w) * 100,
+        topPct:    (minY / h) * 100,
+        rightPct:  ((w - maxX - 1) / w) * 100,
+        bottomPct: ((h - maxY - 1) / h) * 100,
+      });
+    };
+    img.src = src;
+  }, [src]);
+
+  return bounds;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -344,6 +412,10 @@ function ModelStage({
   // Framer Motion drag offset values — reset to 0 after each drag to avoid accumulation
   const dragX = useMotionValue(0);
   const dragY = useMotionValue(0);
+
+  // Canvas alpha-scan: detect the tight non-transparent content bounds for bounding box
+  const imageSrc = isStudioMode && studioSlot ? studioSlot.imageSrc : slot.imageSrc;
+  const contentBounds = useImageContentBounds(imageSrc);
 
   useEffect(() => {
     return () => clearTimeout(leaveTimer.current);
@@ -456,27 +528,32 @@ function ModelStage({
             alt={slot.id}
             className="h-[40vh] md:h-[80vh] w-auto object-bottom origin-bottom select-none block"
             style={{
-              filter: "brightness(0.6) contrast(1.1) saturate(0.7)",
+              // drop-shadow traces the actual silhouette instead of the rectangular box
+              filter: "brightness(0.6) contrast(1.1) saturate(0.7) drop-shadow(0 12px 24px rgba(0,0,0,0.55)) drop-shadow(0 4px 8px rgba(0,0,0,0.4))",
               background: "transparent",
             }}
             draggable={false}
             loading="eager"
           />
 
-          {/* Contact shadow */}
+          {/* Foot shadow — tight ellipse at ground contact, reinforces depth */}
           <div
-            className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none z-10"
+            className="absolute bottom-0 pointer-events-none z-10"
             style={{
-              background:
-                "radial-gradient(ellipse 90% 100% at 50% 100%, rgba(0,0,0,0.55) 0%, transparent 100%)",
+              left: "35%", right: "35%", height: 12,
+              background: "radial-gradient(ellipse 100% 100% at 50% 100%, rgba(0,0,0,0.45) 0%, transparent 100%)",
             }}
           />
 
-          {/* Bounding box + scale handle */}
+          {/* Bounding box + scale handle — uses content bounds from alpha-scan */}
           {showBoundingBox && (
             <div
-              className="absolute inset-0 pointer-events-none z-30"
+              className="absolute pointer-events-none z-30"
               style={{
+                left:   contentBounds ? `${contentBounds.leftPct}%`   : 0,
+                top:    contentBounds ? `${contentBounds.topPct}%`    : 0,
+                right:  contentBounds ? `${contentBounds.rightPct}%`  : 0,
+                bottom: contentBounds ? `${contentBounds.bottomPct}%` : 0,
                 border: "1.5px solid rgba(212,184,150,0.75)",
                 boxShadow: "0 0 0 1px rgba(0,0,0,0.4) inset",
               }}
@@ -491,19 +568,19 @@ function ModelStage({
                 }}
                 onPointerDown={handleScalePointerDown}
               />
-              {/* Scale readout */}
+              {/* Display name + scale readout */}
               <div
-                className="absolute top-1 left-1 text-[8px] tracking-widest pointer-events-none"
+                className="absolute -top-5 left-0 text-[8px] tracking-widest pointer-events-none whitespace-nowrap"
                 style={{ color: "#D4B896" }}
               >
-                {studioSlot.scale.toFixed(2)}×
+                {studioSlot.displayName}  ·  {studioSlot.scale.toFixed(2)}×
               </div>
             </div>
           )}
 
           {/* Label */}
           <span className="absolute bottom-10 w-full text-center text-[10px] tracking-[0.3em] text-white/20 uppercase hidden md:block z-20">
-            {slot.id}
+            {studioSlot.displayName || slot.id}
           </span>
 
           {/* Dots */}
@@ -545,20 +622,20 @@ function ModelStage({
           className="h-[40vh] md:h-[80vh] w-auto object-bottom origin-bottom select-none block"
           style={{
             filter: isEditMode
-              ? "brightness(0.6) contrast(1.1) saturate(0.7)"
-              : "brightness(0.85) contrast(1.1) saturate(0.9)",
+              ? "brightness(0.6) contrast(1.1) saturate(0.7) drop-shadow(0 12px 24px rgba(0,0,0,0.55)) drop-shadow(0 4px 8px rgba(0,0,0,0.4))"
+              : "brightness(0.85) contrast(1.1) saturate(0.9) drop-shadow(0 14px 28px rgba(0,0,0,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.3))",
             background: "transparent",
           }}
           draggable={false}
           loading="eager"
         />
 
-        {/* Contact shadow */}
+        {/* Foot shadow — tight ellipse at ground contact */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none z-10"
+          className="absolute bottom-0 pointer-events-none z-10"
           style={{
-            background:
-              "radial-gradient(ellipse 90% 100% at 50% 100%, rgba(0,0,0,0.55) 0%, transparent 100%)",
+            left: "35%", right: "35%", height: 12,
+            background: "radial-gradient(ellipse 100% 100% at 50% 100%, rgba(0,0,0,0.4) 0%, transparent 100%)",
           }}
         />
 

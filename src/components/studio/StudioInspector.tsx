@@ -98,9 +98,14 @@ export function StudioInspector({
 
             {/* Character */}
             <Section label="Character">
+              <TextInput
+                label="Display Name"
+                value={selected.displayName}
+                onChange={(v) => onUpdateSlot(selected.id, { displayName: v })}
+              />
               <label
-                className="text-[9px] tracking-widest uppercase block mb-1"
-                style={{ color: "rgba(255,255,255,0.25)" }}
+                className="text-[9px] tracking-widest uppercase block mt-2 mb-1"
+                style={{ color: "rgba(255,255,255,0.65)" }}
               >
                 Swap Image
               </label>
@@ -197,7 +202,7 @@ function Section({ label, children }: { label: string; children: React.ReactNode
     <div>
       <p
         className="text-[8px] tracking-[0.4em] uppercase mb-3"
-        style={{ color: "rgba(255,255,255,0.22)" }}
+        style={{ color: "rgba(255,255,255,0.65)" }}
       >
         {label}
       </p>
@@ -211,7 +216,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
     <div className="flex items-center justify-between gap-3">
       <span
         className="text-[10px] flex-shrink-0"
-        style={{ color: "rgba(255,255,255,0.35)", minWidth: 60 }}
+        style={{ color: "rgba(255,255,255,0.7)", minWidth: 60 }}
       >
         {label}
       </span>
@@ -267,7 +272,7 @@ function TextInput({
     <div className="flex items-center gap-2">
       <span
         className="text-[9px] flex-shrink-0"
-        style={{ color: "rgba(255,255,255,0.28)", minWidth: 60 }}
+        style={{ color: "rgba(255,255,255,0.65)", minWidth: 60 }}
       >
         {label}
       </span>
@@ -306,7 +311,7 @@ function DotEditor({
       <div className="flex items-center justify-between mb-1">
         <span
           className="text-[8px] tracking-widest uppercase"
-          style={{ color: dot.type === "vault" ? "#D4B896" : "rgba(255,255,255,0.35)" }}
+          style={{ color: dot.type === "vault" ? "#D4B896" : "rgba(255,255,255,0.65)" }}
         >
           {dot.type}
         </span>

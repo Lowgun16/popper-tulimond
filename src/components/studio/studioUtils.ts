@@ -70,6 +70,13 @@ interface RawModelSlot {
   outfit: RawOutfitItem[];
 }
 
+/** Derive a human-readable display name from a model slot id.
+ *  e.g. "center-model" → "Center", "rack-model" → "Rack" */
+function defaultDisplayName(id: string): string {
+  const first = id.split("-")[0] ?? id;
+  return first.charAt(0).toUpperCase() + first.slice(1);
+}
+
 /** Convert a raw MODEL_INVENTORY slot → StudioSlot for editing */
 export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
   const { leftPct, bottomPct } = parseModelPosition(slot.position);
@@ -91,6 +98,7 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
 
   return {
     id: slot.id,
+    displayName: defaultDisplayName(slot.id),
     imageSrc: slot.imageSrc,
     leftPct,
     bottomPct,
@@ -113,6 +121,7 @@ export function exportInventoryCode(slots: StudioSlot[]): string {
 
     lines.push(`  {`);
     lines.push(`    id: "${slot.id}",`);
+    lines.push(`    // displayName: "${slot.displayName}"`);
     lines.push(`    position: "left-[${l}%] md:left-[${l}%] bottom-[${b}%] md:bottom-[${b}%]",`);
     lines.push(`    scale: "md:scale-[${sc}]",`);
     lines.push(`    mobileScale: "scale-[${sc}]",`);
