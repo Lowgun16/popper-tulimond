@@ -353,17 +353,25 @@ function DotEditor({
         ))}
       </div>
 
-      {/* Position */}
-      <div className="flex gap-2 mt-1">
-        <div className="flex-1">
-          <Row label="Top %">
-            <NumInput value={dot.topPct}  onChange={(v) => onUpdate({ topPct: v })} />
-          </Row>
+      {/* Position — full-width columns so the number is never clipped */}
+      <div className="grid grid-cols-2 gap-2 mt-1">
+        <div>
+          <p className="text-[8px] mb-1" style={{ color: "rgba(255,255,255,0.65)" }}>Top %</p>
+          <NumInput
+            value={dot.topPct}
+            min={0}
+            max={100}
+            onChange={(v) => onUpdate({ topPct: v })}
+          />
         </div>
-        <div className="flex-1">
-          <Row label="Left %">
-            <NumInput value={dot.leftPct} onChange={(v) => onUpdate({ leftPct: v })} />
-          </Row>
+        <div>
+          <p className="text-[8px] mb-1" style={{ color: "rgba(255,255,255,0.65)" }}>Left %</p>
+          <NumInput
+            value={dot.leftPct}
+            min={0}
+            max={100}
+            onChange={(v) => onUpdate({ leftPct: v })}
+          />
         </div>
       </div>
     </div>
