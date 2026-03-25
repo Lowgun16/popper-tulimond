@@ -92,7 +92,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
     id: "vault-model",
     position: "right-[28%] md:right-[25%] bottom-[27%] md:bottom-[8%]",
     scale: "md:scale-[0.8]",
-    mobileScale: "scale-[0.85]",
+    mobileScale: "scale-[0.78]",
     zIndex: 20,
     imageSrc: "/model-vault.png",
     outfit: [
@@ -103,7 +103,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$980",
         type: "public",
-        dotPosition: "top-[45%] left-[50%]",
+        dotPosition: "top-[48%] left-[50%]",
       },
       {
         id: "vault-heartbreaker",
@@ -112,7 +112,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,100",
         type: "vault",
-        dotPosition: "top-[45%] left-[42%]",
+        dotPosition: "top-[48%] left-[42%]",
       },
     ],
   },
@@ -263,7 +263,7 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
 
   return (
     <div
-      className={`absolute pointer-events-auto transition-opacity duration-700 origin-bottom ${slot.position} ${slot.mobileScale} ${slot.scale}`}
+      className={`absolute bg-transparent pointer-events-auto transition-opacity duration-700 origin-bottom ${slot.position} ${slot.mobileScale} ${slot.scale}`}
       style={{
         opacity: revealed ? 1 : 0,
         transitionDelay: `${index * 150}ms`,
@@ -274,7 +274,7 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
     >
       {/* Photo container — w-fit/h-fit lets scale drive apparent size, no clipping */}
       <div
-        className="relative w-fit h-fit bg-transparent border border-white/5 cursor-pointer transition-transform duration-500"
+        className="relative w-fit h-fit bg-transparent cursor-pointer transition-transform duration-500"
         style={{ transform: isActive ? "scale(1.03)" : "scale(1)" }}
         onClick={handleTap}
       >
