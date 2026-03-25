@@ -33,7 +33,7 @@ interface ModelSlot {
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[5%] sm:left-[7%] md:left-[10%] bottom-[25%] md:bottom-[5%]",
+    position: "left-[5%] sm:left-[7%] md:left-[10%] bottom-[18%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
     mobileScale: "scale-[0.5]",
     zIndex: 20,
@@ -45,7 +45,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,200",
         type: "public",
-        dotPosition: "top-[40%] left-[50%]",
+        dotPosition: "top-[30%] left-[50%]",
       },
       {
         id: "lounge-heartbreaker",
@@ -54,13 +54,13 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,400",
         type: "vault",
-        dotPosition: "top-[22%] left-[45%]",
+        dotPosition: "top-[20%] left-[45%]",
       },
     ],
   },
   {
     id: "center-model",
-    position: "left-[35%] sm:left-[37%] md:left-[40%] bottom-[32%] md:bottom-[2%]",
+    position: "left-[35%] sm:left-[37%] md:left-[40%] bottom-[22%] md:bottom-[2%]",
     scale: "md:scale-[1.0]",
     mobileScale: "scale-[0.55]",
     zIndex: 15,
@@ -72,7 +72,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,500",
         type: "public",
-        dotPosition: "top-[38%] left-[50%]",
+        dotPosition: "top-[30%] left-[50%]",
       },
       {
         id: "center-heartbreaker",
@@ -81,13 +81,13 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,600",
         type: "vault",
-        dotPosition: "top-[58%] left-[40%]",
+        dotPosition: "top-[20%] left-[40%]",
       },
     ],
   },
   {
     id: "vault-model",
-    position: "right-[18%] sm:right-[21%] md:right-[25%] bottom-[38%] md:bottom-[8%]",
+    position: "right-[18%] sm:right-[21%] md:right-[25%] bottom-[28%] md:bottom-[8%]",
     scale: "md:scale-[0.8]",
     mobileScale: "scale-[0.45]",
     zIndex: 10,
@@ -99,7 +99,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$980",
         type: "public",
-        dotPosition: "top-[40%] left-[50%]",
+        dotPosition: "top-[30%] left-[50%]",
       },
       {
         id: "vault-heartbreaker",
@@ -108,13 +108,13 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,100",
         type: "vault",
-        dotPosition: "top-[30%] left-[42%]",
+        dotPosition: "top-[20%] left-[42%]",
       },
     ],
   },
   {
     id: "rack-model",
-    position: "right-[2%] sm:right-[3%] md:right-[5%] bottom-[22%] md:bottom-[5%]",
+    position: "right-[2%] sm:right-[3%] md:right-[5%] bottom-[15%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
     mobileScale: "scale-[0.5]",
     zIndex: 25,
@@ -126,7 +126,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$1,100",
         type: "public",
-        dotPosition: "top-[55%] left-[50%]",
+        dotPosition: "top-[30%] left-[50%]",
       },
       {
         id: "rack-heartbreaker",
@@ -135,7 +135,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Dark Grey",
         price: "$1,300",
         type: "vault",
-        dotPosition: "top-[65%] left-[40%]",
+        dotPosition: "top-[20%] left-[40%]",
       },
     ],
   },
@@ -267,10 +267,10 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      <div className="relative w-24 sm:w-32 md:w-48 h-[80vh] flex items-end justify-center">
+      <div className="relative w-24 sm:w-32 md:w-48 h-[40vh] md:h-[80vh] flex items-end justify-center">
         {/* Silhouette placeholder */}
         <div
-          className="w-full h-full bg-white/10 border border-white/5 backdrop-blur-sm rounded-t-full transition-all duration-500 cursor-pointer"
+          className="w-full h-full md:bg-white/10 md:border md:border-white/5 md:backdrop-blur-sm rounded-t-full transition-all duration-500 cursor-pointer"
           style={{
             transform: isActive ? "scale(1.05)" : "scale(1)",
             borderColor: isActive ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)",
