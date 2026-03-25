@@ -35,9 +35,9 @@ interface ModelSlot {
 const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    position: "left-[5%] sm:left-[7%] md:left-[10%] bottom-[18%] md:bottom-[5%]",
+    position: "left-[5%] sm:left-[7%] md:left-[10%] bottom-[12%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
-    mobileScale: "scale-[0.5]",
+    mobileScale: "scale-[1.8]",
     zIndex: 20,
     imageSrc: "/model-lounge.png",
     outfit: [
@@ -63,9 +63,9 @@ const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "center-model",
-    position: "left-[35%] sm:left-[37%] md:left-[40%] bottom-[22%] md:bottom-[2%]",
+    position: "left-[35%] sm:left-[37%] md:left-[40%] bottom-[18%] md:bottom-[2%]",
     scale: "md:scale-[1.0]",
-    mobileScale: "scale-[0.55]",
+    mobileScale: "scale-[2.2]",
     zIndex: 30,
     imageSrc: "/model-center.png",
     outfit: [
@@ -93,7 +93,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
     id: "vault-model",
     position: "right-[18%] sm:right-[21%] md:right-[25%] bottom-[28%] md:bottom-[8%]",
     scale: "md:scale-[0.8]",
-    mobileScale: "scale-[0.45]",
+    mobileScale: "scale-[1.4]",
     zIndex: 10,
     imageSrc: "/model-vault.png",
     outfit: [
@@ -121,7 +121,7 @@ const MODEL_INVENTORY: ModelSlot[] = [
     id: "rack-model",
     position: "right-[2%] sm:right-[3%] md:right-[5%] bottom-[15%] md:bottom-[5%]",
     scale: "md:scale-[0.9]",
-    mobileScale: "scale-[0.5]",
+    mobileScale: "scale-[1.7]",
     zIndex: 25,
     imageSrc: "/model-rack.png",
     outfit: [
@@ -275,7 +275,7 @@ function ModelStage({ slot, index, revealed }: ModelStageProps) {
     >
       {/* Photo container — relative required for Next.js Image fill */}
       <div
-        className="relative w-24 sm:w-32 md:w-48 h-[40vh] md:h-[80vh] cursor-pointer transition-transform duration-500"
+        className="relative w-24 sm:w-32 md:w-48 h-[40vh] md:h-[80vh] bg-transparent cursor-pointer transition-transform duration-500"
         style={{ transform: isActive ? "scale(1.03)" : "scale(1)" }}
         onClick={handleTap}
       >
