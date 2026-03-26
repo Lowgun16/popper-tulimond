@@ -10,7 +10,9 @@ import {
 } from "framer-motion";
 import { StudioInspector } from "./studio/StudioInspector";
 import { modelSlotToStudio, exportInventoryCode } from "./studio/studioUtils";
-import type { StudioSlot, StudioDot, ShadowConfig, LookbookContext } from "./studio/studioTypes";
+import type { StudioSlot, StudioDot, ShadowConfig, LookbookContext, AccessType } from "./studio/studioTypes";
+import { MODEL_INVENTORY } from "@/data/inventory";
+import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import { DEFAULT_SHADOW } from "./studio/studioTypes";
 import { LookbookOverlay } from "./studio/LookbookOverlay";
 
@@ -18,156 +20,8 @@ function isVideo(src: string): boolean {
   return /\.(mp4|webm|mov)$/i.test(src.split("?")[0]);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MODEL_INVENTORY
-// Edit names, prices, and colorways here. Do not touch layout below this block.
-// ─────────────────────────────────────────────────────────────────────────────
-
 // Toggle vault dots globally — set true to re-enable champagne gold markers
 const SHOW_VAULT_DOTS = false;
-
-type AccessType = "public" | "vault";
-
-export interface OutfitItem {
-  id: string;
-  name: string;
-  collection: string;
-  colorway: string;
-  price: string;
-  type: AccessType;
-  dotPosition: string; // Full Tailwind literal — must be a static string, no runtime assembly
-  lookbook?: string[];
-}
-
-export interface ModelSlot {
-  id: string;
-  position: string;    // Responsive Tailwind position — includes sm:/md: breakpoints
-  scale: string;       // Desktop scale: "md:scale-[X]" — applied at md+ breakpoint
-  mobileScale: string; // Mobile scale: "scale-[X]" — base (mobile-first), overridden by scale
-  zIndex: number;      // Depth perception: center=40 (closest), vault=20 (furthest)
-  imageSrc: string;    // Path relative to /public
-  outfit: OutfitItem[];
-  shadow?: ShadowConfig;
-}
-
-const MODEL_INVENTORY: ModelSlot[] = [
-  {
-    id: "lounge-model",
-    // displayName: "Lounge"
-    position: "left-[0.6%] md:left-[0.6%] bottom-[7.4%] md:bottom-[7.4%]",
-    scale: "md:scale-[0.88]",
-    mobileScale: "scale-[0.88]",
-    zIndex: 30,
-    imageSrc: "/model-lounge.png",
-    outfit: [
-      {
-        id: "lounge-showstopper",
-        name: "The Showstopper",
-        collection: "The Constable",
-        colorway: "Ivory",
-        price: "$1,200",
-        type: "public",
-        dotPosition: "top-[30.0%] left-[85.0%]",
-      },
-      {
-        id: "lounge-heartbreaker",
-        name: "The Heartbreaker",
-        collection: "The Constable",
-        colorway: "Dark Grey",
-        price: "$1,400",
-        type: "vault",
-        dotPosition: "top-[50.0%] left-[45.0%]",
-      },
-    ],
-  },
-  {
-    id: "center-model",
-    // displayName: "Jerome"
-    position: "left-[34.2%] md:left-[34.2%] bottom-[16.4%] md:bottom-[16.4%]",
-    scale: "md:scale-[0.70]",
-    mobileScale: "scale-[0.70]",
-    zIndex: 29,
-    imageSrc: "/model-center.png",
-    outfit: [
-      {
-        id: "center-showstopper",
-        name: "The Showstopper",
-        collection: "The Constable",
-        colorway: "Ivory",
-        price: "$1,500",
-        type: "public",
-        dotPosition: "top-[30.0%] left-[57.4%]",
-      },
-      {
-        id: "center-heartbreaker",
-        name: "The Heartbreaker",
-        collection: "The Constable",
-        colorway: "Dark Grey",
-        price: "$1,600",
-        type: "vault",
-        dotPosition: "top-[45.0%] left-[40.0%]",
-      },
-    ],
-  },
-  {
-    id: "vault-model",
-    // displayName: "Jack"
-    position: "left-[24.3%] md:left-[24.3%] bottom-[9.3%] md:bottom-[9.3%]",
-    scale: "md:scale-[0.84]",
-    mobileScale: "scale-[0.84]",
-    zIndex: 20,
-    imageSrc: "/model-vault.png",
-    outfit: [
-      {
-        id: "vault-showstopper",
-        name: "The Showstopper",
-        collection: "The Constable",
-        colorway: "Ivory",
-        price: "$980",
-        type: "public",
-        dotPosition: "top-[35.0%] left-[51.6%]",  // was 350.0% (typo) → clamped to 35.0%
-      },
-      {
-        id: "vault-heartbreaker",
-        name: "The Heartbreaker",
-        collection: "The Constable",
-        colorway: "Dark Grey",
-        price: "$1,100",
-        type: "vault",
-        dotPosition: "top-[47.0%] left-[42.0%]",
-      },
-    ],
-  },
-  {
-    id: "rack-model",
-    // displayName: "Ethan"
-    position: "left-[63.4%] md:left-[63.4%] bottom-[8.0%] md:bottom-[8.0%]",
-    scale: "md:scale-[0.83]",
-    mobileScale: "scale-[0.83]",
-    zIndex: 30,
-    imageSrc: "/model-rack.png",
-    outfit: [
-      {
-        id: "rack-showstopper",
-        name: "The Showstopper",
-        collection: "The Constable",
-        colorway: "Ivory",
-        price: "$1,100",
-        type: "public",
-        dotPosition: "top-[58.0%] left-[88.0%]",
-      },
-      {
-        id: "rack-heartbreaker",
-        name: "The Heartbreaker",
-        collection: "The Constable",
-        colorway: "Dark Grey",
-        price: "$1,300",
-        type: "vault",
-        dotPosition: "top-[50.0%] left-[40.0%]",
-      },
-    ],
-  },
-];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HoverCard
