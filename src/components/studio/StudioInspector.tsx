@@ -377,7 +377,7 @@ export function StudioInspector({
           }}
           onClick={onCopyCode}
         >
-          {copyConfirm ? "✓  Copied to Clipboard" : "Copy Layout Code"}
+          {copyConfirm ? "✓  Config Copied" : "Copy Config"}
         </button>
       </div>
 
@@ -450,10 +450,10 @@ export function StudioInspector({
 
     </motion.div>
 
-    {/* ── Pill Toggle Tab — mobile only, lives OUTSIDE motion.div so it stays visible when sidebar closes ── */}
+    {/* ── Pill Toggle Tab — visible on all screen sizes ── */}
     <button
       onClick={() => setSidebarOpen(!sidebarOpen)}
-      className="md:hidden fixed top-1/2 -translate-y-1/2 z-[201] flex items-center justify-center"
+      className="fixed top-1/2 -translate-y-1/2 z-[201] flex items-center justify-center"
       style={{
         left: sidebarOpen ? "min(85vw, 300px)" : 0,
         transition: "left 0.28s cubic-bezier(0.4, 0, 0.2, 1)",

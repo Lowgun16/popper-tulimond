@@ -442,10 +442,11 @@ function ModelStage({
           x: dragX,
           y: dragY,
         }}
-        drag={isSelected}
+        drag={isStudioMode}
         dragMomentum={false}
         dragElastic={0}
         dragConstraints={{ top: -2000, bottom: 2000, left: -2000, right: 2000 }}
+        onDragStart={() => { if (!isSelected) onSelect(); }}
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onDragEnd={(_: any, info: { offset: { x: number; y: number } }) => {
           onModelDragEnd(slot.id, info.offset.x, info.offset.y);
