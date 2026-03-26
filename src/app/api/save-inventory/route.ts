@@ -25,6 +25,7 @@ export interface OutfitItem {
 
 export interface ModelSlot {
   id: string;
+  displayName?: string;
   position: string;
   scale: string;
   mobileScale: string;

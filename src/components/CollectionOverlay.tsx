@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   motion,
   type MotionValue,
@@ -757,6 +758,7 @@ interface Props {
 }
 
 export default function CollectionOverlay({ opacity }: Props) {
+  const router = useRouter();
   const [active, setActive] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -896,6 +898,7 @@ export default function CollectionOverlay({ opacity }: Props) {
     const data = await res.json();
     if (!data.ok) throw new Error(data.error ?? "Save failed");
     setHasUnsavedChanges(false);
+    router.refresh(); // Signal Next.js to re-render with updated inventory
   };
 
   // Prevent accidental loss of unsaved changes on refresh / tab close

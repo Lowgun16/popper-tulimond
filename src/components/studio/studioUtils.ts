@@ -1,5 +1,5 @@
 // src/components/studio/studioUtils.ts
-import type { StudioDot, StudioSlot, AccessType } from "./studioTypes";
+import type { StudioDot, StudioSlot, AccessType, ShadowConfig } from "./studioTypes";
 import { DEFAULT_SHADOW } from "./studioTypes";
 
 // ── Parsers ──────────────────────────────────────────────────────────────────
@@ -64,12 +64,14 @@ interface RawOutfitItem {
 
 interface RawModelSlot {
   id: string;
+  displayName?: string;
   position: string;
   scale: string;
   mobileScale: string;
   zIndex: number;
   imageSrc: string;
   outfit: RawOutfitItem[];
+  shadow?: ShadowConfig;
 }
 
 /** Derive a human-readable display name from a model slot id.
@@ -101,14 +103,14 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
 
   return {
     id: slot.id,
-    displayName: defaultDisplayName(slot.id),
+    displayName: slot.displayName ?? defaultDisplayName(slot.id),
     imageSrc: slot.imageSrc,
     leftPct,
     bottomPct,
     scale,
     zIndex: slot.zIndex,
     dots,
-    shadow: { ...DEFAULT_SHADOW },
+    shadow: slot.shadow ? { ...slot.shadow } : { ...DEFAULT_SHADOW },
   };
 }
 
@@ -125,7 +127,7 @@ export function exportInventoryCode(slots: StudioSlot[]): string {
 
     lines.push(`  {`);
     lines.push(`    id: "${slot.id}",`);
-    lines.push(`    // displayName: "${slot.displayName}"`);
+    lines.push(`    displayName: "${slot.displayName}",`);
     lines.push(`    position: "left-[${l}%] md:left-[${l}%] bottom-[${b}%] md:bottom-[${b}%]",`);
     lines.push(`    scale: "md:scale-[${sc}]",`);
     lines.push(`    mobileScale: "scale-[${sc}]",`);

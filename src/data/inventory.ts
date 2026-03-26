@@ -17,6 +17,7 @@ export interface OutfitItem {
 
 export interface ModelSlot {
   id: string;
+  displayName?: string;
   position: string;
   scale: string;
   mobileScale: string;
@@ -29,8 +30,8 @@ export interface ModelSlot {
 export const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    // displayName: "Angel"
-    position: "left-[19.5%] md:left-[19.5%] bottom-[5.1%] md:bottom-[5.1%]",
+    displayName: "Angel",
+    position: "left-[19.2%] md:left-[19.2%] bottom-[5.6%] md:bottom-[5.6%]",
     scale: "md:scale-[0.85]",
     mobileScale: "scale-[0.85]",
     zIndex: 30,
@@ -61,7 +62,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "center-model",
-    // displayName: "Center"
+    displayName: "Jerome",
     position: "left-[34.2%] md:left-[34.2%] bottom-[16.4%] md:bottom-[16.4%]",
     scale: "md:scale-[0.70]",
     mobileScale: "scale-[0.70]",
@@ -93,7 +94,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "vault-model",
-    // displayName: "Vault"
+    displayName: "Jack",
     position: "left-[24.3%] md:left-[24.3%] bottom-[9.3%] md:bottom-[9.3%]",
     scale: "md:scale-[0.84]",
     mobileScale: "scale-[0.84]",
@@ -125,7 +126,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
   },
   {
     id: "rack-model",
-    // displayName: "Rack"
+    displayName: "Ethan",
     position: "left-[63.4%] md:left-[63.4%] bottom-[8.0%] md:bottom-[8.0%]",
     scale: "md:scale-[0.83]",
     mobileScale: "scale-[0.83]",
