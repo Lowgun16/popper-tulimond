@@ -554,27 +554,31 @@ function NumInput({
   onChange: (v: number) => void;
   isMobile?: boolean;
 }) {
-  if (!isMobile) {
-    return (
-      <input
-        type="number"
-        className="w-full text-[11px] text-white/75 text-right py-1 px-2 rounded-sm"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.09)",
-          outline: "none",
-        }}
-        value={step < 1 ? value.toFixed(2) : Math.round(value)}
-        step={step}
-        min={min}
-        max={max}
-        onChange={(e) => {
-          const v = parseFloat(e.target.value);
-          if (!isNaN(v)) onChange(Math.min(max, Math.max(min, v)));
-        }}
-      />
-    );
-  }
+  const inputEl = (
+    <input
+      type="number"
+      className={
+        isMobile
+          ? "flex-1 text-[11px] text-white/75 text-center py-2 px-1 rounded-sm min-w-0"
+          : "w-full text-[11px] text-white/75 text-right py-1 px-2 rounded-sm"
+      }
+      style={{
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.09)",
+        outline: "none",
+      }}
+      value={step < 1 ? value.toFixed(2) : Math.round(value)}
+      step={step}
+      min={min}
+      max={max}
+      onChange={(e) => {
+        const v = parseFloat(e.target.value);
+        if (!isNaN(v)) onChange(Math.min(max, Math.max(min, v)));
+      }}
+    />
+  );
+
+  if (!isMobile) return inputEl;
 
   const btnStyle: React.CSSProperties = {
     width: 32,
@@ -585,6 +589,7 @@ function NumInput({
     borderRadius: 4,
     color: "white",
     fontSize: 16,
+    cursor: "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -593,23 +598,7 @@ function NumInput({
   return (
     <div className="flex items-center gap-1 w-full">
       <button type="button" style={btnStyle} onClick={() => onChange(Math.max(min, value - step))}>−</button>
-      <input
-        type="number"
-        className="flex-1 text-[11px] text-white/75 text-center py-2 px-1 rounded-sm min-w-0"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.09)",
-          outline: "none",
-        }}
-        value={step < 1 ? value.toFixed(2) : Math.round(value)}
-        step={step}
-        min={min}
-        max={max}
-        onChange={(e) => {
-          const v = parseFloat(e.target.value);
-          if (!isNaN(v)) onChange(Math.min(max, Math.max(min, v)));
-        }}
-      />
+      {inputEl}
       <button type="button" style={btnStyle} onClick={() => onChange(Math.min(max, value + step))}>+</button>
     </div>
   );
