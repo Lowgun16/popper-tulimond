@@ -1,6 +1,7 @@
 // src/components/studio/StudioInspector.tsx
 "use client";
 import React from "react";
+import { motion } from "framer-motion";
 import type { StudioSlot, StudioDot, ShadowConfig, AccessType } from "./studioTypes";
 
 interface Props {
@@ -18,6 +19,17 @@ interface Props {
   onCopyCode: () => void;
   copyConfirm: boolean;
   onSave: () => Promise<void>;
+}
+
+function useMobile(): boolean {
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
 }
 
 export function StudioInspector({
