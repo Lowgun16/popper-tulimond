@@ -31,9 +31,9 @@ export const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
     displayName: "Angel",
-    position: "left-[19.2%] md:left-[19.2%] bottom-[5.6%] md:bottom-[5.6%]",
-    scale: "md:scale-[0.85]",
-    mobileScale: "scale-[0.85]",
+    position: "left-[5.7%] md:left-[5.7%] bottom-[17.3%] md:bottom-[17.3%]",
+    scale: "md:scale-[0.72]",
+    mobileScale: "scale-[0.72]",
     zIndex: 30,
     imageSrc: "/models/Angel/Angel-pro-lit.png",
     outfit: [
@@ -63,11 +63,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "center-model",
     displayName: "Jerome",
-    position: "left-[34.2%] md:left-[34.2%] bottom-[16.4%] md:bottom-[16.4%]",
-    scale: "md:scale-[0.70]",
-    mobileScale: "scale-[0.70]",
+    position: "left-[40.0%] md:left-[40.0%] bottom-[10.0%] md:bottom-[10.0%]",
+    scale: "md:scale-[0.79]",
+    mobileScale: "scale-[0.79]",
     zIndex: 29,
-    imageSrc: "/model-center.png",
+    imageSrc: "/models/Jerome/Jerome-pro-lit.png",
     outfit: [
       {
         id: "center-showstopper",
@@ -90,16 +90,16 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         lookbook: [],
       },
     ],
-    shadow: { offsetX: 0, offsetY: 8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
+    shadow: { offsetX: 0, offsetY: -18, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
   },
   {
     id: "vault-model",
     displayName: "Jack",
-    position: "left-[24.3%] md:left-[24.3%] bottom-[9.3%] md:bottom-[9.3%]",
-    scale: "md:scale-[0.84]",
-    mobileScale: "scale-[0.84]",
+    position: "left-[24.6%] md:left-[24.6%] bottom-[20.0%] md:bottom-[20.0%]",
+    scale: "md:scale-[0.73]",
+    mobileScale: "scale-[0.73]",
     zIndex: 20,
-    imageSrc: "/model-vault.png",
+    imageSrc: "/models/Jack/Jack-pro-lit.png",
     outfit: [
       {
         id: "vault-showstopper",
@@ -122,16 +122,16 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         lookbook: [],
       },
     ],
-    shadow: { offsetX: 0, offsetY: 8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
+    shadow: { offsetX: -28, offsetY: -42, scaleX: 0.90, scaleY: 0.080, opacity: 0.35, blur: 14 },
   },
   {
     id: "rack-model",
     displayName: "Ethan",
-    position: "left-[63.4%] md:left-[63.4%] bottom-[8.0%] md:bottom-[8.0%]",
-    scale: "md:scale-[0.83]",
-    mobileScale: "scale-[0.83]",
+    position: "left-[65.1%] md:left-[65.1%] bottom-[19.4%] md:bottom-[19.4%]",
+    scale: "md:scale-[0.73]",
+    mobileScale: "scale-[0.73]",
     zIndex: 30,
-    imageSrc: "/model-rack.png",
+    imageSrc: "/models/Ethan/Ethan-pro-lit.png",
     outfit: [
       {
         id: "rack-showstopper",
@@ -154,6 +154,6 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         lookbook: [],
       },
     ],
-    shadow: { offsetX: 0, offsetY: 8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
+    shadow: { offsetX: 0, offsetY: 0, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
   },
 ];
