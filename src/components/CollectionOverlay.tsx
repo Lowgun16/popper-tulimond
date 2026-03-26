@@ -10,7 +10,13 @@ import {
 } from "framer-motion";
 import { StudioInspector } from "./studio/StudioInspector";
 import { modelSlotToStudio, exportInventoryCode } from "./studio/studioUtils";
-import type { StudioSlot, StudioDot } from "./studio/studioTypes";
+import type { StudioSlot, StudioDot, ShadowConfig, LookbookContext } from "./studio/studioTypes";
+import { DEFAULT_SHADOW } from "./studio/studioTypes";
+import { LookbookOverlay } from "./studio/LookbookOverlay";
+
+function isVideo(src: string): boolean {
+  return /\.(mp4|webm|mov)$/i.test(src.split("?")[0]);
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODEL_INVENTORY
@@ -30,6 +36,7 @@ export interface OutfitItem {
   price: string;
   type: AccessType;
   dotPosition: string; // Full Tailwind literal — must be a static string, no runtime assembly
+  lookbook?: string[];
 }
 
 export interface ModelSlot {
@@ -40,6 +47,7 @@ export interface ModelSlot {
   zIndex: number;      // Depth perception: center=40 (closest), vault=20 (furthest)
   imageSrc: string;    // Path relative to /public
   outfit: OutfitItem[];
+  shadow?: ShadowConfig;
 }
 
 const MODEL_INVENTORY: ModelSlot[] = [
@@ -225,6 +233,7 @@ interface PulseDotProps {
   modelId: string;
   onDotDrop: (text: string) => void;
   onStudioDotDrop?: (dotId: string, topPct: number, leftPct: number) => void;
+  onDotTap?: () => void;
 }
 
 function PulseDot({
@@ -237,6 +246,7 @@ function PulseDot({
   modelId,
   onDotDrop,
   onStudioDotDrop,
+  onDotTap,
 }: PulseDotProps) {
   const dot = studioDot ?? item!;
   const isVault = dot.type === "vault";
@@ -298,13 +308,14 @@ function PulseDot({
     <motion.div
       className={positionClass}
       style={positionStyle
-        ? { ...positionStyle, zIndex: 20, cursor: draggable ? "grab" : undefined, x: dotDragX, y: dotDragY }
-        : { cursor: draggable ? "grab" : undefined }}
+        ? { ...positionStyle, zIndex: 20, cursor: draggable ? "grab" : undefined, x: dotDragX, y: dotDragY, pointerEvents: "auto" }
+        : { cursor: draggable ? "grab" : undefined, ...(draggable ? { pointerEvents: "auto" as const } : {}) }}
       drag={draggable}
       dragMomentum={false}
       dragElastic={0}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onDragEnd={handleDragEnd as any}
+      onTap={onDotTap}
       whileDrag={{ cursor: "grabbing", scale: 1.5 }}
     >
       <div className="relative">
@@ -340,12 +351,20 @@ function useImageContentBounds(src: string): ContentBounds | null {
   const [bounds, setBounds] = useState<ContentBounds | null>(null);
 
   useEffect(() => {
+    // Clear stale bounds immediately so the bounding box doesn't lag behind
+    setBounds(null);
+
+    if (isVideo(src)) return; // cannot alpha-scan video frames
+
+    let cancelled = false;
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
 
     const img = new window.Image();
     img.onload = () => {
+      if (cancelled) return; // src changed before this load finished — discard
+
       // Scale down to max 512px for performance
       const maxDim = 512;
       const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
@@ -356,7 +375,7 @@ function useImageContentBounds(src: string): ContentBounds | null {
       ctx.drawImage(img, 0, 0, w, h);
 
       const data = ctx.getImageData(0, 0, w, h).data;
-      const ALPHA = 12; // threshold — ignore near-transparent fringe pixels
+      const ALPHA = 12;
 
       let minX = w, maxX = 0, minY = h, maxY = 0;
       for (let y = 0; y < h; y++) {
@@ -370,7 +389,7 @@ function useImageContentBounds(src: string): ContentBounds | null {
         }
       }
 
-      if (maxX <= minX || maxY <= minY) return; // all transparent
+      if (maxX <= minX || maxY <= minY) return;
 
       setBounds({
         leftPct:   (minX / w) * 100,
@@ -380,9 +399,36 @@ function useImageContentBounds(src: string): ContentBounds | null {
       });
     };
     img.src = src;
+
+    return () => { cancelled = true; };
   }, [src]);
 
   return bounds;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// useSafeImageSrc — holds the last successfully loaded src so the <img> never
+// flashes a broken icon during a swap; updates to the new src once it's ready
+// ─────────────────────────────────────────────────────────────────────────────
+
+function useSafeImageSrc(targetSrc: string): string {
+  const [readySrc, setReadySrc] = useState(targetSrc);
+
+  useEffect(() => {
+    let cancelled = false;
+    // Videos can't be preloaded via Image() — use src directly
+    if (isVideo(targetSrc)) {
+      setReadySrc(targetSrc);
+      return;
+    }
+    const img = new window.Image();
+    img.onload = () => { if (!cancelled) setReadySrc(targetSrc); };
+    // On error, readySrc keeps its previous value — no broken icon
+    img.src = targetSrc;
+    return () => { cancelled = true; };
+  }, [targetSrc]);
+
+  return readySrc;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -402,6 +448,7 @@ interface ModelStageProps {
   onStudioDotDrop: (dotId: string, topPct: number, leftPct: number) => void;
   onModelDragEnd: (slotId: string, offsetX: number, offsetY: number) => void;
   onUpdateStudioSlot: (id: string, patch: Partial<StudioSlot>) => void;
+  onOpenLookbook: (ctx: LookbookContext) => void;
 }
 
 function ModelStage({
@@ -417,18 +464,43 @@ function ModelStage({
   onStudioDotDrop,
   onModelDragEnd,
   onUpdateStudioSlot,
+  onOpenLookbook,
 }: ModelStageProps) {
   const [hovered, setHovered] = useState(false);
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
+  const [imgError, setImgError] = useState(false);
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Framer Motion drag offset values — reset to 0 after each drag to avoid accumulation
   const dragX = useMotionValue(0);
   const dragY = useMotionValue(0);
 
-  // Canvas alpha-scan: detect the tight non-transparent content bounds for bounding box
+  const toLookbookCtx = (dot: StudioDot | OutfitItem): LookbookContext => ({
+    name: dot.name,
+    collection: dot.collection,
+    colorway: dot.colorway,
+    price: dot.price,
+    type: dot.type,
+    lookbook: ('lookbook' in dot ? dot.lookbook : undefined) ?? [],
+  });
+
+  // Target src — may be mid-swap (new path not loaded yet)
   const imageSrc = isStudioMode && studioSlot ? studioSlot.imageSrc : slot.imageSrc;
+  // Reset image error flag whenever the src target changes
+  useEffect(() => setImgError(false), [imageSrc]);
+  // Safe src — holds previous image until new one loads, preventing broken-icon flash.
+  // In studio mode we bypass this so typed paths appear immediately (prefer broken icon over ghost).
+  const safeSrc = useSafeImageSrc(imageSrc);
+  const displaySrc = isStudioMode ? imageSrc : safeSrc;
+  // Content bounds — resets to null on src change, repopulates once new image loads
   const contentBounds = useImageContentBounds(imageSrc);
+
+  // Shadow config: studio overrides live on studioSlot; normal mode uses slot.shadow or default
+  const shadow: ShadowConfig = (isStudioMode && studioSlot) ? studioSlot.shadow : (slot.shadow ?? DEFAULT_SHADOW);
+
+  // Fallback bounds when alpha-scan hasn't completed — near-full-image insets so character is
+  // always clickable and bounding box is always visible even before the scan finishes
+  const effectiveBounds = contentBounds ?? { leftPct: 5, topPct: 5, rightPct: 5, bottomPct: 5 };
 
   useEffect(() => {
     return () => clearTimeout(leaveTimer.current);
@@ -494,7 +566,7 @@ function ModelStage({
   const containerStyle: React.CSSProperties = {
     opacity: revealed ? 1 : 0,
     transitionDelay: `${index * 150}ms`,
-    ...(isStudioMode ? {} : { zIndex: slot.zIndex }),
+    ...(isStudioMode ? {} : { zIndex: isEditMode && hovered ? 999 : slot.zIndex }),
     ...studioPositionStyle,
   };
 
@@ -533,39 +605,111 @@ function ModelStage({
       >
         <div
           className="relative w-fit h-fit bg-transparent model-container"
-          style={{ transform: isSelected ? "none" : undefined }}
+          style={{ transform: isSelected ? "none" : undefined, overflow: "visible", isolation: "isolate" }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={studioSlot.imageSrc}
-            alt={slot.id}
-            className="h-[40vh] md:h-[80vh] w-auto object-bottom origin-bottom select-none block"
-            style={{
-              filter: "brightness(0.6) contrast(1.1) saturate(0.7) drop-shadow(0 6px 10px rgba(0,0,0,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
-              background: "transparent",
-            }}
-            draggable={false}
-            loading="eager"
-          />
+          {/* Dynamic Shadow Plane — suppressed when main image has errored */}
+          {!imgError && (
+            isVideo(displaySrc) ? (
+              <video
+                key={displaySrc}
+                src={displaySrc}
+                className="absolute inset-0 h-full w-full select-none pointer-events-none"
+                style={{
+                  objectFit: "contain",
+                  objectPosition: "bottom",
+                  filter: `brightness(0) saturate(100%) blur(${shadow.blur}px) opacity(${shadow.opacity})`,
+                  transform: `translate(${shadow.offsetX}px, ${shadow.offsetY}px) scaleX(${shadow.scaleX}) scaleY(${shadow.scaleY})`,
+                  transformOrigin: "bottom center",
+                  zIndex: 0,
+                }}
+                muted loop autoPlay playsInline
+              />
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={displaySrc}
+                alt=""
+                aria-hidden
+                className="absolute inset-0 h-full w-full select-none pointer-events-none"
+                style={{
+                  objectFit: "contain",
+                  objectPosition: "bottom",
+                  filter: `brightness(0) saturate(100%) blur(${shadow.blur}px) opacity(${shadow.opacity})`,
+                  transform: `translate(${shadow.offsetX}px, ${shadow.offsetY}px) scaleX(${shadow.scaleX}) scaleY(${shadow.scaleY})`,
+                  transformOrigin: "bottom center",
+                  zIndex: 0,
+                }}
+                draggable={false}
+              />
+            )
+          )}
 
-          {/* Foot shadow — tight ellipse at ground contact, reinforces depth */}
-          <div
-            className="absolute bottom-0 pointer-events-none z-10"
-            style={{
-              left: "35%", right: "35%", height: 12,
-              background: "radial-gradient(ellipse 100% 100% at 50% 100%, rgba(0,0,0,0.45) 0%, transparent 100%)",
-            }}
-          />
+          {isVideo(displaySrc) ? (
+            <video
+              key={displaySrc}
+              src={displaySrc}
+              className="h-[40vh] md:h-[80vh] w-auto object-bottom origin-bottom select-none"
+              style={{ position: "relative", zIndex: 1, display: imgError ? "none" : "block" }}
+              muted loop autoPlay playsInline
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={displaySrc}
+              alt={slot.id}
+              className="h-[40vh] md:h-[80vh] w-auto object-bottom origin-bottom select-none"
+              style={{
+                position: "relative",
+                zIndex: 1,
+                display: imgError ? "none" : "block",
+                filter: "brightness(0.6) contrast(1.1) saturate(0.7) drop-shadow(0 6px 10px rgba(0,0,0,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
+                background: "transparent",
+              }}
+              draggable={false}
+              loading="eager"
+              onError={() => setImgError(true)}
+            />
+          )}
+
+          {/* Ghost box — shown when the image path is missing or fails to load */}
+          {imgError && (
+            <div
+              className="h-[40vh] md:h-[80vh] flex flex-col items-center justify-center gap-3 select-none"
+              style={{
+                width: "12vw",
+                minWidth: 120,
+                position: "relative",
+                zIndex: 1,
+                border: "2px dashed rgba(255,255,255,0.7)",
+                background: "rgba(255,255,255,0.03)",
+                pointerEvents: "none",  // never block clicks behind it
+              }}
+            >
+              <span
+                className="text-[8px] tracking-widest uppercase text-center px-2"
+                style={{ color: "rgba(255,255,255,0.6)" }}
+              >
+                {studioSlot.displayName}
+              </span>
+              <span
+                className="text-[7px] tracking-wide text-center px-2 font-mono"
+                style={{ color: "rgba(255,255,255,0.3)", wordBreak: "break-all" }}
+              >
+                {studioSlot.imageSrc}
+              </span>
+            </div>
+          )}
 
           {/* Bounding box + scale handle — uses content bounds from alpha-scan */}
           {showBoundingBox && (
             <div
               className="absolute pointer-events-none z-30"
               style={{
-                left:   contentBounds ? `${contentBounds.leftPct}%`   : 0,
-                top:    contentBounds ? `${contentBounds.topPct}%`    : 0,
-                right:  contentBounds ? `${contentBounds.rightPct}%`  : 0,
-                bottom: contentBounds ? `${contentBounds.bottomPct}%` : 0,
+                left:   `${effectiveBounds.leftPct}%`,
+                top:    `${effectiveBounds.topPct}%`,
+                right:  `${effectiveBounds.rightPct}%`,
+                bottom: `${effectiveBounds.bottomPct}%`,
                 border: "1.5px solid rgba(212,184,150,0.75)",
                 boxShadow: "0 0 0 1px rgba(0,0,0,0.4) inset",
               }}
@@ -604,6 +748,7 @@ function ModelStage({
               modelId={slot.id}
               onDotDrop={onDotDrop}
               onStudioDotDrop={onStudioDotDrop}
+              onDotTap={dot.lookbook.length > 0 ? () => onOpenLookbook(toLookbookCtx(dot)) : undefined}
             />
           ))}
         </div>
@@ -611,42 +756,91 @@ function ModelStage({
     );
   }
 
-  // ── Normal (non-studio) mode — unchanged layout ──
+  // ── Normal (non-studio) mode ──
   return (
     <div
       className={containerClass}
-      style={containerStyle}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
+      style={{ ...containerStyle, ...(isEditMode ? { pointerEvents: "none" } : {}) }}
+      onMouseEnter={isEditMode ? undefined : handleEnter}
+      onMouseLeave={isEditMode ? undefined : handleLeave}
     >
       <div
-        className="relative w-fit h-fit bg-transparent model-container cursor-pointer transition-transform duration-500"
-        style={{ transform: isActive && !isEditMode ? "scale(1.03)" : "scale(1)" }}
-        onClick={handleTap}
+        className="relative w-fit h-fit bg-transparent model-container transition-transform duration-500"
+        style={{
+          cursor: isEditMode ? undefined : "pointer",
+          transform: isActive && !isEditMode ? "scale(1.03)" : "scale(1)",
+          overflow: "visible",
+          ...(isEditMode ? { pointerEvents: "none" } : {}),
+        }}
+        onClick={isEditMode ? undefined : handleTap}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={slot.imageSrc}
-          alt={slot.id}
-          className="h-[40vh] md:h-[80vh] w-auto object-bottom origin-bottom select-none block"
-          style={{
-            filter: isEditMode
-              ? "brightness(0.6) contrast(1.1) saturate(0.7) drop-shadow(0 6px 10px rgba(0,0,0,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.3))"
-              : "brightness(0.85) contrast(1.1) saturate(0.9) drop-shadow(0 8px 14px rgba(0,0,0,0.45)) drop-shadow(0 2px 4px rgba(0,0,0,0.25))",
-            background: "transparent",
-          }}
-          draggable={false}
-          loading="eager"
-        />
+        {/* Dynamic Shadow Plane */}
+        {isVideo(displaySrc) ? (
+          <video
+            key={displaySrc}
+            src={displaySrc}
+            className="absolute inset-0 h-full w-full select-none pointer-events-none"
+            style={{
+              objectFit: "contain",
+              objectPosition: "bottom",
+              filter: `brightness(0) saturate(100%) blur(${shadow.blur}px) opacity(${shadow.opacity})`,
+              transform: `translate(${shadow.offsetX}px, ${shadow.offsetY}px) scaleX(${shadow.scaleX}) scaleY(${shadow.scaleY})`,
+              transformOrigin: "bottom center",
+              zIndex: 0,
+            }}
+            muted loop autoPlay playsInline
+          />
+        ) : (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={displaySrc}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full select-none pointer-events-none"
+            style={{
+              objectFit: "contain",
+              objectPosition: "bottom",
+              filter: `brightness(0) saturate(100%) blur(${shadow.blur}px) opacity(${shadow.opacity})`,
+              transform: `translate(${shadow.offsetX}px, ${shadow.offsetY}px) scaleX(${shadow.scaleX}) scaleY(${shadow.scaleY})`,
+              transformOrigin: "bottom center",
+              zIndex: 0,
+            }}
+            draggable={false}
+          />
+        )}
 
-        {/* Foot shadow — tight ellipse at ground contact */}
-        <div
-          className="absolute bottom-0 pointer-events-none z-10"
-          style={{
-            left: "35%", right: "35%", height: 12,
-            background: "radial-gradient(ellipse 100% 100% at 50% 100%, rgba(0,0,0,0.4) 0%, transparent 100%)",
-          }}
-        />
+        {isVideo(displaySrc) ? (
+          <video
+            key={displaySrc}
+            src={displaySrc}
+            className="h-[40vh] md:h-[80vh] w-auto object-bottom origin-bottom select-none block"
+            style={{
+              position: "relative",
+              zIndex: 1,
+              filter: isEditMode
+                ? "brightness(0.6) contrast(1.1) saturate(0.7) drop-shadow(0 6px 10px rgba(0,0,0,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.3))"
+                : "brightness(0.85) contrast(1.1) saturate(0.9) drop-shadow(0 8px 14px rgba(0,0,0,0.45)) drop-shadow(0 2px 4px rgba(0,0,0,0.25))",
+            }}
+            muted loop autoPlay playsInline
+          />
+        ) : (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={displaySrc}
+            alt={slot.id}
+            className="h-[40vh] md:h-[80vh] w-auto object-bottom origin-bottom select-none block"
+            style={{
+              position: "relative",
+              zIndex: 1,
+              filter: isEditMode
+                ? "brightness(0.6) contrast(1.1) saturate(0.7) drop-shadow(0 6px 10px rgba(0,0,0,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.3))"
+                : "brightness(0.85) contrast(1.1) saturate(0.9) drop-shadow(0 8px 14px rgba(0,0,0,0.45)) drop-shadow(0 2px 4px rgba(0,0,0,0.25))",
+              background: "transparent",
+            }}
+            draggable={false}
+            loading="eager"
+          />
+        )}
 
         {/* Tap glow */}
         {activeItemId && !isEditMode && (
@@ -656,18 +850,24 @@ function ModelStage({
           />
         )}
 
-        {/* Edit mode dashed border */}
+        {/* Edit mode: tight hit-area using alpha-scan content bounds.
+            Restricts click/hover to the character's actual body pixels. */}
         {isEditMode && (
           <div
-            className="absolute inset-0 pointer-events-none z-10"
-            style={{ border: "1px dashed rgba(212,184,150,0.25)" }}
+            className="absolute z-30"
+            style={{
+              left:   `${effectiveBounds.leftPct}%`,
+              top:    `${effectiveBounds.topPct}%`,
+              right:  `${effectiveBounds.rightPct}%`,
+              bottom: `${effectiveBounds.bottomPct}%`,
+              pointerEvents: "auto",
+              cursor: "pointer",
+            }}
+            onClick={handleTap}
+            onMouseEnter={handleEnter}
+            onMouseLeave={handleLeave}
           />
         )}
-
-        {/* Label */}
-        <span className="absolute bottom-10 w-full text-center text-[10px] tracking-[0.3em] text-white/20 uppercase hidden md:block z-20">
-          {slot.id}
-        </span>
 
         {/* Pulse dots */}
         {(dots as OutfitItem[]).map((item) => (
@@ -681,6 +881,7 @@ function ModelStage({
             modelId={slot.id}
             onDotDrop={onDotDrop}
             onStudioDotDrop={() => {}}
+            onDotTap={item.lookbook?.length ? () => onOpenLookbook(toLookbookCtx(item)) : undefined}
           />
         ))}
       </div>
@@ -713,6 +914,7 @@ export default function CollectionOverlay({ opacity }: Props) {
   const [studioSlots, setStudioSlots] = useState<StudioSlot[]>([]);
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
   const [copyConfirm, setCopyConfirm] = useState(false);
+  const [lookbookDot, setLookbookDot] = useState<LookbookContext | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useMotionValueEvent(opacity, "change", (v) => {
@@ -762,8 +964,9 @@ export default function CollectionOverlay({ opacity }: Props) {
       colorway: "Ivory",
       price: "$0",
       type: "public",
-      topPct: 40,
+      topPct: 50,
       leftPct: 50,
+      lookbook: [],
     };
     setStudioSlots((prev) =>
       prev.map((s) => (s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s))
@@ -787,12 +990,39 @@ export default function CollectionOverlay({ opacity }: Props) {
     setSelectedModelId((prev) => (prev === slotId ? null : prev));
   }, []);
 
+  const addSlot = useCallback(() => {
+    const id = `patron-${Date.now()}`;
+    const newSlot: StudioSlot = {
+      id,
+      displayName: "New Patron",
+      imageSrc: "/model-center.png",
+      leftPct: 40,
+      bottomPct: 5,
+      scale: 0.85,
+      zIndex: 25,
+      dots: [],
+      shadow: { ...DEFAULT_SHADOW },
+    };
+    setStudioSlots((prev) => [...prev, newSlot]);
+    setSelectedModelId(id);
+  }, []);
+
+  const updateShadow = useCallback((slotId: string, patch: Partial<ShadowConfig>) => {
+    setStudioSlots((prev) =>
+      prev.map((s) => (s.id === slotId ? { ...s, shadow: { ...s.shadow, ...patch } } : s))
+    );
+  }, []);
+
   const copyCode = useCallback(() => {
     const code = exportInventoryCode(studioSlots);
     navigator.clipboard.writeText(code);
     setCopyConfirm(true);
     setTimeout(() => setCopyConfirm(false), 2500);
   }, [studioSlots]);
+
+  const openLookbook = useCallback((ctx: LookbookContext) => {
+    setLookbookDot(ctx);
+  }, []);
 
   // ── Model drag-to-reposition ──
   const handleModelDragEnd = useCallback(
@@ -825,36 +1055,79 @@ export default function CollectionOverlay({ opacity }: Props) {
         <StudioInspector
           slots={studioSlots}
           selectedId={selectedModelId}
+          onSelectSlot={setSelectedModelId}
           onUpdateSlot={updateSlot}
           onUpdateDot={updateDot}
           onAddDot={addDot}
           onRemoveDot={removeDot}
           onSwapImage={swapImage}
+          onAddSlot={addSlot}
           onRemoveSlot={removeSlot}
+          onUpdateShadow={updateShadow}
           onCopyCode={copyCode}
           copyConfirm={copyConfirm}
         />
       )}
 
-      {/* Models — always iterate MODEL_INVENTORY for raw slot shape;
-          look up matching StudioSlot by id for studio overrides */}
-      {MODEL_INVENTORY.map((slot, index) => (
+      {/* Models — studio mode iterates studioSlots directly so removed slots are
+          fully unmounted and patron slots (not in MODEL_INVENTORY) render correctly.
+          Normal mode iterates MODEL_INVENTORY as before. */}
+      {isStudioMode
+        ? studioSlots.map((studioSlot, index) => {
+            // Use the raw ModelSlot if it exists; synthesize a minimal one for patrons
+            const rawSlot: ModelSlot = MODEL_INVENTORY.find((s) => s.id === studioSlot.id) ?? {
+              id: studioSlot.id,
+              position: `left-[${studioSlot.leftPct}%] bottom-[${studioSlot.bottomPct}%]`,
+              scale: `md:scale-[${studioSlot.scale}]`,
+              mobileScale: `scale-[${studioSlot.scale}]`,
+              zIndex: studioSlot.zIndex,
+              imageSrc: studioSlot.imageSrc,
+              outfit: [],
+            };
+            return (
+              <ModelStage
+                key={studioSlot.id}
+                slot={rawSlot}
+                index={index}
+                revealed={revealed}
+                isEditMode={false}
+                isStudioMode={true}
+                studioSlot={studioSlot}
+                isSelected={selectedModelId === studioSlot.id}
+                onSelect={() => setSelectedModelId(studioSlot.id)}
+                onDotDrop={handleDotDrop}
+                onStudioDotDrop={(dotId, topPct, leftPct) => updateDot(studioSlot.id, dotId, { topPct, leftPct })}
+                onModelDragEnd={handleModelDragEnd}
+                onUpdateStudioSlot={updateSlot}
+                onOpenLookbook={openLookbook}
+              />
+            );
+          })
+        : MODEL_INVENTORY.map((slot, index) => (
         <ModelStage
           key={slot.id}
           slot={slot}
           index={index}
           revealed={revealed}
-          isEditMode={isEditMode && !isStudioMode}
-          isStudioMode={isStudioMode}
-          studioSlot={isStudioMode ? studioSlots.find((s) => s.id === slot.id) : undefined}
+          isEditMode={isEditMode}
+          isStudioMode={false}
+          studioSlot={undefined}
           isSelected={selectedModelId === slot.id}
           onSelect={() => setSelectedModelId(slot.id)}
           onDotDrop={handleDotDrop}
           onStudioDotDrop={(dotId, topPct, leftPct) => updateDot(slot.id, dotId, { topPct, leftPct })}
           onModelDragEnd={handleModelDragEnd}
           onUpdateStudioSlot={updateSlot}
+          onOpenLookbook={openLookbook}
         />
       ))}
+
+      {lookbookDot && (
+        <LookbookOverlay
+          dot={lookbookDot}
+          onClose={() => setLookbookDot(null)}
+        />
+      )}
 
       {/* Toggle button — Studio Mode / Exit Studio */}
       {active && (

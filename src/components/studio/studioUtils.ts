@@ -59,6 +59,7 @@ interface RawOutfitItem {
   price: string;
   type: AccessType;
   dotPosition: string;
+  lookbook?: string[];
 }
 
 interface RawModelSlot {
@@ -94,6 +95,7 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
       type: item.type,
       topPct,
       leftPct: dLeft,
+      lookbook: item.lookbook ?? [],
     };
   });
 
@@ -140,10 +142,17 @@ export function exportInventoryCode(slots: StudioSlot[]): string {
       lines.push(`        price: "${dot.price}",`);
       lines.push(`        type: "${dot.type}",`);
       lines.push(`        dotPosition: "top-[${dot.topPct.toFixed(1)}%] left-[${dot.leftPct.toFixed(1)}%]",`);
+      if (dot.lookbook.length === 0) {
+        lines.push(`        lookbook: [],`);
+      } else {
+        const paths = dot.lookbook.map((p) => `"${p}"`).join(", ");
+        lines.push(`        lookbook: [${paths}],`);
+      }
       lines.push(`      },`);
     }
 
     lines.push(`    ],`);
+    lines.push(`    shadow: { offsetX: ${slot.shadow.offsetX}, offsetY: ${slot.shadow.offsetY}, scaleX: ${slot.shadow.scaleX.toFixed(2)}, scaleY: ${slot.shadow.scaleY.toFixed(3)}, opacity: ${slot.shadow.opacity.toFixed(2)}, blur: ${slot.shadow.blur} },`);
     lines.push(`  },`);
   }
 

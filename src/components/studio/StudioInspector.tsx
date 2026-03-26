@@ -1,18 +1,20 @@
 // src/components/studio/StudioInspector.tsx
 "use client";
 import React from "react";
-import { AVAILABLE_IMAGES } from "./studioTypes";
-import type { StudioSlot, StudioDot, AccessType } from "./studioTypes";
+import type { StudioSlot, StudioDot, ShadowConfig, AccessType } from "./studioTypes";
 
 interface Props {
   slots: StudioSlot[];
   selectedId: string | null;
+  onSelectSlot: (id: string) => void;
   onUpdateSlot: (id: string, patch: Partial<StudioSlot>) => void;
   onUpdateDot: (slotId: string, dotId: string, patch: Partial<StudioDot>) => void;
   onAddDot: (slotId: string) => void;
   onRemoveDot: (slotId: string, dotId: string) => void;
   onSwapImage: (slotId: string, imageSrc: string) => void;
+  onAddSlot: () => void;
   onRemoveSlot: (slotId: string) => void;
+  onUpdateShadow: (slotId: string, patch: Partial<ShadowConfig>) => void;
   onCopyCode: () => void;
   copyConfirm: boolean;
 }
@@ -20,12 +22,15 @@ interface Props {
 export function StudioInspector({
   slots,
   selectedId,
+  onSelectSlot,
   onUpdateSlot,
   onUpdateDot,
   onAddDot,
   onRemoveDot,
   onSwapImage,
+  onAddSlot,
   onRemoveSlot,
+  onUpdateShadow,
   onCopyCode,
   copyConfirm,
 }: Props) {
@@ -39,6 +44,7 @@ export function StudioInspector({
         background: "rgba(8,8,8,0.97)",
         borderRight: "1px solid rgba(255,255,255,0.07)",
         backdropFilter: "blur(16px)",
+        pointerEvents: "auto",   // explicit override — sidebar must never inherit pointer-events:none
       }}
     >
       {/* ── Header ── */}
@@ -53,8 +59,50 @@ export function StudioInspector({
           Popper Studio
         </p>
         <p className="text-white/40 text-[11px] tracking-wide">
-          {selected ? selected.id : "Click a character to select"}
+          {selected ? selected.displayName : `${slots.length} character${slots.length !== 1 ? "s" : ""}`}
         </p>
+      </div>
+
+      {/* ── Character Roster — always visible, click to select ── */}
+      <div
+        className="px-4 py-3 flex-shrink-0"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <p
+          className="text-[8px] tracking-[0.4em] uppercase mb-2"
+          style={{ color: "rgba(255,255,255,0.3)" }}
+        >
+          Cast
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {slots.map((slot) => {
+            const active = slot.id === selectedId;
+            return (
+              <button
+                key={slot.id}
+                className="text-[8px] tracking-widest uppercase px-2.5 py-1.5 transition-all duration-150"
+                style={{
+                  border: `1px solid ${active ? "#D4B896" : "rgba(255,255,255,0.14)"}`,
+                  color: active ? "#D4B896" : "rgba(255,255,255,0.5)",
+                  background: active ? "rgba(212,184,150,0.07)" : "transparent",
+                }}
+                onClick={() => onSelectSlot(slot.id)}
+              >
+                {slot.displayName}
+              </button>
+            );
+          })}
+          <button
+            className="text-[8px] tracking-widest uppercase px-2.5 py-1.5 transition-all duration-150"
+            style={{
+              border: "1px solid rgba(212,184,150,0.2)",
+              color: "rgba(212,184,150,0.5)",
+            }}
+            onClick={onAddSlot}
+          >
+            + Patron
+          </button>
+        </div>
       </div>
 
       {/* ── Body ── */}
@@ -70,6 +118,20 @@ export function StudioInspector({
                   onChange={(v) => onUpdateSlot(selected.id, { leftPct: v })}
                 />
               </Row>
+              {selected.leftPct < 15 && (
+                <div className="flex items-center justify-between gap-2 mt-1">
+                  <p className="text-[8px] leading-snug" style={{ color: "rgba(255,180,60,0.85)" }}>
+                    ⚠ Behind sidebar
+                  </p>
+                  <button
+                    className="text-[8px] tracking-widest uppercase px-2 py-1 flex-shrink-0"
+                    style={{ border: "1px solid rgba(255,180,60,0.4)", color: "rgba(255,180,60,0.75)" }}
+                    onClick={() => onUpdateSlot(selected.id, { leftPct: 22 })}
+                  >
+                    Nudge →
+                  </button>
+                </div>
+              )}
               <Row label="Bottom %">
                 <NumInput
                   value={selected.bottomPct}
@@ -107,24 +169,25 @@ export function StudioInspector({
                 className="text-[9px] tracking-widest uppercase block mt-2 mb-1"
                 style={{ color: "rgba(255,255,255,0.65)" }}
               >
-                Swap Image
+                Image Path
               </label>
-              <select
-                className="w-full text-[11px] text-white/70 py-1.5 px-2 rounded-sm"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  outline: "none",
-                }}
+              <ImagePathInput
                 value={selected.imageSrc}
-                onChange={(e) => onSwapImage(selected.id, e.target.value)}
+                onChange={(v) => onSwapImage(selected.id, v)}
+              />
+              <button
+                className="w-full text-[9px] tracking-widest uppercase py-1.5 mt-1 transition-colors duration-200"
+                style={{
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "rgba(255,255,255,0.4)",
+                }}
+                onClick={() => {
+                  const base = selected.imageSrc.replace(/\?t=\d+$/, "");
+                  onSwapImage(selected.id, `${base}?t=${Date.now()}`);
+                }}
               >
-                {AVAILABLE_IMAGES.map((src) => (
-                  <option key={src} value={src} style={{ background: "#111" }}>
-                    {src.replace("/", "").replace(".png", "")}
-                  </option>
-                ))}
-              </select>
+                ↻  Reload Image
+              </button>
               <button
                 className="mt-2 w-full text-[9px] tracking-widest uppercase py-2 transition-colors duration-200"
                 style={{
@@ -159,6 +222,64 @@ export function StudioInspector({
               >
                 + Add Hotspot
               </button>
+            </Section>
+
+            {/* Shadow */}
+            <Section label="Shadow Plane">
+              <Row label="Offset X">
+                <NumInput
+                  value={selected.shadow.offsetX}
+                  step={1}
+                  min={-300}
+                  max={300}
+                  onChange={(v) => onUpdateShadow(selected.id, { offsetX: v })}
+                />
+              </Row>
+              <Row label="Offset Y">
+                <NumInput
+                  value={selected.shadow.offsetY}
+                  step={1}
+                  min={-300}
+                  max={300}
+                  onChange={(v) => onUpdateShadow(selected.id, { offsetY: v })}
+                />
+              </Row>
+              <Row label="Scale W">
+                <NumInput
+                  value={selected.shadow.scaleX}
+                  step={0.05}
+                  min={0}
+                  max={5}
+                  onChange={(v) => onUpdateShadow(selected.id, { scaleX: v })}
+                />
+              </Row>
+              <Row label="Scale H">
+                <NumInput
+                  value={selected.shadow.scaleY}
+                  step={0.01}
+                  min={0}
+                  max={2}
+                  onChange={(v) => onUpdateShadow(selected.id, { scaleY: v })}
+                />
+              </Row>
+              <Row label="Opacity">
+                <NumInput
+                  value={selected.shadow.opacity}
+                  step={0.05}
+                  min={0}
+                  max={1}
+                  onChange={(v) => onUpdateShadow(selected.id, { opacity: v })}
+                />
+              </Row>
+              <Row label="Blur">
+                <NumInput
+                  value={selected.shadow.blur}
+                  step={1}
+                  min={0}
+                  max={60}
+                  onChange={(v) => onUpdateShadow(selected.id, { blur: v })}
+                />
+              </Row>
             </Section>
 
           </div>
@@ -222,6 +343,42 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
       </span>
       <div className="flex-1">{children}</div>
     </div>
+  );
+}
+
+/** Free-form image path input.
+ *  Reads the live DOM value on commit so there are zero stale-closure bugs.
+ *  Commits on Enter, Tab, or blur — whichever comes first.
+ */
+function ImagePathInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [draft, setDraft] = React.useState(value);
+  // Sync draft if parent swaps the value from outside (e.g. patron creation)
+  React.useEffect(() => setDraft(value), [value]);
+
+  // Read from the DOM element directly — avoids any stale-state closure issue
+  const commit = (domValue: string) => {
+    const trimmed = domValue.trim();
+    if (trimmed) onChange(trimmed);
+  };
+
+  return (
+    <input
+      className="w-full text-[11px] text-white/75 py-1 px-2 rounded-sm font-mono"
+      style={{
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.09)",
+        outline: "none",
+      }}
+      value={draft}
+      placeholder="/models/jerome-pro.png"
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={(e) => commit(e.currentTarget.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === "Tab") {
+          commit(e.currentTarget.value);
+        }
+      }}
+    />
   );
 }
 
@@ -374,6 +531,66 @@ function DotEditor({
           />
         </div>
       </div>
+
+      {/* Lookbook gallery */}
+      <div className="mt-2 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <p className="text-[8px] tracking-[0.35em] uppercase mb-2" style={{ color: "rgba(255,255,255,0.35)" }}>
+          Lookbook ({dot.lookbook.length})
+        </p>
+        {dot.lookbook.map((src: string, idx: number) => (
+          <div key={idx} className="flex items-center gap-1.5 mb-1.5">
+            <span
+              className="flex-1 text-[9px] font-mono truncate"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+              title={src}
+            >
+              {src.split("/").pop()}
+            </span>
+            <button
+              className="text-[10px] leading-none flex-shrink-0"
+              style={{ color: "rgba(200,70,70,0.6)" }}
+              onClick={() => onUpdate({ lookbook: dot.lookbook.filter((_, i) => i !== idx) })}
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+        <LookbookAdder
+          onAdd={(src) =>
+            onUpdate({ lookbook: [...dot.lookbook, src] })
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
+function LookbookAdder({ onAdd }: { onAdd: (src: string) => void }) {
+  const [src, setSrc] = React.useState("");
+
+  const submit = () => {
+    if (!src.trim()) return;
+    onAdd(src.trim());
+    setSrc("");
+  };
+
+  return (
+    <div className="flex flex-col gap-1 mt-1">
+      <input
+        className="w-full text-[10px] text-white/65 py-1 px-2 rounded-sm font-mono"
+        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", outline: "none" }}
+        value={src}
+        placeholder="/media/look.png or .mp4"
+        onChange={(e) => setSrc(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+      />
+      <button
+        className="w-full text-[8px] tracking-widest uppercase py-1.5 transition-colors duration-150"
+        style={{ border: "1px solid rgba(212,184,150,0.2)", color: "rgba(212,184,150,0.55)" }}
+        onClick={submit}
+      >
+        + Add Media
+      </button>
     </div>
   );
 }
