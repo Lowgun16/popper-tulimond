@@ -769,6 +769,7 @@ export default function CollectionOverlay({ opacity }: Props) {
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
   const [copyConfirm, setCopyConfirm] = useState(false);
   const [lookbookDot, setLookbookDot] = useState<LookbookContext | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useMotionValueEvent(opacity, "change", (v) => {
@@ -878,6 +879,36 @@ export default function CollectionOverlay({ opacity }: Props) {
     setLookbookDot(ctx);
   }, []);
 
+  // Mark dirty whenever studioSlots changes while in Studio mode
+  useEffect(() => {
+    if (isStudioMode) {
+      setHasUnsavedChanges(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [studioSlots]);
+
+  const handleSave = async () => {
+    const res = await fetch("/api/save-inventory", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slots: studioSlots }),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error ?? "Save failed");
+    setHasUnsavedChanges(false);
+  };
+
+  // Prevent accidental loss of unsaved changes on refresh / tab close
+  useEffect(() => {
+    if (!hasUnsavedChanges || !isStudioMode) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [hasUnsavedChanges, isStudioMode]);
+
   // ── Model drag-to-reposition ──
   const handleModelDragEnd = useCallback(
     (slotId: string, offsetX: number, offsetY: number) => {
@@ -920,6 +951,7 @@ export default function CollectionOverlay({ opacity }: Props) {
           onUpdateShadow={updateShadow}
           onCopyCode={copyCode}
           copyConfirm={copyConfirm}
+          onSave={handleSave}
         />
       )}
 

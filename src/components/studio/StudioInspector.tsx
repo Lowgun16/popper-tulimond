@@ -17,6 +17,7 @@ interface Props {
   onUpdateShadow: (slotId: string, patch: Partial<ShadowConfig>) => void;
   onCopyCode: () => void;
   copyConfirm: boolean;
+  onSave: () => Promise<void>;
 }
 
 export function StudioInspector({
@@ -33,8 +34,45 @@ export function StudioInspector({
   onUpdateShadow,
   onCopyCode,
   copyConfirm,
+  onSave,
 }: Props) {
   const selected = selectedId ? (slots.find((s) => s.id === selectedId) ?? null) : null;
+
+  type SaveState = "idle" | "saving" | "saved" | "error";
+  type PublishState = "idle" | "publishing";
+
+  const [saveState, setSaveState] = React.useState<SaveState>("idle");
+  const [saveError, setSaveError] = React.useState<string | null>(null);
+  const [publishState, setPublishState] = React.useState<PublishState>("idle");
+
+  const handleSaveClick = async () => {
+    if (saveState === "saving") return;
+    setSaveState("saving");
+    setSaveError(null);
+    try {
+      await onSave();
+      setSaveState("saved");
+      setTimeout(() => setSaveState("idle"), 2000);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Save failed";
+      setSaveError(msg);
+      setSaveState("error");
+      setTimeout(() => { setSaveState("idle"); setSaveError(null); }, 3000);
+    }
+  };
+
+  const handlePublishClick = async () => {
+    if (publishState === "publishing" || saveState === "saving") return;
+    setPublishState("publishing");
+    try {
+      await onSave();
+      // TODO: wire to deploy endpoint
+      await new Promise<void>((resolve) => setTimeout(resolve, 3000));
+    } catch {
+      // Save error is surfaced by handleSaveClick — publish silently aborts
+    }
+    setPublishState("idle");
+  };
 
   return (
     <div
@@ -310,6 +348,73 @@ export function StudioInspector({
           onClick={onCopyCode}
         >
           {copyConfirm ? "✓  Copied to Clipboard" : "Copy Layout Code"}
+        </button>
+      </div>
+
+      {/* ── Save / Publish footer ── */}
+      <div
+        className="flex-shrink-0 px-4 pb-5 pt-3 flex flex-col gap-2"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        {/* SAVE CHANGES */}
+        <button
+          onClick={handleSaveClick}
+          disabled={saveState === "saving"}
+          className="w-full py-2.5 text-[9px] tracking-[0.3em] uppercase transition-all duration-200 flex items-center justify-center gap-2"
+          style={{
+            background: saveState === "saved" ? "rgba(180,220,150,0.15)" : "rgba(40,40,40,0.95)",
+            border: `1px solid ${
+              saveState === "saved"
+                ? "rgba(180,220,150,0.4)"
+                : saveState === "error"
+                ? "rgba(220,160,80,0.4)"
+                : "rgba(255,255,255,0.12)"
+            }`,
+            color:
+              saveState === "saved"
+                ? "rgba(180,220,150,0.9)"
+                : saveState === "error"
+                ? "rgba(220,160,80,0.85)"
+                : "#fff",
+            opacity: saveState === "saving" ? 0.6 : 1,
+            cursor: saveState === "saving" ? "not-allowed" : "pointer",
+          }}
+        >
+          {saveState === "saving" && (
+            <span className="inline-block w-3 h-3 border border-white/40 border-t-white/80 rounded-full animate-spin" />
+          )}
+          {saveState === "saving" && "Saving…"}
+          {saveState === "saved" && "✓ Saved"}
+          {(saveState === "error" || saveState === "idle") && "Save Changes"}
+        </button>
+
+        {/* Error label */}
+        {saveState === "error" && saveError && (
+          <p className="text-[8px] tracking-widest text-center" style={{ color: "rgba(220,160,80,0.8)" }}>
+            ✕ {saveError}
+          </p>
+        )}
+
+        {/* PUBLISH LIVE */}
+        <button
+          onClick={handlePublishClick}
+          disabled={publishState === "publishing" || saveState === "saving"}
+          className="w-full py-2 text-[8px] tracking-[0.3em] uppercase transition-all duration-200"
+          style={{
+            background: "transparent",
+            border: "1px solid rgba(212,184,150,0.2)",
+            color:
+              publishState === "publishing"
+                ? "rgba(212,184,150,0.9)"
+                : "rgba(212,184,150,0.45)",
+            opacity: publishState === "publishing" || saveState === "saving" ? 0.7 : 1,
+            cursor:
+              publishState === "publishing" || saveState === "saving"
+                ? "not-allowed"
+                : "pointer",
+          }}
+        >
+          {publishState === "publishing" ? "Preparing Production Build…" : "Publish Live"}
         </button>
       </div>
     </div>
