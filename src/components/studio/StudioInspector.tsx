@@ -172,6 +172,7 @@ export function StudioInspector({
                 <NumInput
                   value={selected.leftPct}
                   onChange={(v) => onUpdateSlot(selected.id, { leftPct: v })}
+                  isMobile={isMobile}
                 />
               </Row>
               {selected.leftPct < 15 && (
@@ -192,6 +193,7 @@ export function StudioInspector({
                 <NumInput
                   value={selected.bottomPct}
                   onChange={(v) => onUpdateSlot(selected.id, { bottomPct: v })}
+                  isMobile={isMobile}
                 />
               </Row>
               <Row label="Scale">
@@ -201,6 +203,7 @@ export function StudioInspector({
                   min={0.2}
                   max={2.5}
                   onChange={(v) => onUpdateSlot(selected.id, { scale: v })}
+                  isMobile={isMobile}
                 />
               </Row>
               <Row label="Z-Index">
@@ -210,6 +213,7 @@ export function StudioInspector({
                   min={1}
                   max={100}
                   onChange={(v) => onUpdateSlot(selected.id, { zIndex: v })}
+                  isMobile={isMobile}
                 />
               </Row>
             </Section>
@@ -263,6 +267,7 @@ export function StudioInspector({
                   <DotEditor
                     key={dot.id}
                     dot={dot}
+                    isMobile={isMobile}
                     onUpdate={(patch) => onUpdateDot(selected.id, dot.id, patch)}
                     onRemove={() => onRemoveDot(selected.id, dot.id)}
                   />
@@ -289,6 +294,7 @@ export function StudioInspector({
                   min={-300}
                   max={300}
                   onChange={(v) => onUpdateShadow(selected.id, { offsetX: v })}
+                  isMobile={isMobile}
                 />
               </Row>
               <Row label="Offset Y">
@@ -298,6 +304,7 @@ export function StudioInspector({
                   min={-300}
                   max={300}
                   onChange={(v) => onUpdateShadow(selected.id, { offsetY: v })}
+                  isMobile={isMobile}
                 />
               </Row>
               <Row label="Scale W">
@@ -307,6 +314,7 @@ export function StudioInspector({
                   min={0}
                   max={5}
                   onChange={(v) => onUpdateShadow(selected.id, { scaleX: v })}
+                  isMobile={isMobile}
                 />
               </Row>
               <Row label="Scale H">
@@ -316,6 +324,7 @@ export function StudioInspector({
                   min={0}
                   max={2}
                   onChange={(v) => onUpdateShadow(selected.id, { scaleY: v })}
+                  isMobile={isMobile}
                 />
               </Row>
               <Row label="Opacity">
@@ -325,6 +334,7 @@ export function StudioInspector({
                   min={0}
                   max={1}
                   onChange={(v) => onUpdateShadow(selected.id, { opacity: v })}
+                  isMobile={isMobile}
                 />
               </Row>
               <Row label="Blur">
@@ -334,6 +344,7 @@ export function StudioInspector({
                   min={0}
                   max={60}
                   onChange={(v) => onUpdateShadow(selected.id, { blur: v })}
+                  isMobile={isMobile}
                 />
               </Row>
             </Section>
@@ -534,31 +545,73 @@ function NumInput({
   min = -150,
   max = 250,
   onChange,
+  isMobile = false,
 }: {
   value: number;
   step?: number;
   min?: number;
   max?: number;
   onChange: (v: number) => void;
+  isMobile?: boolean;
 }) {
+  if (!isMobile) {
+    return (
+      <input
+        type="number"
+        className="w-full text-[11px] text-white/75 text-right py-1 px-2 rounded-sm"
+        style={{
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.09)",
+          outline: "none",
+        }}
+        value={step < 1 ? value.toFixed(2) : Math.round(value)}
+        step={step}
+        min={min}
+        max={max}
+        onChange={(e) => {
+          const v = parseFloat(e.target.value);
+          if (!isNaN(v)) onChange(Math.min(max, Math.max(min, v)));
+        }}
+      />
+    );
+  }
+
+  const btnStyle: React.CSSProperties = {
+    width: 32,
+    height: 32,
+    flexShrink: 0,
+    background: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(255,255,255,0.1)",
+    borderRadius: 4,
+    color: "white",
+    fontSize: 16,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
   return (
-    <input
-      type="number"
-      className="w-full text-[11px] text-white/75 text-right py-1 px-2 rounded-sm"
-      style={{
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.09)",
-        outline: "none",
-      }}
-      value={step < 1 ? value.toFixed(2) : Math.round(value)}
-      step={step}
-      min={min}
-      max={max}
-      onChange={(e) => {
-        const v = parseFloat(e.target.value);
-        if (!isNaN(v)) onChange(Math.min(max, Math.max(min, v)));
-      }}
-    />
+    <div className="flex items-center gap-1 w-full">
+      <button type="button" style={btnStyle} onClick={() => onChange(Math.max(min, value - step))}>−</button>
+      <input
+        type="number"
+        className="flex-1 text-[11px] text-white/75 text-center py-2 px-1 rounded-sm min-w-0"
+        style={{
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.09)",
+          outline: "none",
+        }}
+        value={step < 1 ? value.toFixed(2) : Math.round(value)}
+        step={step}
+        min={min}
+        max={max}
+        onChange={(e) => {
+          const v = parseFloat(e.target.value);
+          if (!isNaN(v)) onChange(Math.min(max, Math.max(min, v)));
+        }}
+      />
+      <button type="button" style={btnStyle} onClick={() => onChange(Math.min(max, value + step))}>+</button>
+    </div>
   );
 }
 
@@ -597,10 +650,12 @@ function DotEditor({
   dot,
   onUpdate,
   onRemove,
+  isMobile = false,
 }: {
   dot: StudioDot;
   onUpdate: (p: Partial<StudioDot>) => void;
   onRemove: () => void;
+  isMobile?: boolean;
 }) {
   return (
     <div
@@ -665,6 +720,7 @@ function DotEditor({
             min={0}
             max={100}
             onChange={(v) => onUpdate({ topPct: v })}
+            isMobile={isMobile}
           />
         </div>
         <div>
@@ -674,6 +730,7 @@ function DotEditor({
             min={0}
             max={100}
             onChange={(v) => onUpdate({ leftPct: v })}
+            isMobile={isMobile}
           />
         </div>
       </div>
