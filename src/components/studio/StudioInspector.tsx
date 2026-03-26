@@ -58,6 +58,7 @@ export function StudioInspector({
   const [publishState, setPublishState] = React.useState<PublishState>("idle");
 
   const isMobile = useMobile();
+  const sidePad = isMobile ? 12 : 20;
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
 
   const handleSaveClick = async () => {
@@ -105,8 +106,8 @@ export function StudioInspector({
     >
       {/* ── Header ── */}
       <div
-        className="px-5 pt-5 pb-4 flex-shrink-0"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+        className="pt-5 pb-4 flex-shrink-0"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}
       >
         <p
           className="text-[8px] tracking-[0.4em] uppercase mb-1"
@@ -121,8 +122,8 @@ export function StudioInspector({
 
       {/* ── Character Roster — always visible, click to select ── */}
       <div
-        className="px-4 py-3 flex-shrink-0"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+        className="py-3 flex-shrink-0"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}
       >
         <p
           className="text-[8px] tracking-[0.4em] uppercase mb-2"
@@ -164,7 +165,7 @@ export function StudioInspector({
       {/* ── Body ── */}
       <div className="flex-1 overflow-y-auto">
         {selected ? (
-          <div className="px-5 py-4 flex flex-col gap-6">
+          <div className="py-4 flex flex-col gap-6" style={{ paddingLeft: sidePad, paddingRight: sidePad }}>
 
             {/* Transform */}
             <Section label="Transform">
@@ -364,8 +365,8 @@ export function StudioInspector({
 
       {/* ── Footer — Copy Code ── */}
       <div
-        className="px-5 py-4 flex-shrink-0"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+        className="py-4 flex-shrink-0"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}
       >
         <button
           className="w-full text-[9px] tracking-widest uppercase py-3 transition-all duration-300"
@@ -382,8 +383,8 @@ export function StudioInspector({
 
       {/* ── Save / Publish footer ── */}
       <div
-        className="flex-shrink-0 px-4 pb-5 pt-3 flex flex-col gap-2"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+        className="flex-shrink-0 pb-5 pt-3 flex flex-col gap-2"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}
       >
         {/* SAVE CHANGES */}
         <button
