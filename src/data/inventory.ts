@@ -29,12 +29,12 @@ export interface ModelSlot {
 export const MODEL_INVENTORY: ModelSlot[] = [
   {
     id: "lounge-model",
-    // displayName: "Lounge"
-    position: "left-[0.6%] md:left-[0.6%] bottom-[7.4%] md:bottom-[7.4%]",
-    scale: "md:scale-[0.88]",
-    mobileScale: "scale-[0.88]",
+    // displayName: "Angel"
+    position: "left-[19.5%] md:left-[19.5%] bottom-[5.1%] md:bottom-[5.1%]",
+    scale: "md:scale-[0.85]",
+    mobileScale: "scale-[0.85]",
     zIndex: 30,
-    imageSrc: "/model-lounge.png",
+    imageSrc: "/models/Angel/Angel-pro-lit.png",
     outfit: [
       {
         id: "lounge-showstopper",
@@ -57,10 +57,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         lookbook: [],
       },
     ],
+    shadow: { offsetX: 0, offsetY: 8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
   },
   {
     id: "center-model",
-    // displayName: "Jerome"
+    // displayName: "Center"
     position: "left-[34.2%] md:left-[34.2%] bottom-[16.4%] md:bottom-[16.4%]",
     scale: "md:scale-[0.70]",
     mobileScale: "scale-[0.70]",
@@ -88,10 +89,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         lookbook: [],
       },
     ],
+    shadow: { offsetX: 0, offsetY: 8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
   },
   {
     id: "vault-model",
-    // displayName: "Jack"
+    // displayName: "Vault"
     position: "left-[24.3%] md:left-[24.3%] bottom-[9.3%] md:bottom-[9.3%]",
     scale: "md:scale-[0.84]",
     mobileScale: "scale-[0.84]",
@@ -105,7 +107,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         colorway: "Ivory",
         price: "$980",
         type: "public",
-        dotPosition: "top-[35.0%] left-[51.6%]",  // was 350.0% (typo) → clamped to 35.0%
+        dotPosition: "top-[35.0%] left-[51.6%]",
         lookbook: [],
       },
       {
@@ -119,10 +121,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         lookbook: [],
       },
     ],
+    shadow: { offsetX: 0, offsetY: 8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
   },
   {
     id: "rack-model",
-    // displayName: "Ethan"
+    // displayName: "Rack"
     position: "left-[63.4%] md:left-[63.4%] bottom-[8.0%] md:bottom-[8.0%]",
     scale: "md:scale-[0.83]",
     mobileScale: "scale-[0.83]",
@@ -150,5 +153,6 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         lookbook: [],
       },
     ],
+    shadow: { offsetX: 0, offsetY: 8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
   },
 ];

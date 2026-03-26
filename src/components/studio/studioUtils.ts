@@ -116,7 +116,7 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
 
 /** Generate the full MODEL_INVENTORY TypeScript source from studio state */
 export function exportInventoryCode(slots: StudioSlot[]): string {
-  const lines: string[] = ["const MODEL_INVENTORY: ModelSlot[] = ["];
+  const lines: string[] = ["export const MODEL_INVENTORY: ModelSlot[] = ["];
 
   for (const slot of slots) {
     const l  = slot.leftPct.toFixed(1);
