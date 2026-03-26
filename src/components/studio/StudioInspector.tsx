@@ -57,6 +57,9 @@ export function StudioInspector({
   const [saveError, setSaveError] = React.useState<string | null>(null);
   const [publishState, setPublishState] = React.useState<PublishState>("idle");
 
+  const isMobile = useMobile();
+  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+
   const handleSaveClick = async () => {
     if (saveState === "saving") return;
     setSaveState("saving");
@@ -87,14 +90,16 @@ export function StudioInspector({
   };
 
   return (
-    <div
+    <motion.div
       className="fixed left-0 top-0 bottom-0 z-[200] flex flex-col"
+      animate={{ x: sidebarOpen ? 0 : "-100%" }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
       style={{
-        width: 300,
-        background: "rgba(8,8,8,0.97)",
+        width: "min(85vw, 300px)",
+        background: isMobile ? "rgba(0,0,0,0.6)" : "rgba(8,8,8,0.97)",
         borderRight: "1px solid rgba(255,255,255,0.07)",
         backdropFilter: "blur(16px)",
-        pointerEvents: "auto",   // explicit override — sidebar must never inherit pointer-events:none
+        pointerEvents: "auto",
       }}
     >
       {/* ── Header ── */}
@@ -429,7 +434,27 @@ export function StudioInspector({
           {publishState === "publishing" ? "Preparing Production Build…" : "Publish Live"}
         </button>
       </div>
-    </div>
+
+      {/* ── Pill Toggle Tab — mobile only ── */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="md:hidden absolute top-1/2 -translate-y-1/2 flex items-center justify-center"
+        style={{
+          right: -36,
+          width: 36,
+          height: 56,
+          background: "rgba(0,0,0,0.55)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          borderLeft: "none",
+          borderRadius: "0 8px 8px 0",
+          color: "rgba(255,255,255,0.7)",
+          fontSize: 14,
+        }}
+      >
+        {sidebarOpen ? "‹" : "›"}
+      </button>
+    </motion.div>
   );
 }
 
