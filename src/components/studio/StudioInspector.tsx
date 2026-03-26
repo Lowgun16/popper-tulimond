@@ -538,7 +538,7 @@ function DotEditor({
           Lookbook ({dot.lookbook.length})
         </p>
         {dot.lookbook.map((src: string, idx: number) => (
-          <div key={idx} className="flex items-center gap-1.5 mb-1.5">
+          <div key={src} className="flex items-center gap-1.5 mb-1.5">
             <span
               className="flex-1 text-[9px] font-mono truncate"
               style={{ color: "rgba(255,255,255,0.45)" }}
