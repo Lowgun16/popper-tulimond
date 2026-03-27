@@ -16,7 +16,6 @@ import { MODEL_INVENTORY } from "@/data/inventory";
 import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import { DEFAULT_SHADOW } from "./studio/studioTypes";
 import { LookbookOverlay } from "./studio/LookbookOverlay";
-
 function isVideo(src: string): boolean {
   return /\.(mp4|webm|mov)$/i.test(src.split("?")[0]);
 }
@@ -64,7 +63,7 @@ function HoverCard({ item, visible }: { item: OutfitItem | StudioDot; visible: b
           </>
         ) : (
           <div className="w-full text-center text-[9px] tracking-widest uppercase py-2 border border-white/30 text-white/70 rounded-sm select-none transition-colors duration-300">
-            Add to Cart
+            {item.name.toLowerCase().includes('scarf') || item.name.toLowerCase().includes('belt') ? "Lookbook" : "Find Your Size"}
           </div>
         )}
       </div>
