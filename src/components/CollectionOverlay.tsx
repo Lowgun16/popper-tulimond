@@ -20,10 +20,8 @@ function isVideo(src: string): boolean {
   return /\.(mp4|webm|mov)$/i.test(src.split("?")[0]);
 }
 
-const SHOW_VAULT_DOTS = false;
-
 // ─────────────────────────────────────────────────────────────────────────────
-// HoverCard - The Pop-up Box
+// HoverCard
 // ─────────────────────────────────────────────────────────────────────────────
 
 function HoverCard({ 
@@ -40,25 +38,26 @@ function HoverCard({
   leftPct: number;
 }) {
   const isVault = item.type === "vault";
-  const flipLeft = leftPct > 50; // The Ethan Fix: Flip if on the right half
+  const flipLeft = leftPct > 50; 
 
   const name       = "name"       in item ? item.name       : "";
   const collection = "collection" in item ? item.collection : "";
   const colorway   = "colorway"   in item ? item.colorway   : "";
   const price      = "price"      in item ? item.price      : "";
 
+  // The box slides in slightly from its respective side
   const hiddenTranslate = flipLeft ? "translateX(20px)" : "translateX(-20px)";
 
   return (
     <div
       className="absolute top-1/2 z-[100] w-44 transition-[opacity,transform] duration-500"
       style={{
-        ...(flipLeft ? { right: "2.5rem", left: "auto" } : { left: "2.5rem", right: "auto" }),
+        // ── INCREASED DISTANCE (4rem) to prevent covering the shirt ──
+        ...(flipLeft ? { right: "4rem", left: "auto" } : { left: "4rem", right: "auto" }),
         opacity: visible ? 1 : 0,
         pointerEvents: visible ? "auto" : "none",
         transform: `translateY(-50%) ${visible ? "translateX(0px)" : hiddenTranslate}`,
       }}
-      // STOP PROPAGATION: Kills the "bounce" by preventing the Dot from feeling the touch
       onPointerDown={(e) => e.stopPropagation()}
     >
       <div className="relative bg-black/95 backdrop-blur-xl border border-white/20 p-4 rounded-sm shadow-2xl">
@@ -80,11 +79,7 @@ function HoverCard({
         <p className="text-[10px] text-white/50 mb-2">{colorway}</p>
         <p className="text-xs font-bold text-white/90 mb-4">{price}</p>
 
-        {isVault ? (
-          <div className="w-full text-center text-[9px] tracking-widest uppercase py-2 border border-white/10 text-white/20 rounded-sm">
-            Members Only
-          </div>
-        ) : (
+        {!isVault && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -101,7 +96,7 @@ function HoverCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PulseDot - The Glowing Point
+// PulseDot
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface PulseDotProps {
@@ -121,7 +116,6 @@ interface PulseDotProps {
 function PulseDot({
   item,
   studioDot,
-  hovered,
   tapped,
   isEditMode,
   isStudioMode,
@@ -134,7 +128,6 @@ function PulseDot({
   const dot = studioDot ?? item!;
   const draggable = isEditMode || isStudioMode;
 
-  // Extract left position for Ethan Flip logic
   const leftPct = useMemo(() => {
     if (studioDot) return studioDot.leftPct;
     if (item?.dotPosition) {
@@ -144,39 +137,30 @@ function PulseDot({
     return 20;
   }, [studioDot, item]);
 
-  const dotDragX = useMotionValue(0);
-  const dotDragY = useMotionValue(0);
-
-  const handleDragEnd = (event: any, info: any) => {
-    const target = event.target as HTMLElement;
-    const container = target.closest(".model-container");
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const scrollX = window.scrollX ?? 0;
-    const scrollY = window.scrollY ?? 0;
-    const x = Math.max(0, Math.min(100, ((info.point.x - scrollX - rect.left) / rect.width) * 100));
-    const y = Math.max(0, Math.min(100, ((info.point.y - scrollY - rect.top) / rect.height) * 100));
-
-    if (isStudioMode && onStudioDotDrop) {
-      onStudioDotDrop(dot.id, y, x);
-      dotDragX.set(0);
-      dotDragY.set(0);
-    } else {
-      onDotDrop(`${modelId} · ${dot.id}: top-[${y.toFixed(1)}%] left-[${x.toFixed(1)}%]`);
-    }
-  };
+  const flipLeft = leftPct > 50;
 
   return (
     <div 
       className={`absolute z-20 ${!isStudioMode && item ? item.dotPosition : ""}`}
       style={isStudioMode && studioDot ? { top: `${studioDot.topPct}%`, left: `${studioDot.leftPct}%` } : {}}
     >
+      {/* ── THE GOLD LINE ── */}
+      {tapped && !draggable && (
+        <motion.div 
+          initial={{ width: 0, opacity: 0 }}
+          animate={{ width: "4rem", opacity: 1 }}
+          className="absolute top-0 h-[1px] bg-[#D4B896]/60 pointer-events-none"
+          style={{ 
+            left: flipLeft ? "auto" : "0", 
+            right: flipLeft ? "0" : "auto",
+            transformOrigin: flipLeft ? "right" : "left"
+          }}
+        />
+      )}
+
+      {/* THE DOT */}
       <motion.div
         className="flex items-center justify-center w-11 h-11 -mt-[22px] -ml-[22px] pointer-events-auto cursor-pointer"
-        style={{ x: dotDragX, y: dotDragY }}
-        drag={draggable}
-        dragMomentum={false}
-        onDragEnd={handleDragEnd}
         onTap={onDotTap}
         whileTap={{ scale: 0.9 }}
       >
@@ -190,6 +174,7 @@ function PulseDot({
         />
       </motion.div>
 
+      {/* THE CARD */}
       {!draggable && (
         <HoverCard 
           item={dot} 
@@ -204,7 +189,7 @@ function PulseDot({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ModelStage - Character Component
+// ModelStage & CollectionOverlay (Boilerplate remains same for stability)
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface ModelStageProps {
@@ -244,8 +229,6 @@ function ModelStage({
 }: ModelStageProps) {
   const [hovered, setHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const dragX = useMotionValue(0);
-  const dragY = useMotionValue(0);
 
   const imageSrc = isStudioMode && studioSlot ? studioSlot.imageSrc : slot.imageSrc;
   const shadow: ShadowConfig = (isStudioMode && studioSlot) ? studioSlot.shadow : (slot.shadow ?? DEFAULT_SHADOW);
@@ -274,11 +257,10 @@ function ModelStage({
       onMouseLeave={() => setHovered(false)}
     >
       <div className="relative w-fit h-fit model-container" onClick={() => !isStudioMode && onSelect()}>
-        
-        {/* Shadow */}
         {!imgError && (
           <img
             src={imageSrc}
+            alt=""
             className="absolute inset-0 h-full w-full pointer-events-none select-none"
             style={{
               filter: `brightness(0) blur(${shadow.blur}px) opacity(${shadow.opacity})`,
@@ -287,16 +269,13 @@ function ModelStage({
             }}
           />
         )}
-
-        {/* Character */}
         <img
           src={imageSrc}
+          alt={slot.id}
           className="h-[40vh] md:h-[80vh] w-auto object-bottom select-none"
           style={{ filter: "brightness(0.85) contrast(1.1)" }}
           onError={() => setImgError(true)}
         />
-
-        {/* Dots */}
         {dots.map((dot: any) => (
           <PulseDot
             key={dot.id}
@@ -331,10 +310,6 @@ function ModelStage({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Main Component - CollectionOverlay
-// ─────────────────────────────────────────────────────────────────────────────
-
 export default function CollectionOverlay({ opacity }: { opacity: MotionValue<number> }) {
   const router = useRouter();
   const [active, setActive] = useState(false);
@@ -358,7 +333,6 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
 
   return (
     <div className="absolute inset-0 z-20" style={{ pointerEvents: active ? "auto" : "none" }}>
-      
       {MODEL_INVENTORY.map((slot, index) => (
         <ModelStage
           key={slot.id}
@@ -378,12 +352,9 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
           onOpenLookbook={setLookbookDot}
         />
       ))}
-
       {lookbookDot && (
         <LookbookOverlay dot={lookbookDot} onClose={() => setLookbookDot(null)} />
       )}
-
-      {/* Controls */}
       {active && (
         <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto">
           <button 
