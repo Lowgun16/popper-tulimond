@@ -161,10 +161,19 @@ function PulseDot({
 
   return (
     <motion.div
-      className={positionClass}
-      style={positionStyle
-        ? { ...positionStyle, zIndex: 20, cursor: draggable ? "grab" : undefined, x: dotDragX, y: dotDragY, pointerEvents: "auto" }
-        : { cursor: draggable ? "grab" : undefined, ...(draggable ? { pointerEvents: "auto" as const } : {}) }}
+      className={`${positionClass} flex items-center justify-center`}
+      style={{
+        ...(positionStyle || {}),
+        zIndex: 20,
+        cursor: draggable ? "grab" : undefined,
+        x: dotDragX,
+        y: dotDragY,
+        pointerEvents: "auto",
+        width: '44px',
+        height: '44px',
+        marginTop: '-22px', 
+        marginLeft: '-22px',
+      }}
       drag={draggable}
       dragMomentum={false}
       dragElastic={0}
@@ -172,6 +181,7 @@ function PulseDot({
       onDragEnd={handleDragEnd as any}
       onTap={onDotTap}
       whileDrag={{ cursor: "grabbing", scale: 1.5 }}
+      whileTap={{ scale: 0.9 }}
     >
       <div className="relative">
         <div
