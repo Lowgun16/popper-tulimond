@@ -62,6 +62,9 @@ function HoverCard({ item, visible, flipLeft, onClose, onAction }: HoverCardProp
         pointerEvents: visible ? "auto" : "none",
         transform: `translateY(-50%) ${visible ? "translateX(0px)" : hiddenTranslate}`,
       }}
+      // 2. This is the action block (The "Door Handle")
+  // This is what kills the "Bounce"
+  onPointerDown={(e) => e.stopPropagation()}
     >
       <div className="relative bg-black/95 backdrop-blur-xl border border-white/20 p-4 rounded-sm shadow-2xl">
 
