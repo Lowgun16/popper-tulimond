@@ -21,6 +21,45 @@ function isVideo(src: string): boolean {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ConnectorLine - The "High-Tech Elbow"
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: boolean }) {
+  // We use an SVG path to create the "elbow" look. 
+  // If flipLeft (Ethan), the box is to the left of the dot.
+  // The path moves from the dot (0,0) horizontally, then angles to the box.
+  
+  const pathData = flipLeft 
+    ? "M 0 0 L -20 0 L -60 -20" // Elbow for right-side characters
+    : "M 0 0 L 20 0 L 60 -20";   // Elbow for left-side characters
+
+  return (
+    <svg 
+      className="absolute pointer-events-none overflow-visible"
+      style={{ zIndex: 40, top: 0, left: 0 }}
+      width="100" height="100"
+    >
+      <motion.path
+        d={pathData}
+        fill="none"
+        stroke="#D4B896"
+        strokeWidth="1"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={visible ? { pathLength: 1, opacity: 0.6 } : { pathLength: 0, opacity: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      />
+      <motion.circle 
+        cx={flipLeft ? -60 : 60} 
+        cy="-20" 
+        r="2" 
+        fill="#D4B896" 
+        animate={visible ? { opacity: 1 } : { opacity: 0 }}
+      />
+    </svg>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // HoverCard
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -45,30 +84,23 @@ function HoverCard({
   const colorway   = "colorway"   in item ? item.colorway   : "";
   const price      = "price"      in item ? item.price      : "";
 
-  // The box slides in slightly from its respective side
-  const hiddenTranslate = flipLeft ? "translateX(20px)" : "translateX(-20px)";
-
   return (
     <div
-      className="absolute top-1/2 z-[100] w-44 transition-[opacity,transform] duration-500"
+      className="absolute z-[100] w-44 transition-[opacity,transform] duration-500"
       style={{
-        // ── INCREASED DISTANCE (4rem) to prevent covering the shirt ──
-        ...(flipLeft ? { right: "4rem", left: "auto" } : { left: "4rem", right: "auto" }),
+        // Positioning the box in the "Safe Zone" (Gutters)
+        // Offset vertically (-40px) to match the "elbow" diagonal
+        top: "-40px",
+        ...(flipLeft ? { right: "5.5rem", left: "auto" } : { left: "5.5rem", right: "auto" }),
         opacity: visible ? 1 : 0,
         pointerEvents: visible ? "auto" : "none",
-        transform: `translateY(-50%) ${visible ? "translateX(0px)" : hiddenTranslate}`,
+        transform: visible ? "scale(1) translateY(0)" : "scale(0.95) translateY(10px)",
       }}
       onPointerDown={(e) => e.stopPropagation()}
     >
       <div className="relative bg-black/95 backdrop-blur-xl border border-white/20 p-4 rounded-sm shadow-2xl">
-        
-        {/* PREMIUM CLOSE BUTTON */}
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (onClose) onClose();
-          }}
+          onClick={(e) => { e.stopPropagation(); onClose?.(); }}
           className="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center rounded-full border border-white/40 bg-black text-white hover:bg-white hover:text-black transition-all duration-300 cursor-pointer z-[110]"
         >
           <span className="text-[10px] leading-none font-bold">✕</span>
@@ -81,10 +113,7 @@ function HoverCard({
 
         {!isVault && (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onAction) onAction();
-            }}
+            onClick={(e) => { e.stopPropagation(); onAction?.(); }}
             className="w-full text-center text-[9px] tracking-widest uppercase py-2.5 border border-white/30 text-white hover:bg-white hover:text-black transition-all duration-300 cursor-pointer active:scale-95"
           >
             {name.toLowerCase().includes("scarf") || name.toLowerCase().includes("belt") ? "Lookbook" : "Find Your Size"}
@@ -102,7 +131,6 @@ function HoverCard({
 interface PulseDotProps {
   item?: OutfitItem;
   studioDot?: StudioDot;
-  hovered: boolean;
   tapped: boolean;
   isEditMode: boolean;
   isStudioMode: boolean;
@@ -144,19 +172,8 @@ function PulseDot({
       className={`absolute z-20 ${!isStudioMode && item ? item.dotPosition : ""}`}
       style={isStudioMode && studioDot ? { top: `${studioDot.topPct}%`, left: `${studioDot.leftPct}%` } : {}}
     >
-      {/* ── THE GOLD LINE ── */}
-      {tapped && !draggable && (
-        <motion.div 
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: "4rem", opacity: 1 }}
-          className="absolute top-0 h-[1px] bg-[#D4B896]/60 pointer-events-none"
-          style={{ 
-            left: flipLeft ? "auto" : "0", 
-            right: flipLeft ? "0" : "auto",
-            transformOrigin: flipLeft ? "right" : "left"
-          }}
-        />
-      )}
+      {/* ELBOW CONNECTOR */}
+      {!draggable && <ConnectorLine flipLeft={flipLeft} visible={tapped} />}
 
       {/* THE DOT */}
       <motion.div
@@ -189,7 +206,7 @@ function PulseDot({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ModelStage & CollectionOverlay (Boilerplate remains same for stability)
+// ModelStage & CollectionOverlay (Structure kept stable)
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface ModelStageProps {
@@ -217,15 +234,9 @@ function ModelStage({
   isEditMode,
   isStudioMode,
   studioSlot,
-  isSelected,
-  onSelect,
-  onDotDrop,
-  onStudioDotDrop,
-  onModelDragEnd,
-  onUpdateStudioSlot,
-  onOpenLookbook,
   activeDotId,
-  onToggleDot
+  onToggleDot,
+  onOpenLookbook
 }: ModelStageProps) {
   const [hovered, setHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -256,7 +267,7 @@ function ModelStage({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="relative w-fit h-fit model-container" onClick={() => !isStudioMode && onSelect()}>
+      <div className="relative w-fit h-fit model-container">
         {!imgError && (
           <img
             src={imageSrc}
@@ -286,8 +297,7 @@ function ModelStage({
             isEditMode={isEditMode}
             isStudioMode={isStudioMode}
             modelId={slot.id}
-            onDotDrop={onDotDrop}
-            onStudioDotDrop={onStudioDotDrop}
+            onDotDrop={() => {}}
             onToggleDot={onToggleDot}
             onDotTap={() => {
               if (isEditMode) return;
