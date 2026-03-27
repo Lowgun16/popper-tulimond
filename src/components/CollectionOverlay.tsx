@@ -25,7 +25,6 @@ function isVideo(src: string): boolean {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: boolean }) {
-  // SVG path creating the "elbow" look. Starts at dot, moves horizontal, then diagonal.
   const pathData = flipLeft 
     ? "M 0 0 L -20 0 L -60 -20" 
     : "M 0 0 L 20 0 L 60 -20"; 
@@ -85,7 +84,6 @@ function HoverCard({
     <div
       className="absolute z-[100] w-44 transition-[opacity,transform] duration-500"
       style={{
-        // Lifted -40px to meet the elbow line, and moved out 5.5rem to clear the shirt
         top: "-40px",
         ...(flipLeft ? { right: "5.5rem", left: "auto" } : { left: "5.5rem", right: "auto" }),
         opacity: visible ? 1 : 0,
@@ -121,13 +119,13 @@ function HoverCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PulseDot - The Anchor Point
+// PulseDot
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface PulseDotProps {
   item?: OutfitItem;
   studioDot?: StudioDot;
-  hovered: boolean; // Re-added to fix the Build Error
+  hovered: boolean;
   tapped: boolean;
   isEditMode: boolean;
   isStudioMode: boolean;
@@ -141,7 +139,6 @@ interface PulseDotProps {
 function PulseDot({
   item,
   studioDot,
-  hovered,
   tapped,
   isEditMode,
   isStudioMode,
@@ -165,6 +162,29 @@ function PulseDot({
 
   const flipLeft = leftPct > 50;
 
+  // Drag logic for Studio Mode
+  const dotDragX = useMotionValue(0);
+  const dotDragY = useMotionValue(0);
+
+  const handleDragEnd = (event: any, info: any) => {
+    const target = event.target as HTMLElement;
+    const container = target.closest(".model-container");
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const scrollX = window.scrollX ?? 0;
+    const scrollY = window.scrollY ?? 0;
+    const x = Math.max(0, Math.min(100, ((info.point.x - scrollX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((info.point.y - scrollY - rect.top) / rect.height) * 100));
+
+    if (isStudioMode && onStudioDotDrop) {
+      onStudioDotDrop(dot.id, y, x);
+      dotDragX.set(0);
+      dotDragY.set(0);
+    } else {
+      onDotDrop(`${modelId} · ${dot.id}: top-[${y.toFixed(1)}%] left-[${x.toFixed(1)}%]`);
+    }
+  };
+
   return (
     <div 
       className={`absolute z-20 ${!isStudioMode && item ? item.dotPosition : ""}`}
@@ -174,6 +194,10 @@ function PulseDot({
 
       <motion.div
         className="flex items-center justify-center w-11 h-11 -mt-[22px] -ml-[22px] pointer-events-auto cursor-pointer"
+        style={{ x: dotDragX, y: dotDragY }}
+        drag={draggable}
+        dragMomentum={false}
+        onDragEnd={handleDragEnd}
         onTap={onDotTap}
         whileTap={{ scale: 0.9 }}
       >
@@ -201,7 +225,7 @@ function PulseDot({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ModelStage & Main Container
+// ModelStage
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface ModelStageProps {
@@ -229,17 +253,25 @@ function ModelStage({
   isEditMode,
   isStudioMode,
   studioSlot,
+  isSelected,
+  onSelect,
+  onDotDrop,
+  onStudioDotDrop,
+  onModelDragEnd,
+  onUpdateStudioSlot,
+  onOpenLookbook,
   activeDotId,
-  onToggleDot,
-  onOpenLookbook
+  onToggleDot
 }: ModelStageProps) {
   const [hovered, setHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
 
   const imageSrc = isStudioMode && studioSlot ? studioSlot.imageSrc : slot.imageSrc;
   const shadow: ShadowConfig = (isStudioMode && studioSlot) ? studioSlot.shadow : (slot.shadow ?? DEFAULT_SHADOW);
 
-  const isActive = hovered || slot.outfit.some(item => item.id === activeDotId) || studioSlot?.dots.some(d => d.id === activeDotId);
+  const isActive = hovered || slot.outfit.some(item => item.id === activeDotId) || (studioSlot?.dots.some(d => d.id === activeDotId));
 
   const containerStyle: React.CSSProperties = {
     opacity: revealed ? 1 : 0,
@@ -250,23 +282,31 @@ function ModelStage({
       left: `${studioSlot.leftPct}%`,
       bottom: `${studioSlot.bottomPct}%`,
       transformOrigin: "bottom center",
+      scale: studioSlot.scale,
     } : {})
   };
 
   const dots = isStudioMode && studioSlot ? studioSlot.dots : slot.outfit;
 
   return (
-    <div
+    <motion.div
       className={isStudioMode ? "absolute pointer-events-auto origin-bottom" : `absolute pointer-events-auto origin-bottom ${slot.position} ${slot.mobileScale} ${slot.scale}`}
-      style={containerStyle}
+      style={{ ...containerStyle, x: dragX, y: dragY }}
+      drag={isStudioMode && isSelected}
+      dragMomentum={false}
+      onDragEnd={(_, info) => {
+        onModelDragEnd(slot.id, info.offset.x, info.offset.y);
+        dragX.set(0);
+        dragY.set(0);
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => isStudioMode && onSelect()}
     >
       <div className="relative w-fit h-fit model-container">
         {!imgError && (
           <img
             src={imageSrc}
-            alt=""
             className="absolute inset-0 h-full w-full pointer-events-none select-none"
             style={{
               filter: `brightness(0) blur(${shadow.blur}px) opacity(${shadow.opacity})`,
@@ -277,12 +317,11 @@ function ModelStage({
         )}
         <img
           src={imageSrc}
-          alt={slot.id}
           className="h-[40vh] md:h-[80vh] w-auto object-bottom select-none"
           style={{ filter: "brightness(0.85) contrast(1.1)" }}
           onError={() => setImgError(true)}
         />
-        {(dots as any[]).map((dot) => (
+        {dots.map((dot: any) => (
           <PulseDot
             key={dot.id}
             item={isStudioMode ? undefined : dot}
@@ -292,7 +331,8 @@ function ModelStage({
             isEditMode={isEditMode}
             isStudioMode={isStudioMode}
             modelId={slot.id}
-            onDotDrop={() => {}}
+            onDotDrop={onDotDrop}
+            onStudioDotDrop={onStudioDotDrop}
             onToggleDot={onToggleDot}
             onDotTap={() => {
               if (isEditMode) return;
@@ -311,9 +351,13 @@ function ModelStage({
           />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CollectionOverlay
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function CollectionOverlay({ opacity }: { opacity: MotionValue<number> }) {
   const router = useRouter();
@@ -321,15 +365,74 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
   const [revealed, setRevealed] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeDotId, setActiveDotId] = useState<string | null>(null);
+  
   const [isStudioMode, setIsStudioMode] = useState(false);
   const [studioSlots, setStudioSlots] = useState<StudioSlot[]>([]);
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
   const [lookbookDot, setLookbookDot] = useState<LookbookContext | null>(null);
+  const [copyConfirm, setCopyConfirm] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useMotionValueEvent(opacity, "change", (v) => {
     setActive(v > 0.05);
     if (!revealed && v >= 0.99) setRevealed(true);
   });
+
+  // ── Studio Callbacks ──
+  const updateSlot = useCallback((id: string, patch: Partial<StudioSlot>) => {
+    setStudioSlots((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+    setHasUnsavedChanges(true);
+  }, []);
+
+  const updateDot = useCallback((slotId: string, dotId: string, patch: Partial<StudioDot>) => {
+    setStudioSlots((prev) => prev.map((s) => s.id === slotId ? { ...s, dots: s.dots.map((d) => (d.id === dotId ? { ...d, ...patch } : d)) } : s));
+    setHasUnsavedChanges(true);
+  }, []);
+
+  const addDot = useCallback((slotId: string) => {
+    const newDot: StudioDot = { id: `${slotId}-dot-${Date.now()}`, name: "New Item", collection: "Collection", colorway: "Color", price: "$0", type: "public", topPct: 50, leftPct: 50, lookbook: [] };
+    setStudioSlots((prev) => prev.map((s) => (s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s)));
+  }, []);
+
+  const removeDot = useCallback((slotId: string, dotId: string) => {
+    setStudioSlots((prev) => prev.map((s) => s.id === slotId ? { ...s, dots: s.dots.filter((d) => d.id !== dotId) } : s));
+  }, []);
+
+  const addSlot = useCallback(() => {
+    const id = `patron-${Date.now()}`;
+    const newSlot: StudioSlot = { id, displayName: "New Patron", imageSrc: "/model-center.png", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [], shadow: { ...DEFAULT_SHADOW } };
+    setStudioSlots((prev) => [...prev, newSlot]);
+    setSelectedModelId(id);
+  }, []);
+
+  const removeSlot = useCallback((slotId: string) => {
+    setStudioSlots((prev) => prev.filter((s) => s.id !== slotId));
+    setSelectedModelId(null);
+  }, []);
+
+  const handleSave = async () => {
+    await fetch("/api/save-inventory", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ slots: studioSlots }) });
+    setHasUnsavedChanges(false);
+    router.refresh();
+  };
+
+  const copyCode = useCallback(() => {
+    const code = exportInventoryCode(studioSlots);
+    navigator.clipboard.writeText(code);
+    setCopyConfirm(true);
+    setTimeout(() => setCopyConfirm(false), 2000);
+  }, [studioSlots]);
+
+  const handleModelDragEnd = useCallback((slotId: string, offsetX: number, offsetY: number) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const slot = studioSlots.find((s) => s.id === slotId);
+    if (!slot) return;
+    updateSlot(slotId, { leftPct: slot.leftPct + (offsetX / rect.width) * 100, bottomPct: slot.bottomPct - (offsetY / rect.height) * 100 });
+  }, [studioSlots, updateSlot]);
 
   const enterStudio = () => {
     setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
@@ -337,42 +440,90 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
   };
 
   return (
-    <div className="absolute inset-0 z-20" style={{ pointerEvents: active ? "auto" : "none" }}>
-      {MODEL_INVENTORY.map((slot, index) => (
-        <ModelStage
-          key={slot.id}
-          slot={slot}
-          index={index}
-          revealed={revealed}
-          isEditMode={isEditMode}
-          isStudioMode={isStudioMode}
-          activeDotId={activeDotId}
-          onToggleDot={setActiveDotId}
-          isSelected={selectedModelId === slot.id}
-          onSelect={() => setSelectedModelId(slot.id)}
-          onDotDrop={() => {}}
-          onStudioDotDrop={() => {}}
-          onModelDragEnd={() => {}}
-          onUpdateStudioSlot={() => {}}
-          onOpenLookbook={setLookbookDot}
+    <div ref={containerRef} className="absolute inset-0 z-20" style={{ pointerEvents: active ? "auto" : "none" }}>
+      
+      {isStudioMode && (
+        <StudioInspector
+          slots={studioSlots}
+          selectedId={selectedModelId}
+          onSelectSlot={setSelectedModelId}
+          onUpdateSlot={updateSlot}
+          onUpdateDot={updateDot}
+          onAddDot={addDot}
+          onRemoveDot={removeDot}
+          onSwapImage={(id, src) => updateSlot(id, { imageSrc: src })}
+          onAddSlot={addSlot}
+          onRemoveSlot={removeSlot}
+          onUpdateShadow={(id, patch) => updateSlot(id, { shadow: { ...studioSlots.find(s=>s.id===id)!.shadow, ...patch } })}
+          onCopyCode={copyCode}
+          copyConfirm={copyConfirm}
+          onSave={handleSave}
         />
-      ))}
+      )}
+
+      {isStudioMode 
+        ? studioSlots.map((studioSlot, index) => (
+            <ModelStage
+              key={studioSlot.id}
+              slot={MODEL_INVENTORY.find(s => s.id === studioSlot.id) || { id: studioSlot.id, position: "", scale: "", mobileScale: "", zIndex: studioSlot.zIndex, imageSrc: studioSlot.imageSrc, outfit: [] }}
+              index={index}
+              revealed={revealed}
+              isEditMode={false}
+              isStudioMode={true}
+              studioSlot={studioSlot}
+              isSelected={selectedModelId === studioSlot.id}
+              onSelect={() => setSelectedModelId(studioSlot.id)}
+              onDotDrop={() => {}}
+              onStudioDotDrop={(dotId, top, left) => updateDot(studioSlot.id, dotId, { topPct: top, leftPct: left })}
+              onModelDragEnd={handleModelDragEnd}
+              onUpdateStudioSlot={updateSlot}
+              onOpenLookbook={setLookbookDot}
+              activeDotId={activeDotId}
+              onToggleDot={setActiveDotId}
+            />
+          ))
+        : MODEL_INVENTORY.map((slot, index) => (
+            <ModelStage
+              key={slot.id}
+              slot={slot}
+              index={index}
+              revealed={revealed}
+              isEditMode={isEditMode}
+              isStudioMode={false}
+              studioSlot={undefined}
+              isSelected={false}
+              onSelect={() => {}}
+              onDotDrop={() => {}}
+              onStudioDotDrop={() => {}}
+              onModelDragEnd={() => {}}
+              onUpdateStudioSlot={() => {}}
+              onOpenLookbook={setLookbookDot}
+              activeDotId={activeDotId}
+              onToggleDot={setActiveDotId}
+            />
+          ))
+      }
+
       {lookbookDot && (
         <LookbookOverlay dot={lookbookDot} onClose={() => setLookbookDot(null)} />
       )}
+
       {active && (
-        <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto">
+        <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[201]">
+          {!isStudioMode && (
+            <button 
+              className="px-4 py-2 bg-black/80 border border-white/20 text-[9px] uppercase tracking-widest text-white/40 backdrop-blur-md"
+              onClick={() => setIsEditMode(!isEditMode)}
+            >
+              {isEditMode ? "✕ Exit Edit" : "⊙ Edit Dots"}
+            </button>
+          )}
           <button 
-            className="px-4 py-2 bg-black/80 border border-white/20 text-[9px] uppercase tracking-widest text-white/40"
-            onClick={() => setIsEditMode(!isEditMode)}
-          >
-            {isEditMode ? "Exit Edit" : "Edit Dots"}
-          </button>
-          <button 
-            className="px-4 py-2 bg-black/80 border border-white/20 text-[9px] uppercase tracking-widest text-white/40"
+            className="px-4 py-2 bg-black/80 border border-white/20 text-[9px] uppercase tracking-widest text-white/40 backdrop-blur-md"
+            style={isStudioMode ? { color: "#D4B896", borderColor: "#D4B896" } : {}}
             onClick={() => isStudioMode ? setIsStudioMode(false) : enterStudio()}
           >
-            {isStudioMode ? "Exit Studio" : "Studio Mode"}
+            {isStudioMode ? "✕ Exit Studio" : "⊙ Studio Mode"}
           </button>
         </div>
       )}
