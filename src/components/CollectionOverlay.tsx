@@ -25,13 +25,9 @@ function isVideo(src: string): boolean {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: boolean }) {
-  // We use an SVG path to create the "elbow" look. 
-  // If flipLeft (Ethan), the box is to the left of the dot.
-  // The path moves from the dot (0,0) horizontally, then angles to the box.
-  
   const pathData = flipLeft 
-    ? "M 0 0 L -20 0 L -60 -20" // Elbow for right-side characters
-    : "M 0 0 L 20 0 L 60 -20";   // Elbow for left-side characters
+    ? "M 0 0 L -20 0 L -60 -20" 
+    : "M 0 0 L 20 0 L 60 -20"; 
 
   return (
     <svg 
@@ -88,8 +84,6 @@ function HoverCard({
     <div
       className="absolute z-[100] w-44 transition-[opacity,transform] duration-500"
       style={{
-        // Positioning the box in the "Safe Zone" (Gutters)
-        // Offset vertically (-40px) to match the "elbow" diagonal
         top: "-40px",
         ...(flipLeft ? { right: "5.5rem", left: "auto" } : { left: "5.5rem", right: "auto" }),
         opacity: visible ? 1 : 0,
@@ -131,6 +125,7 @@ function HoverCard({
 interface PulseDotProps {
   item?: OutfitItem;
   studioDot?: StudioDot;
+  hovered: boolean; // THE FIX IS HERE
   tapped: boolean;
   isEditMode: boolean;
   isStudioMode: boolean;
@@ -144,6 +139,7 @@ interface PulseDotProps {
 function PulseDot({
   item,
   studioDot,
+  hovered,
   tapped,
   isEditMode,
   isStudioMode,
@@ -172,10 +168,8 @@ function PulseDot({
       className={`absolute z-20 ${!isStudioMode && item ? item.dotPosition : ""}`}
       style={isStudioMode && studioDot ? { top: `${studioDot.topPct}%`, left: `${studioDot.leftPct}%` } : {}}
     >
-      {/* ELBOW CONNECTOR */}
       {!draggable && <ConnectorLine flipLeft={flipLeft} visible={tapped} />}
 
-      {/* THE DOT */}
       <motion.div
         className="flex items-center justify-center w-11 h-11 -mt-[22px] -ml-[22px] pointer-events-auto cursor-pointer"
         onTap={onDotTap}
@@ -191,7 +185,6 @@ function PulseDot({
         />
       </motion.div>
 
-      {/* THE CARD */}
       {!draggable && (
         <HoverCard 
           item={dot} 
@@ -206,7 +199,7 @@ function PulseDot({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ModelStage & CollectionOverlay (Structure kept stable)
+// ModelStage & CollectionOverlay
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface ModelStageProps {
@@ -287,7 +280,7 @@ function ModelStage({
           style={{ filter: "brightness(0.85) contrast(1.1)" }}
           onError={() => setImgError(true)}
         />
-        {dots.map((dot: any) => (
+        {(dots as any[]).map((dot) => (
           <PulseDot
             key={dot.id}
             item={isStudioMode ? undefined : dot}
