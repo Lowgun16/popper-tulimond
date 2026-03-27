@@ -27,10 +27,9 @@ const SHOW_VAULT_DOTS = false;
 // HoverCard
 // ─────────────────────────────────────────────────────────────────────────────
 
-function HoverCard({ item, visible }: { item: OutfitItem | StudioDot; visible: boolean }) {
+function HoverCard({ item, visible, onAction }: { item: OutfitItem | StudioDot; visible: boolean; onAction?: () => void }) {
   const isVault = item.type === "vault";
 
-  // Support both raw OutfitItem and StudioDot shapes
   const name       = "name"       in item ? item.name       : "";
   const collection = "collection" in item ? item.collection : "";
   const colorway   = "colorway"   in item ? item.colorway   : "";
@@ -38,33 +37,34 @@ function HoverCard({ item, visible }: { item: OutfitItem | StudioDot; visible: b
 
   return (
     <div
-      className="absolute left-6 top-1/2 z-30 w-48 transition-[opacity,transform] duration-500 pointer-events-none"
+      className="absolute left-6 top-1/2 z-50 w-48 transition-[opacity,transform] duration-500"
       style={{
         opacity: visible ? 1 : 0,
+        // CRITICAL: This allows the button to be clicked
+        pointerEvents: visible ? "auto" : "none", 
         transform: `translateY(-50%) translateX(${visible ? "0px" : "16px"})`,
       }}
     >
-      <div className="bg-black/80 backdrop-blur-md border border-white/10 p-3 rounded-sm">
-        <p className="type-eyebrow mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>
-          {collection}
-        </p>
+      <div className="bg-black/95 backdrop-blur-xl border border-white/20 p-4 rounded-sm shadow-2xl">
+        <p className="type-eyebrow mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>{collection}</p>
         <p className="text-xs text-white mb-1">{name}</p>
         <p className="text-[10px] text-white/50 mb-2">{colorway}</p>
         <p className="text-xs font-bold text-white/90 mb-3">{price}</p>
 
         {isVault ? (
-          <>
-            <p className="text-[9px] tracking-widest uppercase mb-2" style={{ color: "#D4B896" }}>
-              Vault Access Required
-            </p>
-            <div className="w-full text-center text-[9px] tracking-widest uppercase py-2 border border-white/10 text-white/20 rounded-sm select-none">
-              Members Only
-            </div>
-          </>
-        ) : (
-          <div className="w-full text-center text-[9px] tracking-widest uppercase py-2 border border-white/30 text-white/70 rounded-sm select-none transition-colors duration-300">
-            {item.name.toLowerCase().includes('scarf') || item.name.toLowerCase().includes('belt') ? "Lookbook" : "Find Your Size"}
+          <div className="w-full text-center text-[9px] tracking-widest uppercase py-2 border border-white/10 text-white/20 rounded-sm">
+            Members Only
           </div>
+        ) : (
+          <button 
+            onClick={(e) => { 
+              e.stopPropagation(); // Prevents clicking "through" to the character
+              if (onAction) onAction(); 
+            }}
+            className="w-full text-center text-[9px] tracking-widest uppercase py-2.5 border border-white/30 text-white hover:bg-white hover:text-black transition-all duration-300 cursor-pointer active:scale-95"
+          >
+            {item.name.toLowerCase().includes('scarf') || item.name.toLowerCase().includes('belt') ? "Lookbook" : "Find Your Size"}
+          </button>
         )}
       </div>
     </div>
@@ -194,7 +194,13 @@ function PulseDot({
             cursor: draggable ? "inherit" : "pointer",
           }}
         />
-        {!draggable && <HoverCard item={dot} visible={hovered || tapped} />}
+        {!draggable && (
+          <HoverCard 
+            item={dot} 
+            visible={hovered || tapped} 
+            onAction={onDotTap}  // <--- ADD THIS LINE
+          />
+        )}
       </div>
     </motion.div>
   );
@@ -430,7 +436,9 @@ function ModelStage({
   const containerStyle: React.CSSProperties = {
     opacity: revealed ? 1 : 0,
     transitionDelay: `${index * 150}ms`,
-    ...(isStudioMode ? {} : { zIndex: isEditMode && hovered ? 999 : slot.zIndex }),
+    // MAGIC LINE: If a dot is tapped or hovered (isActive), z-index jumps to 999.
+    // This forces the character to the very front so the box is never hidden.
+    zIndex: (isActive || (isEditMode && hovered)) ? 999 : (slot.zIndex || 20 + index),
     ...studioPositionStyle,
   };
 
