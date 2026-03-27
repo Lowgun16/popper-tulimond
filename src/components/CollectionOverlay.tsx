@@ -25,6 +25,7 @@ function isVideo(src: string): boolean {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: boolean }) {
+  // SVG path creating the "elbow" look. Starts at dot, moves horizontal, then diagonal.
   const pathData = flipLeft 
     ? "M 0 0 L -20 0 L -60 -20" 
     : "M 0 0 L 20 0 L 60 -20"; 
@@ -42,7 +43,7 @@ function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: bool
         strokeWidth="1"
         initial={{ pathLength: 0, opacity: 0 }}
         animate={visible ? { pathLength: 1, opacity: 0.6 } : { pathLength: 0, opacity: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
       />
       <motion.circle 
         cx={flipLeft ? -60 : 60} 
@@ -56,7 +57,7 @@ function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: bool
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HoverCard
+// HoverCard - The Info Box
 // ─────────────────────────────────────────────────────────────────────────────
 
 function HoverCard({ 
@@ -84,6 +85,7 @@ function HoverCard({
     <div
       className="absolute z-[100] w-44 transition-[opacity,transform] duration-500"
       style={{
+        // Lifted -40px to meet the elbow line, and moved out 5.5rem to clear the shirt
         top: "-40px",
         ...(flipLeft ? { right: "5.5rem", left: "auto" } : { left: "5.5rem", right: "auto" }),
         opacity: visible ? 1 : 0,
@@ -119,13 +121,13 @@ function HoverCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PulseDot
+// PulseDot - The Anchor Point
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface PulseDotProps {
   item?: OutfitItem;
   studioDot?: StudioDot;
-  hovered: boolean; // THE FIX IS HERE
+  hovered: boolean; // Re-added to fix the Build Error
   tapped: boolean;
   isEditMode: boolean;
   isStudioMode: boolean;
@@ -199,7 +201,7 @@ function PulseDot({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ModelStage & CollectionOverlay
+// ModelStage & Main Container
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface ModelStageProps {
