@@ -94,7 +94,7 @@ export function StudioInspector({
       className="fixed left-0 top-0 bottom-0 z-[6000] flex flex-col shadow-2xl"
       animate={{ x: sidebarOpen ? 0 : "-100%" }}
       transition={{ type: "tween", duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-      onPointerDown={(e) => e.stopPropagation()} // Stop background deselect
+      onPointerDown={(e) => e.stopPropagation()} 
       style={{
         width: "min(85vw, 320px)",
         background: isMobile ? "rgba(0,0,0,0.85)" : "rgba(8,8,8,0.98)",
@@ -119,7 +119,7 @@ export function StudioInspector({
         </p>
       </div>
 
-      {/* ── Cast Roster — Fixed Selection Logic ── */}
+      {/* ── Cast Roster ── */}
       <div
         className="py-4 flex-shrink-0"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}
@@ -137,7 +137,6 @@ export function StudioInspector({
                   color: active ? "#000" : "rgba(255,255,255,0.5)",
                   background: active ? "#D4B896" : "rgba(255,255,255,0.03)",
                 }}
-                // FIXED: instant selection on touch
                 onPointerDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -169,16 +168,16 @@ export function StudioInspector({
             {/* Transform */}
             <Section label="Spatial Config">
               <Row label="Horizontal %">
-                <NumInput value={selected.leftPct} onChange={(v) => onUpdateSlot(selected.id, { leftPct: v })} isMobile={isMobile} />
+                <NumInput value={selected.leftPct} onChange={(v: number) => onUpdateSlot(selected.id, { leftPct: v })} isMobile={isMobile} />
               </Row>
               <Row label="Depth %">
-                <NumInput value={selected.bottomPct} onChange={(v) => onUpdateSlot(selected.id, { bottomPct: v })} isMobile={isMobile} />
+                <NumInput value={selected.bottomPct} onChange={(v: number) => onUpdateSlot(selected.id, { bottomPct: v })} isMobile={isMobile} />
               </Row>
               <Row label="Scale Factor">
-                <NumInput value={selected.scale} step={0.05} min={0.2} max={2.5} onChange={(v) => onUpdateSlot(selected.id, { scale: v })} isMobile={isMobile} />
+                <NumInput value={selected.scale} step={0.05} min={0.2} max={2.5} onChange={(v: number) => onUpdateSlot(selected.id, { scale: v })} isMobile={isMobile} />
               </Row>
               <Row label="Layer Order">
-                <NumInput value={selected.zIndex} step={1} min={1} max={100} onChange={(v) => onUpdateSlot(selected.id, { zIndex: v })} isMobile={isMobile} />
+                <NumInput value={selected.zIndex} step={1} min={1} max={100} onChange={(v: number) => onUpdateSlot(selected.id, { zIndex: v })} isMobile={isMobile} />
               </Row>
             </Section>
 
@@ -190,14 +189,14 @@ export function StudioInspector({
                     key={dot.id}
                     dot={dot}
                     isMobile={isMobile}
-                    onUpdate={(patch) => onUpdateDot(selected.id, dot.id, patch)}
+                    onUpdate={(patch: Partial<StudioDot>) => onUpdateDot(selected.id, dot.id, patch)}
                     onRemove={() => onRemoveDot(selected.id, dot.id)}
                   />
                 ))}
               </div>
               <button
                 className="w-full text-[9px] tracking-widest uppercase py-3 mt-2 border border-[#D4B896]/20 text-[#D4B896]/60 hover:bg-[#D4B896]/5"
-                onPointerDown={(e) => { e.stopPropagation(); onAddDot(selected.id); }}
+                onPointerDown={(e: any) => { e.stopPropagation(); onAddDot(selected.id); }}
               >
                 + Create Hotspot
               </button>
@@ -205,12 +204,12 @@ export function StudioInspector({
 
             {/* Character Info */}
             <Section label="Asset Config">
-              <TextInput label="Label" value={selected.displayName} onChange={(v) => onUpdateSlot(selected.id, { displayName: v })} />
+              <TextInput label="Label" value={selected.displayName} onChange={(v: string) => onUpdateSlot(selected.id, { displayName: v })} />
               <label className="text-[8px] tracking-widest uppercase block mt-4 mb-2 text-white/40">Path to Image</label>
-              <ImagePathInput value={selected.imageSrc} onChange={(v) => onSwapImage(selected.id, v)} />
+              <ImagePathInput value={selected.imageSrc} onChange={(v: string) => onSwapImage(selected.id, v)} />
               <button
                 className="mt-4 w-full text-[9px] tracking-[0.2em] uppercase py-2 border border-red-900/30 text-red-500/60 hover:bg-red-900/20"
-                onPointerDown={(e) => { e.stopPropagation(); if(confirm('Delete Character?')) onRemoveSlot(selected.id); }}
+                onPointerDown={(e: any) => { e.stopPropagation(); if(confirm('Delete Character?')) onRemoveSlot(selected.id); }}
               >
                 Delete Character
               </button>
@@ -218,10 +217,10 @@ export function StudioInspector({
 
             {/* Shadow Controls */}
             <Section label="Shadow Calibration">
-              <Row label="Offset X"><NumInput value={selected.shadow.offsetX} min={-300} max={300} onChange={(v) => onUpdateShadow(selected.id, { offsetX: v })} isMobile={isMobile} /></Row>
-              <Row label="Offset Y"><NumInput value={selected.shadow.offsetY} min={-300} max={300} onChange={(v) => onUpdateShadow(selected.id, { offsetY: v })} isMobile={isMobile} /></Row>
-              <Row label="Opacity"><NumInput value={selected.shadow.opacity} step={0.05} min={0} max={1} onChange={(v) => onUpdateShadow(selected.id, { opacity: v })} isMobile={isMobile} /></Row>
-              <Row label="Softness"><NumInput value={selected.shadow.blur} min={0} max={100} onChange={(v) => onUpdateShadow(selected.id, { blur: v })} isMobile={isMobile} /></Row>
+              <Row label="Offset X"><NumInput value={selected.shadow.offsetX} min={-300} max={300} onChange={(v: number) => onUpdateShadow(selected.id, { offsetX: v })} isMobile={isMobile} /></Row>
+              <Row label="Offset Y"><NumInput value={selected.shadow.offsetY} min={-300} max={300} onChange={(v: number) => onUpdateShadow(selected.id, { offsetY: v })} isMobile={isMobile} /></Row>
+              <Row label="Opacity"><NumInput value={selected.shadow.opacity} step={0.05} min={0} max={1} onChange={(v: number) => onUpdateShadow(selected.id, { opacity: v })} isMobile={isMobile} /></Row>
+              <Row label="Softness"><NumInput value={selected.shadow.blur} min={0} max={100} onChange={(v: number) => onUpdateShadow(selected.id, { blur: v })} isMobile={isMobile} /></Row>
             </Section>
 
           </div>
@@ -312,8 +311,8 @@ function ImagePathInput({ value, onChange }: { value: string; onChange: (v: stri
     <input
       className="w-full text-[10px] text-white/70 py-2 px-3 bg-white/5 border border-white/10 outline-none focus:border-[#D4B896]/40"
       value={draft}
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={(e) => commit(e.currentTarget.value)}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDraft(e.target.value)}
+      onBlur={(e: React.FocusEvent<HTMLInputElement>) => commit(e.target.value)}
     />
   );
 }
@@ -324,7 +323,7 @@ function NumInput({ value, step = 0.5, min = -150, max = 250, onChange, isMobile
       type="number"
       className="w-full text-[11px] text-white/90 text-center py-2 bg-white/5 border border-white/10 outline-none"
       value={step < 1 ? value.toFixed(2) : Math.round(value)}
-      onChange={(e) => {
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
         const v = parseFloat(e.target.value);
         if (!isNaN(v)) onChange(Math.min(max, Math.max(min, v)));
       }}
@@ -333,9 +332,9 @@ function NumInput({ value, step = 0.5, min = -150, max = 250, onChange, isMobile
 
   return (
     <div className="flex items-center gap-1 w-full">
-      <button className="w-8 h-8 bg-white/10 text-white" onPointerDown={(e) => { e.stopPropagation(); onChange(Math.max(min, value - step)); }}>−</button>
+      <button className="w-8 h-8 bg-white/10 text-white" onPointerDown={(e: any) => { e.stopPropagation(); onChange(Math.max(min, value - step)); }}>−</button>
       {inputEl}
-      <button className="w-8 h-8 bg-white/10 text-white" onPointerDown={(e) => { e.stopPropagation(); onChange(Math.min(max, value + step)); }}>+</button>
+      <button className="w-8 h-8 bg-white/10 text-white" onPointerDown={(e: any) => { e.stopPropagation(); onChange(Math.min(max, value + step)); }}>+</button>
     </div>
   );
 }
@@ -347,7 +346,7 @@ function TextInput({ label, value, onChange }: any) {
       <input
         className="flex-1 text-[11px] text-white/90 py-2 px-3 bg-white/5 border border-white/10 outline-none"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
       />
     </div>
   );
@@ -358,19 +357,19 @@ function DotEditor({ dot, onUpdate, onRemove, isMobile = false }: any) {
     <div className="p-4 bg-white/5 border border-white/10">
       <div className="flex items-center justify-between mb-3">
         <span className="text-[8px] font-bold tracking-[0.3em] uppercase text-[#D4B896]">{dot.type}</span>
-        <button className="text-red-500/60 text-[10px]" onPointerDown={(e) => { e.stopPropagation(); onRemove(); }}>✕</button>
+        <button className="text-red-500/60 text-[10px]" onPointerDown={(e: any) => { e.stopPropagation(); onRemove(); }}>✕</button>
       </div>
       <div className="flex flex-col gap-2">
-        <TextInput label="Name" value={dot.name} onChange={(v:any) => onUpdate({ name: v })} />
-        <TextInput label="Price" value={dot.price} onChange={(v:any) => onUpdate({ price: v })} />
+        <TextInput label="Name" value={dot.name} onChange={(v: string) => onUpdate({ name: v })} />
+        <TextInput label="Price" value={dot.price} onChange={(v: string) => onUpdate({ price: v })} />
         <div className="grid grid-cols-2 gap-2 mt-2">
             <div>
                 <p className="text-[7px] uppercase text-white/30 mb-1">Top %</p>
-                <NumInput value={dot.topPct} min={0} max={100} onChange={(v:any) => onUpdate({ topPct: v })} />
+                <NumInput value={dot.topPct} min={0} max={100} onChange={(v: number) => onUpdate({ topPct: v })} />
             </div>
             <div>
                 <p className="text-[7px] uppercase text-white/30 mb-1">Left %</p>
-                <NumInput value={dot.leftPct} min={0} max={100} onChange={(v:any) => onUpdate({ leftPct: v })} />
+                <NumInput value={dot.leftPct} min={0} max={100} onChange={(v: number) => onUpdate({ leftPct: v })} />
             </div>
         </div>
       </div>
