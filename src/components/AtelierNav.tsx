@@ -1,4 +1,3 @@
-// src/components/AtelierNav.tsx
 "use client";
 
 import { motion, type MotionValue, useMotionValueEvent } from "framer-motion";
@@ -23,13 +22,18 @@ export default function AtelierNav({ opacity }: Props) {
       className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center pt-8 md:pt-10 pb-4"
       style={{ opacity, pointerEvents: active ? "auto" : "none" }}
     >
-      {/* Logo — slightly smaller on mobile for letterboxed layout */}
+      {/* Logo — Enhanced with multi-layered drop shadow for legibility against bright lights */}
       <Image
         src="/logo-horizontal.png"
         alt="Popper Tulimond"
         width={220}
         height={64}
         className="object-contain mb-4 w-[180px] md:w-[220px]"
+        style={{
+            // Layer 1: Tight shadow to define the gold script edges
+            // Layer 2: Broad, soft shadow to separate the logo from the room's depth
+            filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.8)) drop-shadow(0 4px 12px rgba(0,0,0,0.4))"
+        }}
         priority
       />
 
