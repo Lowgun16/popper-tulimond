@@ -18,10 +18,6 @@ import { LookbookOverlay } from "./studio/LookbookOverlay";
 
 const STUDIO_DRAFT_KEY = "tulimond-studio-draft";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Visual Components
-// ─────────────────────────────────────────────────────────────────────────────
-
 function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: boolean }) {
   const pathData = flipLeft ? "M 0 0 L -20 0 L -60 -20" : "M 0 0 L 20 0 L 60 -20"; 
   return (
@@ -69,10 +65,6 @@ function HoverCard({ item, visible, onAction, onClose, leftPct }: any) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PulseDot
-// ─────────────────────────────────────────────────────────────────────────────
-
 function PulseDot({ item, studioDot, tapped, isStudioMode, onStudioDotDrop, onDotTap, onToggleDot }: any) {
   const dot = studioDot ?? item!;
   const leftPct = useMemo(() => {
@@ -104,10 +96,6 @@ function PulseDot({ item, studioDot, tapped, isStudioMode, onStudioDotDrop, onDo
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ModelStage
-// ─────────────────────────────────────────────────────────────────────────────
-
 function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelected, onSelect, onStudioDotDrop, onModelDrag, onUpdateStudioSlot, activeDotId, onToggleDot }: any) {
   const imageSrc = isStudioMode && studioSlot ? studioSlot.imageSrc : slot.imageSrc;
   const shadow = (isStudioMode && studioSlot) ? studioSlot.shadow : (slot.shadow ?? DEFAULT_SHADOW);
@@ -125,7 +113,6 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
         zIndex: isSelected ? 1000 : (slot.zIndex || 20 + index),
         ...(isStudioMode ? { left, bottom } : {})
       }}
-      // Using onPointerDown for instant selection in Studio Mode
       onPointerDown={(e) => { 
         if (isStudioMode) { e.stopPropagation(); onSelect(); } 
       }}
@@ -169,10 +156,6 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
     </motion.div>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main Overlay Component
-// ─────────────────────────────────────────────────────────────────────────────
 
 export default function CollectionOverlay({ opacity }: { opacity: MotionValue<number> }) {
   const router = useRouter();
@@ -222,24 +205,20 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
   return (
     <div 
       className="absolute inset-0 z-[5000] main-container" 
-      style={{ pointerEvents: active ? "auto" : "none" }} 
+      style={{ pointerEvents: active || isStudioMode ? "auto" : "none" }} 
       onPointerDown={(e) => { 
-          // Background click deselects ONLY if it didn't happen inside the Inspector
           if (isStudioMode) setSelectedModelId(null); 
       }}
     >
       {isStudioMode && (
         <div 
-          className="fixed inset-y-0 left-0 w-[400px] z-[6000]" // HARD SHIELD over the panel area
-          onPointerDown={(e) => e.stopPropagation()} // Stop selection leak
+          className="fixed inset-y-0 left-0 w-[400px] z-[6000]" 
+          onPointerDown={(e) => e.stopPropagation()} 
         >
           <StudioInspector
             slots={studioSlots} 
             selectedId={selectedModelId} 
-            onSelectSlot={(id: string) => {
-                console.log("Inspector selecting character:", id);
-                setSelectedModelId(id);
-            }} 
+            onSelectSlot={setSelectedModelId} 
             onUpdateSlot={updateSlot} 
             onUpdateDot={updateDot} 
             onSave={async () => {
@@ -295,7 +274,6 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
           ))
       }
 
-      {/* Save Place Notification Overlay */}
       {saveConfirm && (
         <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[7000] shadow-2xl">
           Draft Saved Locally
