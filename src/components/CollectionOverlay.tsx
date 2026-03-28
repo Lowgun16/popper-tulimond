@@ -69,6 +69,10 @@ function HoverCard({ item, visible, onAction, onClose, leftPct }: any) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// PulseDot
+// ─────────────────────────────────────────────────────────────────────────────
+
 function PulseDot({ item, studioDot, tapped, isStudioMode, onStudioDotDrop, onDotTap, onToggleDot }: any) {
   const dot = studioDot ?? item!;
   const leftPct = useMemo(() => {
@@ -121,6 +125,7 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
         zIndex: isSelected ? 1000 : (slot.zIndex || 20 + index),
         ...(isStudioMode ? { left, bottom } : {})
       }}
+      // Using onPointerDown for instant selection in Studio Mode
       onPointerDown={(e) => { 
         if (isStudioMode) { e.stopPropagation(); onSelect(); } 
       }}
@@ -219,18 +224,22 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
       className="absolute inset-0 z-[5000] main-container" 
       style={{ pointerEvents: active ? "auto" : "none" }} 
       onPointerDown={(e) => { 
+          // Background click deselects ONLY if it didn't happen inside the Inspector
           if (isStudioMode) setSelectedModelId(null); 
       }}
     >
       {isStudioMode && (
         <div 
-          className="fixed inset-y-0 left-0 w-[400px] z-[6000]" 
-          onPointerDown={(e) => e.stopPropagation()} 
+          className="fixed inset-y-0 left-0 w-[400px] z-[6000]" // HARD SHIELD over the panel area
+          onPointerDown={(e) => e.stopPropagation()} // Stop selection leak
         >
           <StudioInspector
             slots={studioSlots} 
             selectedId={selectedModelId} 
-            onSelectSlot={setSelectedModelId} 
+            onSelectSlot={(id: string) => {
+                console.log("Inspector selecting character:", id);
+                setSelectedModelId(id);
+            }} 
             onUpdateSlot={updateSlot} 
             onUpdateDot={updateDot} 
             onSave={async () => {
@@ -274,12 +283,6 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
                 ⚠ Clear Session Draft
              </button>
           </div>
-
-          {saveConfirm && (
-             <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[3000] shadow-2xl">
-                Draft Saved Locally
-             </div>
-          )}
         </div>
       )}
 
@@ -292,7 +295,14 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
           ))
       }
 
-      <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[2100]">
+      {/* Save Place Notification Overlay */}
+      {saveConfirm && (
+        <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[7000] shadow-2xl">
+          Draft Saved Locally
+        </div>
+      )}
+
+      <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[6100]">
         <button 
           className="px-6 py-3 bg-black/90 border border-white/20 text-[10px] uppercase tracking-widest text-white backdrop-blur-xl"
           style={isStudioMode ? { color: "#D4B896", borderColor: "#D4B896" } : {}}
