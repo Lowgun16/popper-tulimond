@@ -16,8 +16,11 @@ import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import { DEFAULT_SHADOW } from "./studio/studioTypes";
 import { LookbookOverlay } from "./studio/LookbookOverlay";
 
+// Key for browser memory
+const STUDIO_DRAFT_KEY = "tulimond-studio-draft";
+
 // ─────────────────────────────────────────────────────────────────────────────
-// Visuals: Connector & Card
+// Visual Components (Connector & Card)
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: boolean }) {
@@ -124,10 +127,7 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
         ...(isStudioMode ? { left, bottom } : {})
       }}
       onClick={(e) => { 
-        if (isStudioMode) { 
-          e.stopPropagation(); // Shield: clicking character doesn't deselect
-          onSelect(); 
-        } 
+        if (isStudioMode) { e.stopPropagation(); onSelect(); } 
       }}
       drag={isStudioMode && isSelected}
       dragMomentum={false}
@@ -184,6 +184,7 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
   const [lookbookDot, setLookbookDot] = useState<LookbookContext | null>(null);
   const [copyConfirm, setCopyConfirm] = useState(false);
+  const [saveConfirm, setSaveConfirm] = useState(false);
 
   useMotionValueEvent(opacity, "change", (v) => {
     setActive(v > 0.05);
@@ -213,22 +214,22 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
     <div 
       className="absolute inset-0 z-20 main-container" 
       style={{ pointerEvents: active ? "auto" : "none" }} 
-      onClick={() => {
-        if (isStudioMode) setSelectedModelId(null);
-      }}
+      onClick={() => { if (isStudioMode) setSelectedModelId(null); }}
     >
       {isStudioMode && (
-        <div 
-          className="relative z-[2000]" // Shield: higher than characters
-          onClick={(e) => e.stopPropagation()} // Shield: stop clicks from deselecting
-        >
+        <div className="relative z-[2000]" onClick={(e) => e.stopPropagation()}>
           <StudioInspector
             slots={studioSlots} 
             selectedId={selectedModelId} 
             onSelectSlot={setSelectedModelId}
             onUpdateSlot={updateSlot} 
             onUpdateDot={updateDot} 
-            onSave={async () => {}} 
+            // ── NEW: SAVE PLACE (Local Storage) ──
+            onSave={async () => {
+                localStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify(studioSlots));
+                setSaveConfirm(true);
+                setTimeout(() => setSaveConfirm(false), 2000);
+            }} 
             onCopyCode={() => {
               navigator.clipboard.writeText(exportInventoryCode(studioSlots));
               setCopyConfirm(true); setTimeout(() => setCopyConfirm(false), 2000);
@@ -256,6 +257,12 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
                if (s) updateSlot(id, { shadow: { ...s.shadow, ...patch } });
             }}
           />
+          {/* Quick confirmation popup for Save Place */}
+          {saveConfirm && (
+             <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[3000]">
+                Draft Saved Locally
+             </div>
+          )}
         </div>
       )}
 
@@ -277,8 +284,13 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
             if (isStudioMode) {
               setIsStudioMode(false);
             } else {
-              setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
-              // SYNC: If you have a dot active, select that model automatically
+              // ── NEW: LOAD FROM MEMORY ON ENTRY ──
+              const savedDraft = localStorage.getItem(STUDIO_DRAFT_KEY);
+              if (savedDraft) {
+                  setStudioSlots(JSON.parse(savedDraft));
+              } else {
+                  setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
+              }
               const currentModel = MODEL_INVENTORY.find(m => m.outfit.some(d => d.id === activeDotId));
               if (currentModel) setSelectedModelId(currentModel.id);
               setIsStudioMode(true);
