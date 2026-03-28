@@ -1,4 +1,3 @@
-// src/components/studio/StudioInspector.tsx
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
@@ -82,10 +81,9 @@ export function StudioInspector({
     setPublishState("publishing");
     try {
       await onSave();
-      // TODO: wire to deploy endpoint
       await new Promise<void>((resolve) => setTimeout(resolve, 3000));
     } catch {
-      // Save error is surfaced by handleSaveClick — publish silently aborts
+      // Errors handled by save state
     }
     setPublishState("idle");
   };
@@ -93,69 +91,70 @@ export function StudioInspector({
   return (
     <>
     <motion.div
-      className="fixed left-0 top-0 bottom-0 z-[200] flex flex-col"
+      className="fixed left-0 top-0 bottom-0 z-[6000] flex flex-col shadow-2xl"
       animate={{ x: sidebarOpen ? 0 : "-100%" }}
       transition={{ type: "tween", duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+      onPointerDown={(e) => e.stopPropagation()} // Stop background deselect
       style={{
-        width: "min(85vw, 300px)",
-        background: isMobile ? "rgba(0,0,0,0.6)" : "rgba(8,8,8,0.97)",
-        borderRight: "1px solid rgba(255,255,255,0.07)",
-        backdropFilter: "blur(16px)",
+        width: "min(85vw, 320px)",
+        background: isMobile ? "rgba(0,0,0,0.85)" : "rgba(8,8,8,0.98)",
+        borderRight: "1px solid rgba(212,184,150,0.15)",
+        backdropFilter: "blur(24px)",
         pointerEvents: "auto",
       }}
     >
       {/* ── Header ── */}
       <div
-        className="pt-5 pb-4 flex-shrink-0"
+        className="pt-6 pb-4 flex-shrink-0"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}
       >
         <p
-          className="text-[8px] tracking-[0.4em] uppercase mb-1"
+          className="text-[9px] font-bold tracking-[0.5em] uppercase mb-1"
           style={{ color: "#D4B896" }}
         >
           Popper Studio
         </p>
-        <p className="text-white/40 text-[11px] tracking-wide">
-          {selected ? selected.displayName : `${slots.length} character${slots.length !== 1 ? "s" : ""}`}
+        <p className="text-white/40 text-[10px] tracking-wide uppercase">
+          {selected ? `Editing: ${selected.displayName}` : `${slots.length} Patrons On Stage`}
         </p>
       </div>
 
-      {/* ── Character Roster — always visible, click to select ── */}
+      {/* ── Cast Roster — Fixed Selection Logic ── */}
       <div
-        className="py-3 flex-shrink-0"
+        className="py-4 flex-shrink-0"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}
       >
-        <p
-          className="text-[8px] tracking-[0.4em] uppercase mb-2"
-          style={{ color: "rgba(255,255,255,0.3)" }}
-        >
-          Cast
-        </p>
-        <div className="flex flex-wrap gap-1.5">
+        <p className="text-[8px] tracking-[0.4em] uppercase mb-3 text-white/30">Cast Selection</p>
+        <div className="flex flex-wrap gap-2">
           {slots.map((slot) => {
             const active = slot.id === selectedId;
             return (
               <button
                 key={slot.id}
-                className="text-[8px] tracking-widest uppercase px-2.5 py-1.5 transition-all duration-150"
+                className="text-[9px] tracking-widest uppercase px-3 py-2 transition-all duration-200 border"
                 style={{
-                  border: `1px solid ${active ? "#D4B896" : "rgba(255,255,255,0.14)"}`,
-                  color: active ? "#D4B896" : "rgba(255,255,255,0.5)",
-                  background: active ? "rgba(212,184,150,0.07)" : "transparent",
+                  borderColor: active ? "#D4B896" : "rgba(255,255,255,0.1)",
+                  color: active ? "#000" : "rgba(255,255,255,0.5)",
+                  background: active ? "#D4B896" : "rgba(255,255,255,0.03)",
                 }}
-                onClick={() => onSelectSlot(slot.id)}
+                // FIXED: instant selection on touch
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onSelectSlot(slot.id);
+                }}
               >
                 {slot.displayName}
               </button>
             );
           })}
           <button
-            className="text-[8px] tracking-widest uppercase px-2.5 py-1.5 transition-all duration-150"
-            style={{
-              border: "1px solid rgba(212,184,150,0.2)",
-              color: "rgba(212,184,150,0.5)",
+            className="text-[9px] tracking-widest uppercase px-3 py-2 transition-all duration-200 border border-dashed border-[#D4B896]/30 text-[#D4B896]/60 hover:text-[#D4B896]"
+            onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onAddSlot();
             }}
-            onClick={onAddSlot}
           >
             + Patron
           </button>
@@ -163,107 +162,29 @@ export function StudioInspector({
       </div>
 
       {/* ── Body ── */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
         {selected ? (
-          <div className="py-4 flex flex-col gap-6" style={{ paddingLeft: sidePad, paddingRight: sidePad }}>
+          <div className="py-6 flex flex-col gap-8" style={{ paddingLeft: sidePad, paddingRight: sidePad }}>
 
             {/* Transform */}
-            <Section label="Transform">
-              <Row label="Left %">
-                <NumInput
-                  value={selected.leftPct}
-                  onChange={(v) => onUpdateSlot(selected.id, { leftPct: v })}
-                  isMobile={isMobile}
-                />
+            <Section label="Spatial Config">
+              <Row label="Horizontal %">
+                <NumInput value={selected.leftPct} onChange={(v) => onUpdateSlot(selected.id, { leftPct: v })} isMobile={isMobile} />
               </Row>
-              {selected.leftPct < 15 && (
-                <div className="flex items-center justify-between gap-2 mt-1">
-                  <p className="text-[8px] leading-snug" style={{ color: "rgba(255,180,60,0.85)" }}>
-                    ⚠ Behind sidebar
-                  </p>
-                  <button
-                    className="text-[8px] tracking-widest uppercase px-2 py-1 flex-shrink-0"
-                    style={{ border: "1px solid rgba(255,180,60,0.4)", color: "rgba(255,180,60,0.75)" }}
-                    onClick={() => onUpdateSlot(selected.id, { leftPct: 22 })}
-                  >
-                    Nudge →
-                  </button>
-                </div>
-              )}
-              <Row label="Bottom %">
-                <NumInput
-                  value={selected.bottomPct}
-                  onChange={(v) => onUpdateSlot(selected.id, { bottomPct: v })}
-                  isMobile={isMobile}
-                />
+              <Row label="Depth %">
+                <NumInput value={selected.bottomPct} onChange={(v) => onUpdateSlot(selected.id, { bottomPct: v })} isMobile={isMobile} />
               </Row>
-              <Row label="Scale">
-                <NumInput
-                  value={selected.scale}
-                  step={0.05}
-                  min={0.2}
-                  max={2.5}
-                  onChange={(v) => onUpdateSlot(selected.id, { scale: v })}
-                  isMobile={isMobile}
-                />
+              <Row label="Scale Factor">
+                <NumInput value={selected.scale} step={0.05} min={0.2} max={2.5} onChange={(v) => onUpdateSlot(selected.id, { scale: v })} isMobile={isMobile} />
               </Row>
-              <Row label="Z-Index">
-                <NumInput
-                  value={selected.zIndex}
-                  step={1}
-                  min={1}
-                  max={100}
-                  onChange={(v) => onUpdateSlot(selected.id, { zIndex: v })}
-                  isMobile={isMobile}
-                />
+              <Row label="Layer Order">
+                <NumInput value={selected.zIndex} step={1} min={1} max={100} onChange={(v) => onUpdateSlot(selected.id, { zIndex: v })} isMobile={isMobile} />
               </Row>
-            </Section>
-
-            {/* Character */}
-            <Section label="Character">
-              <TextInput
-                label="Display Name"
-                value={selected.displayName}
-                onChange={(v) => onUpdateSlot(selected.id, { displayName: v })}
-              />
-              <label
-                className="text-[9px] tracking-widest uppercase block mt-2 mb-1"
-                style={{ color: "rgba(255,255,255,0.65)" }}
-              >
-                Image Path
-              </label>
-              <ImagePathInput
-                value={selected.imageSrc}
-                onChange={(v) => onSwapImage(selected.id, v)}
-              />
-              <button
-                className="w-full text-[9px] tracking-widest uppercase py-1.5 mt-1 transition-colors duration-200"
-                style={{
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  color: "rgba(255,255,255,0.4)",
-                }}
-                onClick={() => {
-                  const base = selected.imageSrc.replace(/\?t=\d+$/, "");
-                  onSwapImage(selected.id, `${base}?t=${Date.now()}`);
-                }}
-              >
-                ↻  Reload Image
-              </button>
-              <button
-                className="mt-2 w-full text-[9px] tracking-widest uppercase py-2 transition-colors duration-200"
-                style={{
-                  border: "1px solid rgba(220,60,60,0.3)",
-                  color: "rgba(220,90,90,0.75)",
-                }}
-                onClick={() => onRemoveSlot(selected.id)}
-              >
-                Remove Character
-              </button>
             </Section>
 
             {/* Hotspots */}
-            <Section label={`Hotspots (${selected.dots.length})`}>
-              <div className="flex flex-col gap-3">
+            <Section label={`Garment Hotspots (${selected.dots.length})`}>
+              <div className="flex flex-col gap-4">
                 {selected.dots.map((dot) => (
                   <DotEditor
                     key={dot.id}
@@ -275,197 +196,79 @@ export function StudioInspector({
                 ))}
               </div>
               <button
-                className="w-full text-[9px] tracking-widest uppercase py-2 mt-2 transition-colors duration-200"
-                style={{
-                  border: "1px solid rgba(212,184,150,0.25)",
-                  color: "rgba(212,184,150,0.6)",
-                }}
-                onClick={() => onAddDot(selected.id)}
+                className="w-full text-[9px] tracking-widest uppercase py-3 mt-2 border border-[#D4B896]/20 text-[#D4B896]/60 hover:bg-[#D4B896]/5"
+                onPointerDown={(e) => { e.stopPropagation(); onAddDot(selected.id); }}
               >
-                + Add Hotspot
+                + Create Hotspot
               </button>
             </Section>
 
-            {/* Shadow */}
-            <Section label="Shadow Plane">
-              <Row label="Offset X">
-                <NumInput
-                  value={selected.shadow.offsetX}
-                  step={1}
-                  min={-300}
-                  max={300}
-                  onChange={(v) => onUpdateShadow(selected.id, { offsetX: v })}
-                  isMobile={isMobile}
-                />
-              </Row>
-              <Row label="Offset Y">
-                <NumInput
-                  value={selected.shadow.offsetY}
-                  step={1}
-                  min={-300}
-                  max={300}
-                  onChange={(v) => onUpdateShadow(selected.id, { offsetY: v })}
-                  isMobile={isMobile}
-                />
-              </Row>
-              <Row label="Scale W">
-                <NumInput
-                  value={selected.shadow.scaleX}
-                  step={0.05}
-                  min={0}
-                  max={5}
-                  onChange={(v) => onUpdateShadow(selected.id, { scaleX: v })}
-                  isMobile={isMobile}
-                />
-              </Row>
-              <Row label="Scale H">
-                <NumInput
-                  value={selected.shadow.scaleY}
-                  step={0.01}
-                  min={0}
-                  max={2}
-                  onChange={(v) => onUpdateShadow(selected.id, { scaleY: v })}
-                  isMobile={isMobile}
-                />
-              </Row>
-              <Row label="Opacity">
-                <NumInput
-                  value={selected.shadow.opacity}
-                  step={0.05}
-                  min={0}
-                  max={1}
-                  onChange={(v) => onUpdateShadow(selected.id, { opacity: v })}
-                  isMobile={isMobile}
-                />
-              </Row>
-              <Row label="Blur">
-                <NumInput
-                  value={selected.shadow.blur}
-                  step={1}
-                  min={0}
-                  max={60}
-                  onChange={(v) => onUpdateShadow(selected.id, { blur: v })}
-                  isMobile={isMobile}
-                />
-              </Row>
+            {/* Character Info */}
+            <Section label="Asset Config">
+              <TextInput label="Label" value={selected.displayName} onChange={(v) => onUpdateSlot(selected.id, { displayName: v })} />
+              <label className="text-[8px] tracking-widest uppercase block mt-4 mb-2 text-white/40">Path to Image</label>
+              <ImagePathInput value={selected.imageSrc} onChange={(v) => onSwapImage(selected.id, v)} />
+              <button
+                className="mt-4 w-full text-[9px] tracking-[0.2em] uppercase py-2 border border-red-900/30 text-red-500/60 hover:bg-red-900/20"
+                onPointerDown={(e) => { e.stopPropagation(); if(confirm('Delete Character?')) onRemoveSlot(selected.id); }}
+              >
+                Delete Character
+              </button>
+            </Section>
+
+            {/* Shadow Controls */}
+            <Section label="Shadow Calibration">
+              <Row label="Offset X"><NumInput value={selected.shadow.offsetX} min={-300} max={300} onChange={(v) => onUpdateShadow(selected.id, { offsetX: v })} isMobile={isMobile} /></Row>
+              <Row label="Offset Y"><NumInput value={selected.shadow.offsetY} min={-300} max={300} onChange={(v) => onUpdateShadow(selected.id, { offsetY: v })} isMobile={isMobile} /></Row>
+              <Row label="Opacity"><NumInput value={selected.shadow.opacity} step={0.05} min={0} max={1} onChange={(v) => onUpdateShadow(selected.id, { opacity: v })} isMobile={isMobile} /></Row>
+              <Row label="Softness"><NumInput value={selected.shadow.blur} min={0} max={100} onChange={(v) => onUpdateShadow(selected.id, { blur: v })} isMobile={isMobile} /></Row>
             </Section>
 
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full px-8">
-            <p
-              className="text-center text-[11px] leading-relaxed"
-              style={{ color: "rgba(255,255,255,0.18)" }}
-            >
-              Select a character on the canvas to inspect and edit their position, scale, and hotspots.
+          <div className="flex items-center justify-center h-full px-10">
+            <p className="text-center text-[10px] uppercase tracking-[0.2em] leading-relaxed text-white/20">
+              Select a Patron to begin calibration
             </p>
           </div>
         )}
       </div>
 
-      {/* ── Footer — Copy Code ── */}
-      <div
-        className="py-4 flex-shrink-0"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}
-      >
+      {/* ── Footer ── */}
+      <div className="p-5 flex flex-col gap-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <button
-          className="w-full text-[9px] tracking-widest uppercase py-3 transition-all duration-300"
+          className="w-full text-[9px] tracking-widest uppercase py-3 border transition-all duration-300"
           style={{
-            border: `1px solid ${copyConfirm ? "#D4B896" : "rgba(255,255,255,0.18)"}`,
-            color: copyConfirm ? "#D4B896" : "rgba(255,255,255,0.55)",
-            background: copyConfirm ? "rgba(212,184,150,0.06)" : "transparent",
+            borderColor: copyConfirm ? "#D4B896" : "rgba(255,255,255,0.1)",
+            color: copyConfirm ? "#D4B896" : "rgba(255,255,255,0.4)",
+            background: copyConfirm ? "rgba(212,184,150,0.05)" : "transparent",
           }}
-          onClick={onCopyCode}
+          onPointerDown={(e) => { e.stopPropagation(); onCopyCode(); }}
         >
-          {copyConfirm ? "✓  Config Copied" : "Copy Config"}
+          {copyConfirm ? "✓ Config Copied" : "Copy Production Config"}
         </button>
-      </div>
 
-      {/* ── Save / Publish footer ── */}
-      <div
-        className="flex-shrink-0 pb-5 pt-3 flex flex-col gap-2"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}
-      >
-        {/* SAVE CHANGES */}
         <button
-          onClick={handleSaveClick}
+          onPointerDown={(e) => { e.stopPropagation(); handleSaveClick(); }}
           disabled={saveState === "saving"}
-          className="w-full py-2.5 text-[9px] tracking-[0.3em] uppercase transition-all duration-200 flex items-center justify-center gap-2"
-          style={{
-            background: saveState === "saved" ? "rgba(180,220,150,0.15)" : "rgba(40,40,40,0.95)",
-            border: `1px solid ${
-              saveState === "saved"
-                ? "rgba(180,220,150,0.4)"
-                : saveState === "error"
-                ? "rgba(220,160,80,0.4)"
-                : "rgba(255,255,255,0.12)"
-            }`,
-            color:
-              saveState === "saved"
-                ? "rgba(180,220,150,0.9)"
-                : saveState === "error"
-                ? "rgba(220,160,80,0.85)"
-                : "#fff",
-            opacity: saveState === "saving" ? 0.6 : 1,
-            cursor: saveState === "saving" ? "not-allowed" : "pointer",
-          }}
+          className="w-full py-3 text-[9px] tracking-[0.3em] uppercase transition-all duration-300 flex items-center justify-center gap-2 bg-white text-black font-bold"
         >
-          {saveState === "saving" && (
-            <span className="inline-block w-3 h-3 border border-white/40 border-t-white/80 rounded-full animate-spin" />
-          )}
-          {saveState === "saving" && "Saving…"}
-          {saveState === "saved" && "✓ Saved"}
-          {(saveState === "error" || saveState === "idle") && "Save Changes"}
-        </button>
-
-        {/* Error label */}
-        {saveState === "error" && saveError && (
-          <p className="text-[8px] tracking-widest text-center" style={{ color: "rgba(220,160,80,0.8)" }}>
-            ✕ {saveError}
-          </p>
-        )}
-
-        {/* PUBLISH LIVE */}
-        <button
-          onClick={handlePublishClick}
-          disabled={publishState === "publishing" || saveState === "saving"}
-          className="w-full py-2 text-[8px] tracking-[0.3em] uppercase transition-all duration-200"
-          style={{
-            background: "transparent",
-            border: "1px solid rgba(212,184,150,0.2)",
-            color:
-              publishState === "publishing"
-                ? "rgba(212,184,150,0.9)"
-                : "rgba(212,184,150,0.45)",
-            opacity: publishState === "publishing" || saveState === "saving" ? 0.7 : 1,
-            cursor:
-              publishState === "publishing" || saveState === "saving"
-                ? "not-allowed"
-                : "pointer",
-          }}
-        >
-          {publishState === "publishing" ? "Preparing Production Build…" : "Publish Live"}
+          {saveState === "saving" ? "Writing..." : saveState === "saved" ? "✓ Saved Local" : "Save Place"}
         </button>
       </div>
-
     </motion.div>
 
-    {/* ── Pill Toggle Tab — visible on all screen sizes ── */}
     <button
-      onClick={() => setSidebarOpen(!sidebarOpen)}
-      className="fixed top-1/2 -translate-y-1/2 z-[201] flex items-center justify-center"
+      onPointerDown={() => setSidebarOpen(!sidebarOpen)}
+      className="fixed top-1/2 -translate-y-1/2 z-[6001] flex items-center justify-center"
       style={{
-        left: sidebarOpen ? "min(85vw, 300px)" : 0,
+        left: sidebarOpen ? "min(85vw, 320px)" : 0,
         transition: "left 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
-        width: 36,
-        height: 56,
-        background: "rgba(0,0,0,0.55)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(255,255,255,0.12)",
-        borderLeft: "none",
-        borderRadius: "0 8px 8px 0",
-        color: "rgba(255,255,255,0.7)",
-        fontSize: 14,
+        width: 32, height: 64,
+        background: "rgba(212,184,150,0.9)",
+        borderRadius: "0 4px 4px 0",
+        color: "black",
+        fontWeight: "bold"
       }}
     >
       {sidebarOpen ? "‹" : "›"}
@@ -478,11 +281,8 @@ export function StudioInspector({
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div>
-      <p
-        className="text-[8px] tracking-[0.4em] uppercase mb-3"
-        style={{ color: "rgba(255,255,255,0.65)" }}
-      >
+    <div className="flex flex-col gap-4">
+      <p className="text-[8px] tracking-[0.4em] uppercase text-[#D4B896]/60 font-bold border-b border-white/5 pb-2">
         {label}
       </p>
       <div className="flex flex-col gap-2">{children}</div>
@@ -493,10 +293,7 @@ function Section({ label, children }: { label: string; children: React.ReactNode
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span
-        className="text-[10px] flex-shrink-0"
-        style={{ color: "rgba(255,255,255,0.7)", minWidth: 60 }}
-      >
+      <span className="text-[9px] uppercase tracking-wider text-white/40 min-w-[80px]">
         {label}
       </span>
       <div className="flex-1">{children}</div>
@@ -504,74 +301,29 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-/** Free-form image path input.
- *  Reads the live DOM value on commit so there are zero stale-closure bugs.
- *  Commits on Enter, Tab, or blur — whichever comes first.
- */
 function ImagePathInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [draft, setDraft] = React.useState(value);
-  // Sync draft if parent swaps the value from outside (e.g. patron creation)
   React.useEffect(() => setDraft(value), [value]);
-
-  // Read from the DOM element directly — avoids any stale-state closure issue
   const commit = (domValue: string) => {
     const trimmed = domValue.trim();
     if (trimmed) onChange(trimmed);
   };
-
   return (
     <input
-      className="w-full text-[11px] text-white/75 py-1 px-2 rounded-sm font-mono"
-      style={{
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.09)",
-        outline: "none",
-      }}
+      className="w-full text-[10px] text-white/70 py-2 px-3 bg-white/5 border border-white/10 outline-none focus:border-[#D4B896]/40"
       value={draft}
-      placeholder="/models/jerome-pro.png"
       onChange={(e) => setDraft(e.target.value)}
       onBlur={(e) => commit(e.currentTarget.value)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === "Tab") {
-          commit(e.currentTarget.value);
-        }
-      }}
     />
   );
 }
 
-function NumInput({
-  value,
-  step = 0.5,
-  min = -150,
-  max = 250,
-  onChange,
-  isMobile = false,
-}: {
-  value: number;
-  step?: number;
-  min?: number;
-  max?: number;
-  onChange: (v: number) => void;
-  isMobile?: boolean;
-}) {
+function NumInput({ value, step = 0.5, min = -150, max = 250, onChange, isMobile = false }: any) {
   const inputEl = (
     <input
       type="number"
-      className={
-        isMobile
-          ? "flex-1 text-[11px] text-white/75 text-center py-2 px-1 rounded-sm min-w-0"
-          : "w-full text-[11px] text-white/75 text-right py-1 px-2 rounded-sm"
-      }
-      style={{
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.09)",
-        outline: "none",
-      }}
+      className="w-full text-[11px] text-white/90 text-center py-2 bg-white/5 border border-white/10 outline-none"
       value={step < 1 ? value.toFixed(2) : Math.round(value)}
-      step={step}
-      min={min}
-      max={max}
       onChange={(e) => {
         const v = parseFloat(e.target.value);
         if (!isNaN(v)) onChange(Math.min(max, Math.max(min, v)));
@@ -579,56 +331,21 @@ function NumInput({
     />
   );
 
-  if (!isMobile) return inputEl;
-
-  const btnStyle: React.CSSProperties = {
-    width: 32,
-    height: 32,
-    flexShrink: 0,
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 4,
-    color: "white",
-    fontSize: 16,
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  };
-
   return (
     <div className="flex items-center gap-1 w-full">
-      <button type="button" style={btnStyle} onClick={() => onChange(Math.max(min, value - step))}>−</button>
+      <button className="w-8 h-8 bg-white/10 text-white" onPointerDown={(e) => { e.stopPropagation(); onChange(Math.max(min, value - step)); }}>−</button>
       {inputEl}
-      <button type="button" style={btnStyle} onClick={() => onChange(Math.min(max, value + step))}>+</button>
+      <button className="w-8 h-8 bg-white/10 text-white" onPointerDown={(e) => { e.stopPropagation(); onChange(Math.min(max, value + step)); }}>+</button>
     </div>
   );
 }
 
-function TextInput({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function TextInput({ label, value, onChange }: any) {
   return (
-    <div className="flex items-center gap-2">
-      <span
-        className="text-[9px] flex-shrink-0"
-        style={{ color: "rgba(255,255,255,0.65)", minWidth: 60 }}
-      >
-        {label}
-      </span>
+    <div className="flex items-center gap-3">
+      <span className="text-[9px] uppercase tracking-wider text-white/40 min-w-[80px]">{label}</span>
       <input
-        className="flex-1 text-[11px] text-white/75 py-0.5 px-2 rounded-sm"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.09)",
-          outline: "none",
-        }}
+        className="flex-1 text-[11px] text-white/90 py-2 px-3 bg-white/5 border border-white/10 outline-none"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
@@ -636,154 +353,27 @@ function TextInput({
   );
 }
 
-function DotEditor({
-  dot,
-  onUpdate,
-  onRemove,
-  isMobile = false,
-}: {
-  dot: StudioDot;
-  onUpdate: (p: Partial<StudioDot>) => void;
-  onRemove: () => void;
-  isMobile?: boolean;
-}) {
+function DotEditor({ dot, onUpdate, onRemove, isMobile = false }: any) {
   return (
-    <div
-      className="rounded-sm p-3 flex flex-col gap-2"
-      style={{
-        border: "1px solid rgba(255,255,255,0.07)",
-        background: "rgba(255,255,255,0.02)",
-      }}
-    >
-      {/* Dot header */}
-      <div className="flex items-center justify-between mb-1">
-        <span
-          className="text-[8px] tracking-widest uppercase"
-          style={{ color: dot.type === "vault" ? "#D4B896" : "rgba(255,255,255,0.65)" }}
-        >
-          {dot.type}
-        </span>
-        <button
-          className="text-[10px] leading-none"
-          style={{ color: "rgba(200,70,70,0.6)" }}
-          onClick={onRemove}
-        >
-          ✕
-        </button>
+    <div className="p-4 bg-white/5 border border-white/10">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[8px] font-bold tracking-[0.3em] uppercase text-[#D4B896]">{dot.type}</span>
+        <button className="text-red-500/60 text-[10px]" onPointerDown={(e) => { e.stopPropagation(); onRemove(); }}>✕</button>
       </div>
-
-      <TextInput label="Name"       value={dot.name}       onChange={(v) => onUpdate({ name: v })} />
-      <TextInput label="Collection" value={dot.collection} onChange={(v) => onUpdate({ collection: v })} />
-      <TextInput label="Colorway"   value={dot.colorway}   onChange={(v) => onUpdate({ colorway: v })} />
-      <TextInput label="Price"      value={dot.price}      onChange={(v) => onUpdate({ price: v })} />
-
-      {/* Type toggle */}
-      <div className="flex gap-1.5 mt-1">
-        {(["public", "vault"] as AccessType[]).map((t) => (
-          <button
-            key={t}
-            className="flex-1 text-[8px] tracking-widest uppercase py-1.5 transition-colors duration-150"
-            style={{
-              border: `1px solid ${
-                dot.type === t
-                  ? t === "vault" ? "#D4B896" : "rgba(255,255,255,0.4)"
-                  : "rgba(255,255,255,0.07)"
-              }`,
-              color:
-                dot.type === t
-                  ? t === "vault" ? "#D4B896" : "rgba(255,255,255,0.65)"
-                  : "rgba(255,255,255,0.2)",
-            }}
-            onClick={() => onUpdate({ type: t })}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-
-      {/* Position — full-width columns so the number is never clipped */}
-      <div className="grid grid-cols-2 gap-2 mt-1">
-        <div>
-          <p className="text-[8px] mb-1" style={{ color: "rgba(255,255,255,0.65)" }}>Top %</p>
-          <NumInput
-            value={dot.topPct}
-            min={0}
-            max={100}
-            onChange={(v) => onUpdate({ topPct: v })}
-            isMobile={isMobile}
-          />
-        </div>
-        <div>
-          <p className="text-[8px] mb-1" style={{ color: "rgba(255,255,255,0.65)" }}>Left %</p>
-          <NumInput
-            value={dot.leftPct}
-            min={0}
-            max={100}
-            onChange={(v) => onUpdate({ leftPct: v })}
-            isMobile={isMobile}
-          />
+      <div className="flex flex-col gap-2">
+        <TextInput label="Name" value={dot.name} onChange={(v:any) => onUpdate({ name: v })} />
+        <TextInput label="Price" value={dot.price} onChange={(v:any) => onUpdate({ price: v })} />
+        <div className="grid grid-cols-2 gap-2 mt-2">
+            <div>
+                <p className="text-[7px] uppercase text-white/30 mb-1">Top %</p>
+                <NumInput value={dot.topPct} min={0} max={100} onChange={(v:any) => onUpdate({ topPct: v })} />
+            </div>
+            <div>
+                <p className="text-[7px] uppercase text-white/30 mb-1">Left %</p>
+                <NumInput value={dot.leftPct} min={0} max={100} onChange={(v:any) => onUpdate({ leftPct: v })} />
+            </div>
         </div>
       </div>
-
-      {/* Lookbook gallery */}
-      <div className="mt-2 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-        <p className="text-[8px] tracking-[0.35em] uppercase mb-2" style={{ color: "rgba(255,255,255,0.35)" }}>
-          Lookbook ({dot.lookbook.length})
-        </p>
-        {dot.lookbook.map((src: string, idx: number) => (
-          <div key={src} className="flex items-center gap-1.5 mb-1.5">
-            <span
-              className="flex-1 text-[9px] font-mono truncate"
-              style={{ color: "rgba(255,255,255,0.45)" }}
-              title={src}
-            >
-              {src.split("/").pop()}
-            </span>
-            <button
-              className="text-[10px] leading-none flex-shrink-0"
-              style={{ color: "rgba(200,70,70,0.6)" }}
-              onClick={() => onUpdate({ lookbook: dot.lookbook.filter((_, i) => i !== idx) })}
-            >
-              ✕
-            </button>
-          </div>
-        ))}
-        <LookbookAdder
-          onAdd={(src) =>
-            onUpdate({ lookbook: [...dot.lookbook, src] })
-          }
-        />
-      </div>
-    </div>
-  );
-}
-
-function LookbookAdder({ onAdd }: { onAdd: (src: string) => void }) {
-  const [src, setSrc] = React.useState("");
-
-  const submit = () => {
-    if (!src.trim()) return;
-    onAdd(src.trim());
-    setSrc("");
-  };
-
-  return (
-    <div className="flex flex-col gap-1 mt-1">
-      <input
-        className="w-full text-[10px] text-white/65 py-1 px-2 rounded-sm font-mono"
-        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", outline: "none" }}
-        value={src}
-        placeholder="/media/look.png or .mp4"
-        onChange={(e) => setSrc(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
-      />
-      <button
-        className="w-full text-[8px] tracking-widest uppercase py-1.5 transition-colors duration-150"
-        style={{ border: "1px solid rgba(212,184,150,0.2)", color: "rgba(212,184,150,0.55)" }}
-        onClick={submit}
-      >
-        + Add Media
-      </button>
     </div>
   );
 }

@@ -16,11 +16,10 @@ import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import { DEFAULT_SHADOW } from "./studio/studioTypes";
 import { LookbookOverlay } from "./studio/LookbookOverlay";
 
-// Key for browser memory
 const STUDIO_DRAFT_KEY = "tulimond-studio-draft";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Visual Components (Connector & Card)
+// Visual Components
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: boolean }) {
@@ -126,7 +125,8 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
         zIndex: isSelected ? 1000 : (slot.zIndex || 20 + index),
         ...(isStudioMode ? { left, bottom } : {})
       }}
-      onClick={(e) => { 
+      // Using onPointerDown for instant selection in Studio Mode
+      onPointerDown={(e) => { 
         if (isStudioMode) { e.stopPropagation(); onSelect(); } 
       }}
       drag={isStudioMode && isSelected}
@@ -210,7 +210,6 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
     });
   }, [studioSlots, updateSlot]);
 
-  // ── NEW: CLEAR DRAFT LOGIC ──
   const handleClearDraft = useCallback(() => {
     const confirmed = window.confirm("Are you sure you want to delete your changes from this session?");
     if (confirmed) {
@@ -222,16 +221,25 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
 
   return (
     <div 
-      className="absolute inset-0 z-20 main-container" 
+      className="absolute inset-0 z-[5000] main-container" 
       style={{ pointerEvents: active ? "auto" : "none" }} 
-      onClick={() => { if (isStudioMode) setSelectedModelId(null); }}
+      onPointerDown={(e) => { 
+          // Background click deselects ONLY if it didn't happen inside the Inspector
+          if (isStudioMode) setSelectedModelId(null); 
+      }}
     >
       {isStudioMode && (
-        <div className="relative z-[2000]" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="fixed inset-y-0 left-0 w-[400px] z-[6000]" // HARD SHIELD over the panel area
+          onPointerDown={(e) => e.stopPropagation()} // Stop selection leak
+        >
           <StudioInspector
             slots={studioSlots} 
             selectedId={selectedModelId} 
-            onSelectSlot={setSelectedModelId}
+            onSelectSlot={(id: string) => {
+                console.log("Inspector selecting character:", id);
+                setSelectedModelId(id);
+            }} 
             onUpdateSlot={updateSlot} 
             onUpdateDot={updateDot} 
             onSave={async () => {
@@ -267,21 +275,14 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
             }}
           />
           
-          {/* THE PANIC BUTTON: CLEAR DRAFT */}
-          <div className="fixed bottom-24 right-6 pointer-events-auto">
+          <div className="absolute bottom-24 right-[-140px] pointer-events-auto">
              <button 
-                onClick={handleClearDraft}
+                onPointerDown={handleClearDraft}
                 className="px-4 py-2 bg-red-900/40 border border-red-500/50 text-red-200 text-[8px] uppercase tracking-[0.2em] backdrop-blur-md hover:bg-red-900/60 transition-all duration-300"
              >
                 ⚠ Clear Session Draft
              </button>
           </div>
-
-          {saveConfirm && (
-             <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[3000] shadow-2xl">
-                Draft Saved Locally
-             </div>
-          )}
         </div>
       )}
 
@@ -294,21 +295,25 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
           ))
       }
 
-      <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[2100]">
+      {/* Save Place Notification Overlay */}
+      {saveConfirm && (
+        <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[7000] shadow-2xl">
+          Draft Saved Locally
+        </div>
+      )}
+
+      <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[6100]">
         <button 
           className="px-6 py-3 bg-black/90 border border-white/20 text-[10px] uppercase tracking-widest text-white backdrop-blur-xl"
           style={isStudioMode ? { color: "#D4B896", borderColor: "#D4B896" } : {}}
-          onClick={(e) => { 
+          onPointerDown={(e) => { 
             e.stopPropagation(); 
             if (isStudioMode) {
               setIsStudioMode(false);
             } else {
               const savedDraft = localStorage.getItem(STUDIO_DRAFT_KEY);
-              if (savedDraft) {
-                  setStudioSlots(JSON.parse(savedDraft));
-              } else {
-                  setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
-              }
+              if (savedDraft) setStudioSlots(JSON.parse(savedDraft));
+              else setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
               const currentModel = MODEL_INVENTORY.find(m => m.outfit.some(d => d.id === activeDotId));
               if (currentModel) setSelectedModelId(currentModel.id);
               setIsStudioMode(true);
