@@ -109,7 +109,7 @@ function PulseDot({ item, studioDot, tapped, isStudioMode, onStudioDotDrop, onDo
 // ModelStage
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelected, onSelect, onStudioDotDrop, onModelDrag, onUpdateStudioSlot, onOpenLookbook, activeDotId, onToggleDot }: any) {
+function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelected, onSelect, onStudioDotDrop, onModelDrag, onUpdateStudioSlot, activeDotId, onToggleDot }: any) {
   const imageSrc = isStudioMode && studioSlot ? studioSlot.imageSrc : slot.imageSrc;
   const shadow = (isStudioMode && studioSlot) ? studioSlot.shadow : (slot.shadow ?? DEFAULT_SHADOW);
 
@@ -210,6 +210,16 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
     });
   }, [studioSlots, updateSlot]);
 
+  // ── NEW: CLEAR DRAFT LOGIC ──
+  const handleClearDraft = useCallback(() => {
+    const confirmed = window.confirm("Are you sure you want to delete your changes from this session?");
+    if (confirmed) {
+      localStorage.removeItem(STUDIO_DRAFT_KEY);
+      setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
+      setSelectedModelId(null);
+    }
+  }, []);
+
   return (
     <div 
       className="absolute inset-0 z-20 main-container" 
@@ -224,7 +234,6 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
             onSelectSlot={setSelectedModelId}
             onUpdateSlot={updateSlot} 
             onUpdateDot={updateDot} 
-            // ── NEW: SAVE PLACE (Local Storage) ──
             onSave={async () => {
                 localStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify(studioSlots));
                 setSaveConfirm(true);
@@ -257,9 +266,19 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
                if (s) updateSlot(id, { shadow: { ...s.shadow, ...patch } });
             }}
           />
-          {/* Quick confirmation popup for Save Place */}
+          
+          {/* THE PANIC BUTTON: CLEAR DRAFT */}
+          <div className="fixed bottom-24 right-6 pointer-events-auto">
+             <button 
+                onClick={handleClearDraft}
+                className="px-4 py-2 bg-red-900/40 border border-red-500/50 text-red-200 text-[8px] uppercase tracking-[0.2em] backdrop-blur-md hover:bg-red-900/60 transition-all duration-300"
+             >
+                ⚠ Clear Session Draft
+             </button>
+          </div>
+
           {saveConfirm && (
-             <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[3000]">
+             <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[3000] shadow-2xl">
                 Draft Saved Locally
              </div>
           )}
@@ -284,7 +303,6 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
             if (isStudioMode) {
               setIsStudioMode(false);
             } else {
-              // ── NEW: LOAD FROM MEMORY ON ENTRY ──
               const savedDraft = localStorage.getItem(STUDIO_DRAFT_KEY);
               if (savedDraft) {
                   setStudioSlots(JSON.parse(savedDraft));
