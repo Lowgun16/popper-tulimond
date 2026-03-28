@@ -17,7 +17,7 @@ import { DEFAULT_SHADOW } from "./studio/studioTypes";
 import { LookbookOverlay } from "./studio/LookbookOverlay";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Visual Components (Connector & Card)
+// Visuals: Connector & Card
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: boolean }) {
@@ -39,10 +39,6 @@ function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: bool
 
 function HoverCard({ item, visible, onAction, onClose, leftPct }: any) {
   const flipLeft = leftPct > 50; 
-  const name = item.name || "";
-  const collection = item.collection || "";
-  const price = item.price || "";
-
   return (
     <div
       className="absolute z-[100] w-44 transition-[opacity,transform] duration-500"
@@ -59,10 +55,10 @@ function HoverCard({ item, visible, onAction, onClose, leftPct }: any) {
         <button onClick={(e) => { e.stopPropagation(); onClose?.(); }} className="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center rounded-full border border-white/40 bg-black text-white hover:bg-white hover:text-black transition-all duration-300 z-[110]">
           <span className="text-[10px] font-bold">✕</span>
         </button>
-        <p className="type-eyebrow mb-1 text-white/40 uppercase tracking-widest text-[8px]">{collection}</p>
-        <p className="text-xs text-white mb-1 font-medium">{name}</p>
+        <p className="type-eyebrow mb-1 text-white/40 uppercase tracking-widest text-[8px]">{item.collection || ""}</p>
+        <p className="text-xs text-white mb-1 font-medium">{item.name || ""}</p>
         <p className="text-[10px] text-white/50 mb-2">{item.colorway || ""}</p>
-        <p className="text-xs font-bold text-white/90 mb-4">{price}</p>
+        <p className="text-xs font-bold text-white/90 mb-4">{item.price || ""}</p>
         <button onClick={(e) => { e.stopPropagation(); onAction?.(); }} className="w-full text-center text-[9px] tracking-widest uppercase py-2.5 border border-white/30 text-white hover:bg-white hover:text-black transition-all duration-300">
           Find Your Size
         </button>
@@ -75,7 +71,7 @@ function HoverCard({ item, visible, onAction, onClose, leftPct }: any) {
 // PulseDot
 // ─────────────────────────────────────────────────────────────────────────────
 
-function PulseDot({ item, studioDot, tapped, isStudioMode, modelId, onStudioDotDrop, onDotTap, onToggleDot }: any) {
+function PulseDot({ item, studioDot, tapped, isStudioMode, onStudioDotDrop, onDotTap, onToggleDot }: any) {
   const dot = studioDot ?? item!;
   const leftPct = useMemo(() => {
     if (studioDot) return studioDot.leftPct;
@@ -117,7 +113,6 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   const left = isStudioMode && studioSlot ? `${studioSlot.leftPct}%` : "";
   const bottom = isStudioMode && studioSlot ? `${studioSlot.bottomPct}%` : "";
   const scale = isStudioMode && studioSlot ? studioSlot.scale : 1;
-
   const dots = isStudioMode && studioSlot ? studioSlot.dots : slot.outfit;
 
   return (
@@ -128,7 +123,12 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
         zIndex: isSelected ? 1000 : (slot.zIndex || 20 + index),
         ...(isStudioMode ? { left, bottom } : {})
       }}
-      onClick={(e) => { if (isStudioMode) { e.stopPropagation(); onSelect(); } }}
+      onClick={(e) => { 
+        if (isStudioMode) { 
+          e.stopPropagation(); // Shield: clicking character doesn't deselect
+          onSelect(); 
+        } 
+      }}
       drag={isStudioMode && isSelected}
       dragMomentum={false}
       onDrag={(_, info) => {
@@ -160,12 +160,10 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
             </div>
           </div>
         )}
-
         <img src={imageSrc} alt="" className="absolute inset-0 h-full w-full pointer-events-none select-none" style={{ filter: `brightness(0) blur(${shadow.blur}px) opacity(${shadow.opacity})`, transform: `translate(${shadow.offsetX}px, ${shadow.offsetY}px) scaleX(${shadow.scaleX}) scaleY(${shadow.scaleY})`, transformOrigin: "bottom center", scale }} />
         <img src={imageSrc} alt="" className="h-[40vh] md:h-[80vh] w-auto object-bottom select-none" style={{ filter: "brightness(0.85) contrast(1.1)", scale }} />
-
         {dots.map((dot: any) => (
-          <PulseDot key={dot.id} item={isStudioMode ? undefined : dot} studioDot={isStudioMode ? dot : undefined} tapped={activeDotId === dot.id} isStudioMode={isStudioMode} modelId={slot.id} onStudioDotDrop={onStudioDotDrop} onToggleDot={onToggleDot} onDotTap={() => onToggleDot(activeDotId === dot.id ? null : dot.id)} />
+          <PulseDot key={dot.id} item={isStudioMode ? undefined : dot} studioDot={isStudioMode ? dot : undefined} tapped={activeDotId === dot.id} isStudioMode={isStudioMode} onStudioDotDrop={onStudioDotDrop} onToggleDot={onToggleDot} onDotTap={() => onToggleDot(activeDotId === dot.id ? null : dot.id)} />
         ))}
       </div>
     </motion.div>
@@ -212,54 +210,53 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
   }, [studioSlots, updateSlot]);
 
   return (
-    <div className="absolute inset-0 z-20 main-container" style={{ pointerEvents: active ? "auto" : "none" }} onClick={() => setSelectedModelId(null)}>
-      
+    <div 
+      className="absolute inset-0 z-20 main-container" 
+      style={{ pointerEvents: active ? "auto" : "none" }} 
+      onClick={() => {
+        if (isStudioMode) setSelectedModelId(null);
+      }}
+    >
       {isStudioMode && (
-        <StudioInspector
-          slots={studioSlots} 
-          selectedId={selectedModelId} 
-          onSelectSlot={setSelectedModelId}
-          onUpdateSlot={updateSlot} 
-          onUpdateDot={updateDot} 
-          onSave={async () => {}} 
-          onCopyCode={() => {
-            navigator.clipboard.writeText(exportInventoryCode(studioSlots));
-            setCopyConfirm(true); setTimeout(() => setCopyConfirm(false), 2000);
-          }}
-          copyConfirm={copyConfirm}
-          onAddDot={(slotId) => {
-            // FIX: Added 'colorway' and 'type' to satisfy StudioDot interface
-            const newDot: StudioDot = { 
-                id: `dot-${Date.now()}`, 
-                name: "New Item", 
-                collection: "TULIMOND", 
-                colorway: "N/A", 
-                price: "$0", 
-                type: "public",
-                topPct: 50, 
-                leftPct: 50, 
-                lookbook: [] 
-            };
-            setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s));
-          }}
-          onRemoveDot={(slotId, dotId) => {
-            setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: s.dots.filter(d => d.id !== dotId) } : s));
-          }}
-          onSwapImage={(id, src) => updateSlot(id, { imageSrc: src })}
-          onAddSlot={() => {
-             const id = `patron-${Date.now()}`;
-             setStudioSlots(prev => [...prev, { id, displayName: "New Patron", imageSrc: "/model-center.png", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [], shadow: { ...DEFAULT_SHADOW } }]);
-             setSelectedModelId(id);
-          }}
-          onRemoveSlot={(slotId) => {
-             setStudioSlots(prev => prev.filter(s => s.id !== slotId));
-             setSelectedModelId(null);
-          }}
-          onUpdateShadow={(id, patch) => {
-             const s = studioSlots.find(sl => sl.id === id);
-             if (s) updateSlot(id, { shadow: { ...s.shadow, ...patch } });
-          }}
-        />
+        <div 
+          className="relative z-[2000]" // Shield: higher than characters
+          onClick={(e) => e.stopPropagation()} // Shield: stop clicks from deselecting
+        >
+          <StudioInspector
+            slots={studioSlots} 
+            selectedId={selectedModelId} 
+            onSelectSlot={setSelectedModelId}
+            onUpdateSlot={updateSlot} 
+            onUpdateDot={updateDot} 
+            onSave={async () => {}} 
+            onCopyCode={() => {
+              navigator.clipboard.writeText(exportInventoryCode(studioSlots));
+              setCopyConfirm(true); setTimeout(() => setCopyConfirm(false), 2000);
+            }}
+            copyConfirm={copyConfirm}
+            onAddDot={(slotId) => {
+              const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "TULIMOND", colorway: "N/A", price: "$0", type: "public", topPct: 50, leftPct: 50, lookbook: [] };
+              setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s));
+            }}
+            onRemoveDot={(slotId, dotId) => {
+              setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: s.dots.filter(d => d.id !== dotId) } : s));
+            }}
+            onSwapImage={(id, src) => updateSlot(id, { imageSrc: src })}
+            onAddSlot={() => {
+               const id = `patron-${Date.now()}`;
+               setStudioSlots(prev => [...prev, { id, displayName: "New Patron", imageSrc: "/model-center.png", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [], shadow: { ...DEFAULT_SHADOW } }]);
+               setSelectedModelId(id);
+            }}
+            onRemoveSlot={(slotId) => {
+               setStudioSlots(prev => prev.filter(s => s.id !== slotId));
+               setSelectedModelId(null);
+            }}
+            onUpdateShadow={(id, patch) => {
+               const s = studioSlots.find(sl => sl.id === id);
+               if (s) updateSlot(id, { shadow: { ...s.shadow, ...patch } });
+            }}
+          />
+        </div>
       )}
 
       {isStudioMode 
@@ -271,11 +268,22 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
           ))
       }
 
-      <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[201]">
+      <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[2100]">
         <button 
           className="px-6 py-3 bg-black/90 border border-white/20 text-[10px] uppercase tracking-widest text-white backdrop-blur-xl"
           style={isStudioMode ? { color: "#D4B896", borderColor: "#D4B896" } : {}}
-          onClick={(e) => { e.stopPropagation(); isStudioMode ? setIsStudioMode(false) : (setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio)), setIsStudioMode(true)); }}
+          onClick={(e) => { 
+            e.stopPropagation(); 
+            if (isStudioMode) {
+              setIsStudioMode(false);
+            } else {
+              setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
+              // SYNC: If you have a dot active, select that model automatically
+              const currentModel = MODEL_INVENTORY.find(m => m.outfit.some(d => d.id === activeDotId));
+              if (currentModel) setSelectedModelId(currentModel.id);
+              setIsStudioMode(true);
+            }
+          }}
         >
           {isStudioMode ? "✕ Close Studio" : "⊙ Studio Mode"}
         </button>
