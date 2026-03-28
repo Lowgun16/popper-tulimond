@@ -122,12 +122,14 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
       className={isStudioMode ? "absolute pointer-events-auto origin-bottom" : `absolute pointer-events-auto origin-bottom ${slot.position} ${slot.mobileScale} ${slot.scale}`}
       style={{
         opacity: revealed ? 1 : 0,
-        zIndex: isSelected ? 1000 : (slot.zIndex || 20 + index),
+        zIndex: isSelected ? 4000 : (slot.zIndex || 20 + index),
         ...(isStudioMode ? { left, bottom } : {})
       }}
-      // Using onPointerDown for instant selection in Studio Mode
       onPointerDown={(e) => { 
-        if (isStudioMode) { e.stopPropagation(); onSelect(); } 
+        if (isStudioMode) { 
+          e.stopPropagation(); 
+          onSelect(); 
+        } 
       }}
       drag={isStudioMode && isSelected}
       dragMomentum={false}
@@ -140,7 +142,7 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
           <div className="absolute inset-0 border-2 border-[#D4B896] pointer-events-none z-50">
             <div className="absolute top-0 left-0 bg-[#D4B896] text-black text-[8px] px-1 font-bold uppercase tracking-tighter">SELECTED</div>
             <div 
-              className="absolute -bottom-2 -right-2 w-5 h-5 bg-[#D4B896] pointer-events-auto cursor-ns-resize flex items-center justify-center shadow-lg"
+              className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#D4B896] pointer-events-auto cursor-ns-resize flex items-center justify-center shadow-lg"
               onPointerDown={(e) => {
                 e.stopPropagation();
                 const startY = e.clientY;
@@ -222,16 +224,16 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
   return (
     <div 
       className="absolute inset-0 z-[5000] main-container" 
-      style={{ pointerEvents: active ? "auto" : "none" }} 
+      // FIX: Ensure interactions are ON if Studio is ON, regardless of "active" walk-in state
+      style={{ pointerEvents: (active || isStudioMode) ? "auto" : "none" }} 
       onPointerDown={(e) => { 
-          // Background click deselects ONLY if it didn't happen inside the Inspector
           if (isStudioMode) setSelectedModelId(null); 
       }}
     >
       {isStudioMode && (
         <div 
-          className="fixed inset-y-0 left-0 w-[400px] z-[6000]" // HARD SHIELD over the panel area
-          onPointerDown={(e) => e.stopPropagation()} // Stop selection leak
+          className="fixed inset-y-0 left-0 w-[400px] z-[6000]" 
+          onPointerDown={(e) => e.stopPropagation()} 
         >
           <StudioInspector
             slots={studioSlots} 
@@ -295,7 +297,6 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
           ))
       }
 
-      {/* Save Place Notification Overlay */}
       {saveConfirm && (
         <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[7000] shadow-2xl">
           Draft Saved Locally
