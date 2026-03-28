@@ -18,6 +18,10 @@ import { LookbookOverlay } from "./studio/LookbookOverlay";
 
 const STUDIO_DRAFT_KEY = "tulimond-studio-draft";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Visual Components
+// ─────────────────────────────────────────────────────────────────────────────
+
 function ConnectorLine({ flipLeft, visible }: { flipLeft: boolean; visible: boolean }) {
   const pathData = flipLeft ? "M 0 0 L -20 0 L -60 -20" : "M 0 0 L 20 0 L 60 -20"; 
   return (
@@ -96,6 +100,10 @@ function PulseDot({ item, studioDot, tapped, isStudioMode, onStudioDotDrop, onDo
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ModelStage
+// ─────────────────────────────────────────────────────────────────────────────
+
 function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelected, onSelect, onStudioDotDrop, onModelDrag, onUpdateStudioSlot, activeDotId, onToggleDot }: any) {
   const imageSrc = isStudioMode && studioSlot ? studioSlot.imageSrc : slot.imageSrc;
   const shadow = (isStudioMode && studioSlot) ? studioSlot.shadow : (slot.shadow ?? DEFAULT_SHADOW);
@@ -157,6 +165,10 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Overlay Component
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function CollectionOverlay({ opacity }: { opacity: MotionValue<number> }) {
   const router = useRouter();
   const [active, setActive] = useState(false);
@@ -205,7 +217,7 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
   return (
     <div 
       className="absolute inset-0 z-[5000] main-container" 
-      style={{ pointerEvents: active || isStudioMode ? "auto" : "none" }} 
+      style={{ pointerEvents: active ? "auto" : "none" }} 
       onPointerDown={(e) => { 
           if (isStudioMode) setSelectedModelId(null); 
       }}
@@ -262,6 +274,12 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
                 ⚠ Clear Session Draft
              </button>
           </div>
+
+          {saveConfirm && (
+             <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[3000] shadow-2xl">
+                Draft Saved Locally
+             </div>
+          )}
         </div>
       )}
 
@@ -274,13 +292,7 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
           ))
       }
 
-      {saveConfirm && (
-        <div className="fixed top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#D4B896] text-black text-[10px] font-bold uppercase tracking-widest z-[7000] shadow-2xl">
-          Draft Saved Locally
-        </div>
-      )}
-
-      <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[6100]">
+      <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[2100]">
         <button 
           className="px-6 py-3 bg-black/90 border border-white/20 text-[10px] uppercase tracking-widest text-white backdrop-blur-xl"
           style={isStudioMode ? { color: "#D4B896", borderColor: "#D4B896" } : {}}
