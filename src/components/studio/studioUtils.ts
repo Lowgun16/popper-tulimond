@@ -4,7 +4,6 @@ import { DEFAULT_SHADOW } from "./studioTypes";
 
 // ── Parsers ──────────────────────────────────────────────────────────────────
 
-/** "top-[30%] left-[85%]" → { topPct: 30, leftPct: 85 } */
 export function parseDotPosition(pos: string): { topPct: number; leftPct: number } {
   const top = pos.match(/top-\[(-?[\d.]+)%\]/)?.[1];
   const left = pos.match(/left-\[(-?[\d.]+)%\]/)?.[1];
@@ -14,10 +13,6 @@ export function parseDotPosition(pos: string): { topPct: number; leftPct: number
   };
 }
 
-/**
- * Parse model position string to desktop left/bottom percentages.
- * Prefers md: values over base. Converts right→left as (100 - rightPct - 12).
- */
 export function parseModelPosition(pos: string): { leftPct: number; bottomPct: number } {
   const mdLeft    = pos.match(/md:left-\[(-?[\d.]+)%\]/)?.[1];
   const baseLeft  = pos.match(/(?<!md:)left-\[(-?[\d.]+)%\]/)?.[1];
@@ -33,7 +28,6 @@ export function parseModelPosition(pos: string): { leftPct: number; bottomPct: n
   if (leftRaw !== undefined) {
     leftPct = parseFloat(leftRaw);
   } else if (rightRaw !== undefined) {
-    // right-positioned: approximate left as 100 - right - ~12 (rough model width offset)
     leftPct = 100 - parseFloat(rightRaw) - 12;
   } else {
     leftPct = 30;
@@ -43,13 +37,12 @@ export function parseModelPosition(pos: string): { leftPct: number; bottomPct: n
   return { leftPct, bottomPct };
 }
 
-/** "md:scale-[0.9]" → 0.9 */
 export function parseScale(scale: string): number {
   const m = scale.match(/scale-\[([\d.]+)\]/);
   return m ? parseFloat(m[1]) : 1.0;
 }
 
-// ── Raw shape (mirrors CollectionOverlay types, avoids circular import) ──────
+// ── Raw shape (mirrors data/inventory.ts types) ──────────────────────────────
 
 interface RawOutfitItem {
   id: string;
@@ -74,14 +67,11 @@ interface RawModelSlot {
   shadow?: ShadowConfig;
 }
 
-/** Derive a human-readable display name from a model slot id.
- *  e.g. "center-model" → "Center", "rack-model" → "Rack" */
 function defaultDisplayName(id: string): string {
   const first = id.split("-")[0] ?? id;
   return first.charAt(0).toUpperCase() + first.slice(1);
 }
 
-/** Convert a raw MODEL_INVENTORY slot → StudioSlot for editing */
 export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
   const { leftPct, bottomPct } = parseModelPosition(slot.position);
   const scale = parseScale(slot.scale);
@@ -116,10 +106,18 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
 
 // ── Exporter ─────────────────────────────────────────────────────────────────
 
-/** Generate the full MODEL_INVENTORY TypeScript source from studio state */
+/** * Generate the FULL src/data/inventory.ts file content.
+ * This includes the imports so you can "Select All -> Delete -> Paste".
+ */
 export function exportInventoryCode(slots: StudioSlot[]): string {
-  const lines: string[] = ["export const MODEL_INVENTORY: ModelSlot[] = ["];
+  // 1. ADD THE HEADER (Imports)
+  const lines: string[] = [
+    `import { ModelSlot } from "@/components/studio/studioTypes";`,
+    ``,
+    `export const MODEL_INVENTORY: ModelSlot[] = [`
+  ];
 
+  // 2. BUILD THE DATA
   for (const slot of slots) {
     const l  = slot.leftPct.toFixed(1);
     const b  = slot.bottomPct.toFixed(1);
@@ -144,7 +142,7 @@ export function exportInventoryCode(slots: StudioSlot[]): string {
       lines.push(`        price: "${dot.price}",`);
       lines.push(`        type: "${dot.type}",`);
       lines.push(`        dotPosition: "top-[${dot.topPct.toFixed(1)}%] left-[${dot.leftPct.toFixed(1)}%]",`);
-      if (dot.lookbook.length === 0) {
+      if (!dot.lookbook || dot.lookbook.length === 0) {
         lines.push(`        lookbook: [],`);
       } else {
         const paths = dot.lookbook.map((p) => `"${p}"`).join(", ");
