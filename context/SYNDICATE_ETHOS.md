@@ -3,18 +3,18 @@
 ## The Core Philosophy
 We do not sell "fabric"; we sell a **Code of Conduct**. We are the "Project Mayhem" of luxury. We reject the "Virtue Signaling" of loud logos (LV/Gucci) and replace it with "Internal Authority."
 
-## The Hierarchy: The Performers vs. The Sentinel
+## The Hierarchy: The Performers vs. The Leader Who Eats Last
 
 ### The Performers (The Front)
-- **The Role:** The visible leaders. They catch the light, the credit, and the eyes of the room.
-- **The Signal:** They wear the "Captain's C" and the loud logos. They are the "Sails" of the ship—highly visible and necessary for movement, but easily torn.
-- **The Purpose:** They provide the "show." Much like a beautiful woman walking into a restaurant, they are the focus of the environment.
+- **The Role:** The visible "Captains." They are the first to the table. They seek the light, the credit, and the logo.
+- **The Signal:** They wear the "C" on their jersey. They need the world to know they are in charge so they can feel in charge.
+- **The Reality:** They are capable, but they are driven by the hunger for recognition.
 
-### The Sentinel (The Foundation)
-- **The Role:** The Stoic Guardian. He is the **Bedrock** that allows the Performers to shine.
-- **The Strategy:** He leads from the **Sentinel Position**. He creates the safety that makes the "Shine" possible. He doesn't need the spotlight because he is the one guarding the power source. 
-- **The Chivalry:** He allows others to take the stage because he is the only one in the room who knows that if "shit gets real," every eye will turn to him. He leads through **Presence** and **Capability**, not announcement.
-- **The Signal:** The Red Gun. It is the Sentinel’s mark—placed out of sight, because the person who knows it's there is the only one who needs to know.
+### The Leader Who Eats Last (The Source)
+- **The Role:** The Stoic Provider. He is the man who stands behind the chair, watches the door, and pays the bill.
+- **The Strategy:** He allows the Performers to shine because his satisfaction comes from their safety. He doesn't need a logo to tell him he's the head of the table; he knows he's the one who provided the table.
+- **The Chivalry:** He is the most dangerous person in the room, which is exactly why he can afford to be the most patient. He eats last because he is the only one strong enough to go without.
+- **The Signal:** The Red Gun. Positioned at the side/rear seam. It is a nod to the man who carries the weight so others can walk light.
 
 ### The Anchor (The Foundation)
 - **The Role:** The Stoic Protector. He positions himself as the final line of defense, guarding the most vulnerable.
