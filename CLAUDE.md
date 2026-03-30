@@ -3,7 +3,7 @@
 ## 🥃 THE SOUL & VISION
 - **Brand:** Popper Tulimond (The "Project Mayhem" of Luxury).
 - **Core Characters:** Angel, Jack, Jerome, and Ethan.
-- **Philosophy:** Hierarchy of Competence. The **Anchor** leads with **Stoic Authority**, supporting from the foundation while the performers take the front.
+- **Philosophy:** Hierarchy of Competence. The **Sentinel** leads with **Stoic Authority**, providing the **Bedrock** that allows the pack to shine.
 - **The Red Gun:** Unassuming icon behind the side seam. Restrained power.
 - **Tech Stack:** Next.js (Custom APIs), Framer Motion, Tailwind CSS.
 
