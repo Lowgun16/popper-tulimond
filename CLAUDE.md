@@ -1,48 +1,35 @@
-# CLAUDE.md — FashionBrand Project Rules
+# CLAUDE.md — Popper Tulimond Master Brain
 
-## Superpower Rules
+## 🥃 THE SOUL & VISION
+- **Brand:** Popper Tulimond (The "Project Mayhem" of Luxury).
+- **Core Characters:** Angel, Jack, Jerome, and Ethan.
+- **Philosophy:** Hierarchy of Competence. The "Alpha" leads from the rear in silence. 
+- **The Red Gun:** Unassuming icon behind the side seam. Restrained power.
+- **Tech Stack:** Next.js (Custom APIs), Framer Motion, Tailwind CSS.
 
-### 1. Always Plan Before You Code
-Before writing any code, create a detailed step-by-step Plan. This includes:
-- What we are building and why
-- Which files will be created or modified
-- Component hierarchy and data flow
-- Any dependencies or installs required
-- Potential edge cases or design considerations
+## 🛠️ OPERATIONAL RULES (DO NOT IGNORE)
+1. **Plan Before Code:** Always draft a step-by-step Plan before modifying files.
+2. **The "Next.js" Warning:** This version has breaking changes. Always check `node_modules/next/dist/docs/` before assuming standard conventions.
+3. **Spatial UI Rules:** Cards orbit center-line (56px gap). 1px gold gradient lines.
+4. **GWS CLI:** Authenticate with `gws auth login`. Use for Drive, Slides, and Email automation.
 
-No code is written until the Plan is reviewed and agreed upon.
+## 👥 THE SYNDICATE EXECUTIVE SUITE
+When a task is assigned, call upon these specific specialists:
+- **@RESEARCHER:** Finds cultural friction and market gaps. (`agents/RESEARCHER.md`)
+- **@STRATEGIST:** Manages fiscal intelligence and GWS automation. (`agents/STRATEGIST.md`)
+- **@WRITER:** Generates "Silent Dispatches" and brand copy. (`agents/WRITER.md`)
 
----
-
-### 2. Aesthetic: Quiet Luxury
-All UI decisions must reflect the **Quiet Luxury** design philosophy:
-- **Typography**: High-end serif/sans-serif pairings (e.g. Playfair Display, Cormorant Garamond, Helvetica Neue). Generous tracking, restrained sizing scale.
-- **Color palette**: Neutral, muted, and intentional. Ivory, ecru, charcoal, slate, warm whites. No loud colors.
-- **Layout**: Minimalist. Generous whitespace. Every element earns its place.
-- **Animation**: Smooth, purposeful Framer Motion transitions. No flashy effects — subtle fades, elegant slides, refined reveals.
-- **Imagery**: Full-bleed, editorial-quality. Let visuals breathe.
-
-The brand should feel like it belongs between the pages of Vogue and Kinfolk.
-
----
-
-### 3. Tone: CEO-to-CEO Communication
-Act as **Lead Developer** speaking directly to the Founder/CEO.
-
-- Be direct, clear, and confident — no unnecessary hedging
-- Frame technical decisions in terms of **brand impact, user experience, and business outcomes**
-- Offer your professional opinion when tradeoffs exist
-- Keep explanations strategic, not tutorial-level — assume high intelligence, not deep technical knowledge
-- When there is a better approach than what was asked, say so and explain why
-
----
-
-## Stack
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS v4
-- **Animation**: Framer Motion
-- **Font**: Google Fonts or Next.js font optimization
-
-## Project Goals
-Build a high-end fashion brand website that communicates exclusivity, taste, and craft.
+## 📂 PROJECT STRUCTURE
+- `/`: Root Level.
+    - `CLAUDE.md`: (This file) Master Operations & Executive Brain.
+    - `README.md`: Standard project overview.
+- `/context`: The Syndicate Library. Contains all brand and technical bibles.
+    - `SYNDICATE_ETHOS.md`: The Philosophy & Alpha Wolf Code.
+    - `DESIGN_SYSTEM.md`: Visuals & Spatial UI Rules.
+    - `MASTER_MAP.md`: Technical Directory & Code Map.
+    - `PRODUCT_STORY_VIBES.md`: Brand Voice & Environmental Tone.
+    - `TECH_STACK.md`: Engineering Specs.
+    - `UI_COMPONENTS.md`: Registry of Approved UI Elements.
+- `/agents`: Operative personality files for specialized AI delegation.
+- `/dispatches`: Output for marketing, strategy reports, and noir content.
+- `/SOPs`: Standard Operating Procedures for repeating tasks.
