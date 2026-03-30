@@ -3,12 +3,16 @@
 ## The Core Philosophy
 We do not sell "fabric"; we sell a **Code of Conduct**. We are the "Project Mayhem" of luxury. We reject the "Virtue Signaling" of loud logos (LV/Gucci) and replace it with "Internal Authority."
 
-## The Hierarchy: Performers vs. Foundations
+## The Hierarchy: Performers vs. The Anchor
 
 ### The Performers (The Front)
-- **The Role:** Capable, loud, and boisterous. They lead the pack's movement.
-- **The Signal:** They wear the "Captain's C." They represent the men who plaster logos across their chests to signal strength. 
-- **The Truth:** They are capable, but they still seek external validation. They are the "loud" leaders.
+- **The Role:** Capable and loud. They catch the light and the credit.
+- **The Signal:** They wear the "Captain's C." They represent the men who need logos to signal their tier.
+
+### The Anchor (The Foundation)
+- **The Role:** The Stoic Protector. He positions himself as the final line of defense, guarding the most vulnerable.
+- **The Strategy:** He leads from the **Anchor Position**. He doesn't seek the stage; he supports it. He allows others to take the credit because he knows that true authority is felt, not announced.
+- **The Signal:** Absolute presence. He rejects the "Captain's C" because his competence is self-evident. Even the "Captains" fall into a respectful hush when the Anchor speaks.
 
 ### The True Alpha (The Rear)
 - **The Role:** The Silent Protector. He stays at the very back with the smallest, weakest, and most vulnerable.
