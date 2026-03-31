@@ -16,16 +16,16 @@ We do not sell "fabric"; we sell a **Code of Conduct**. We are the "Project Mayh
 - **The Chivalry:** He is the most dangerous person in the room, which is exactly why he can afford to be the most patient. He eats last because he is the only one strong enough to go without.
 - **The Signal:** The Red Gun. Positioned at the side/rear seam. It is a nod to the man who carries the weight so others can walk light.
 
-### The Anchor (The Foundation)
-- **The Role:** The Stoic Protector. He positions himself as the final line of defense, guarding the most vulnerable.
-- **The Strategy:** He leads from the **Anchor Position**. He doesn't seek the stage; he supports it. He allows others to take the credit because he knows that true authority is felt, not announced.
-- **The Signal:** Absolute presence. He rejects the "Captain's C" because his competence is self-evident. Even the "Captains" fall into a respectful hush when the Anchor speaks.
+## The Brand’s Debt: We Eat Last So He Can Feast
 
-### The True Alpha (The Rear)
-- **The Role:** The Silent Protector. He stays at the very back with the smallest, weakest, and most vulnerable.
-- **The Strategy:** He stays at the rear because that is where the predator strikes. He is the most dangerous, so he guards the most precious.
-- **The Signal:** None. He rejects the "Captain's C." He knows that a logo is just posturing. 
-- **The Authority:** His mere presence is the indicator. He does not chase glory. Yet, when he speaks, even the "Captains" at the front fall silent to listen.
+### The Role of the Brand
+- **The Service:** We do not compete with the man for the spotlight. We are the lighting rig. We are the stage.
+- **The Logic:** A man who spends his life protecting his family and leading his team is a man who rarely has someone looking out for *him*. Popper Tulimond is the only entity that provides for the provider.
+- **The Placement:** Our name is at the bottom-back. We stay out of his way. We don't steal his credit; we provide the frame that demands he receives it.
+
+### The Two Archetypes (The Main Characters)
+- **The Showstopper (Ivory):** The "White Hat." The foundational hero. The man who walks into the room and everyone knows the "Good Guy" has arrived to handle business.
+- **The Heartbreaker (Dark Grey):** The "Anti-Hero." The darker side of the protagonist. The man who is dangerous, desired, and perhaps a bit more complicated, but no less essential.
 
 ## The "Red Gun" Philosophy
 - The icon is not a "C" for a jersey; it is a nod of recognition between those who have moved past the need for posturing. 
