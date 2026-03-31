@@ -22,6 +22,7 @@ We do not sell "fabric"; we sell a **Code of Conduct**. We are the "Project Mayh
 - **The Service:** We do not compete with the man for the spotlight. We are the lighting rig. We are the stage.
 - **The Logic:** A man who spends his life protecting his family and leading his team is a man who rarely has someone looking out for *him*. Popper Tulimond is the only entity that provides for the provider.
 - **The Placement:** Our name is at the bottom-back. We stay out of his way. We don't steal his credit; we provide the frame that demands he receives it.
+- **Sacred Text:** "You’ve spent your life making sure everyone else was full. Sit down. It's time you had the meal you earned."
 
 ### The Two Archetypes (The Main Characters)
 - **The Showstopper (Ivory):** The "White Hat." The foundational hero. The man who walks into the room and everyone knows the "Good Guy" has arrived to handle business.
