@@ -5,6 +5,20 @@
 - **Core:** The Leader Who Eats Last.
 - **Goal:** Savable, shareable "Signals" that validate the Stoic Foundation.
 
+## 🎥 CINEMATOGRAPHY SPECS: THE SENTINEL'S JOURNAL
+- **The Look:** "Saturated Noir." High-contrast (Chiaroscuro) with deep, clean blacks. Not grainy or muted, but surgically precise.
+- **The Color Logic:** "The Anchor Palette."
+    - The Protagonist is monochrome (Showstopper Ivory / Heartbreaker Grey).
+    - The Environment has high-saturation "Pops" (Red velvet seats, deep purple uniforms, orange autumn leaves).
+- **Lensing & Framing:**
+    - Center-weighted symmetry for Authority.
+    - Wide-angle close-ups for Intimacy.
+    - Low-angle shots to establish the "Foundation" status.
+- **Narrative Device:** The "Journal Entry" Voiceover. Stoic, rhythmic, and meaningful thoughts delivered over cinematic B-roll.
+- **Audio Signature:** Deep cello-heavy score. Rhythmic and weighted.
+- **Lighting:** Directional "Aquarium" lighting (Cool blues/teals in shadows, warm candlelight/amber in highlights).
+- **Cinematic Reference:** Tim Burton's *Wednesday* — the visual grammar of a protagonist who is monochrome in a world of color. The world performs; the Foundation simply exists within it.
+
 ## 📊 GENRE MAPPINGS (Popper-fied)
 ### [Stoicism/Philosophy]
 - **Style:** [TBD]
@@ -35,3 +49,4 @@
 ## 📈 EVOLUTION LOG
 - 2026-03-30: Engine Initialized.
 - 2026-04-01: First Sequenced genre logged — The Passenger Seat Philosophy.
+- 2026-04-01: Cinematography Specs logged — The Sentinel's Journal (Saturated Noir / Wednesday reference).
