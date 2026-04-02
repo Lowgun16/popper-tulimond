@@ -12,6 +12,7 @@
 2. **The "Next.js" Warning:** This version has breaking changes. Always check `node_modules/next/dist/docs/` before assuming standard conventions.
 3. **Spatial UI Rules:** Cards orbit center-line (56px gap). 1px gold gradient lines.
 4. **GWS CLI:** Authenticate with `gws auth login`. Use for Drive, Slides, and Email automation.
+5. **Asset Queries:** All visual asset queries must first reference `/context/ASSET_MANIFEST.md` for garment and accessory details.
 
 ## 👥 THE SYNDICATE EXECUTIVE SUITE
 When a task is assigned, call upon these specific specialists:
