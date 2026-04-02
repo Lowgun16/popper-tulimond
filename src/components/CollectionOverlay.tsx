@@ -41,6 +41,8 @@ interface CardLayout {
   /** Dot origin circle center in viewport coords */
   dotX: number;
   dotY: number;
+  /** X coordinate of the elbow corner (where horizontal meets vertical segment) */
+  elbowX: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -95,7 +97,7 @@ function computeLayout(
     const cardCornerY = vSide === "above" ? cardTop + CARD_APPROX_H : cardTop;
     const elbowPath = `M ${dotX} ${dotY} H ${elbowX} V ${cardCornerY}`;
 
-    return { cardLeft, cardTop, elbowPath, dotX, dotY };
+    return { cardLeft, cardTop, elbowPath, dotX, dotY, elbowX };
   };
 
   // Fallback: clamp to viewport, ignore model overlap (last resort)
@@ -112,7 +114,7 @@ function computeLayout(
     const cardTop = Math.max(EDGE, Math.min(dotY - CARD_APPROX_H, vh - CARD_APPROX_H - EDGE));
     const elbowX = hSide === "right" ? dotX + ELBOW_H : dotX - ELBOW_H;
     const elbowPath = `M ${dotX} ${dotY} H ${elbowX} V ${cardTop + CARD_APPROX_H}`;
-    return { cardLeft, cardTop, elbowPath, dotX, dotY };
+    return { cardLeft, cardTop, elbowPath, dotX, dotY, elbowX };
   };
 
   return (
@@ -143,7 +145,7 @@ function ElbowConnector({ layout, visible }: { layout: CardLayout | null; visibl
       }}
     >
       {/* Origin dot */}
-      <circle cx={layout.dotX} cy={layout.dotY} r={2} fill={GOLD} opacity={0.9} />
+      <circle cx={layout.dotX} cy={layout.dotY} r={4} fill={GOLD} opacity={0.9} />
       {/* Elbow path */}
       <path
         d={layout.elbowPath}
@@ -155,6 +157,8 @@ function ElbowConnector({ layout, visible }: { layout: CardLayout | null; visibl
         strokeLinejoin="round"
         style={{ strokeLinejoin: "round" } as React.CSSProperties}
       />
+      {/* Elbow corner circle */}
+      <circle cx={layout.elbowX} cy={layout.dotY} r={3} fill="#C4A456" opacity={0.6} />
     </svg>
   );
 }
@@ -320,7 +324,26 @@ function PulseDot({
 // ModelStage
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelected, onSelect, onStudioDotDrop, onModelDrag, onUpdateStudioSlot, activeDotId, onToggleDot }: any) {
+interface ModelStageProps {
+  /** Full ModelSlot in normal mode; in studio mode a partial fallback (id + outfit) is acceptable
+   *  because studioSlot provides the missing visual fields. */
+  slot: Pick<ModelSlot, "id" | "outfit"> & Partial<Pick<ModelSlot, "position" | "scale" | "mobileScale" | "zIndex" | "imageSrc" | "shadow">>;
+  index: number;
+  revealed: boolean;
+  isStudioMode: boolean;
+  activeDotId: string | null;
+  onToggleDot: (id: string | null) => void;
+  // Studio-only props
+  studioSlot?: StudioSlot;
+  isSelected?: boolean;
+  onSelect?: () => void;
+  onStudioDotDrop?: (dotId: string, top: number, left: number) => void;
+  onModelDrag?: (slotId: string, deltaX: number, deltaY: number) => void;
+  onUpdateStudioSlot?: (id: string, patch: Partial<StudioSlot>) => void;
+  onOpenLookbook?: (ctx: LookbookContext) => void;
+}
+
+function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelected, onSelect, onStudioDotDrop, onModelDrag, onUpdateStudioSlot, activeDotId, onToggleDot }: ModelStageProps) {
   const imageSrc = isStudioMode && studioSlot ? studioSlot.imageSrc : slot.imageSrc;
   const shadow = (isStudioMode && studioSlot) ? studioSlot.shadow : (slot.shadow ?? DEFAULT_SHADOW);
 
@@ -343,13 +366,13 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
       onPointerDown={(e) => {
         if (isStudioMode) {
           e.stopPropagation();
-          onSelect();
+          onSelect?.();
         }
       }}
       drag={isStudioMode && isSelected}
       dragMomentum={false}
       onDrag={(_, info) => {
-        if (isStudioMode && isSelected) onModelDrag(slot.id, info.delta.x, info.delta.y);
+        if (isStudioMode && isSelected) onModelDrag?.(slot.id, info.delta.x, info.delta.y);
       }}
     >
       <div ref={modelContainerRef} className="relative w-fit h-fit model-container">
@@ -363,7 +386,7 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
                 const startY = e.clientY;
                 const startScale = scale;
                 const onPointerMove = (m: PointerEvent) => {
-                  onUpdateStudioSlot(slot.id, { scale: Math.max(0.1, startScale + (startY - m.clientY) * 0.005) });
+                  onUpdateStudioSlot?.(slot.id, { scale: Math.max(0.1, startScale + (startY - m.clientY) * 0.005) });
                 };
                 const onPointerUp = () => {
                   window.removeEventListener("pointermove", onPointerMove);
