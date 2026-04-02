@@ -175,16 +175,17 @@ const smokedObsidian: React.CSSProperties = {
 };
 
 interface ObsidianCardProps {
+  id: string;
   item: OutfitItem | StudioDot;
   layout: CardLayout;
   onClose: () => void;
   onAction: () => void;
 }
 
-function ObsidianCard({ item, layout, onClose, onAction }: ObsidianCardProps) {
+function ObsidianCard({ id, item, layout, onClose, onAction }: ObsidianCardProps) {
   return (
     <motion.div
-      key="obsidian-card"
+      key={id}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
@@ -309,6 +310,7 @@ function PulseDot({
       <AnimatePresence>
         {!isStudioMode && tapped && layout && (
           <ObsidianCard
+            id={dot.id}
             item={dot}
             layout={layout}
             onClose={() => onToggleDot(null)}
@@ -355,6 +357,16 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   // Ref passed to PulseDot so it can measure the model container bounding box
   const modelContainerRef = useRef<HTMLDivElement>(null);
 
+  // Refs holding the active resize-drag listeners so they can be cleaned up on unmount
+  const resizeMoveRef = useRef<((e: PointerEvent) => void) | null>(null);
+  const resizeUpRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    return () => {
+      if (resizeMoveRef.current) window.removeEventListener("pointermove", resizeMoveRef.current);
+      if (resizeUpRef.current) window.removeEventListener("pointerup", resizeUpRef.current);
+    };
+  }, []);
+
   return (
     <motion.div
       className={isStudioMode ? "absolute pointer-events-auto origin-bottom" : `absolute pointer-events-auto origin-bottom ${slot.position} ${slot.mobileScale} ${slot.scale}`}
@@ -391,7 +403,11 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
                 const onPointerUp = () => {
                   window.removeEventListener("pointermove", onPointerMove);
                   window.removeEventListener("pointerup", onPointerUp);
+                  resizeMoveRef.current = null;
+                  resizeUpRef.current = null;
                 };
+                resizeMoveRef.current = onPointerMove;
+                resizeUpRef.current = onPointerUp;
                 window.addEventListener("pointermove", onPointerMove);
                 window.addEventListener("pointerup", onPointerUp);
               }}
@@ -561,8 +577,16 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
               setIsStudioMode(false);
             } else {
               const savedDraft = localStorage.getItem(STUDIO_DRAFT_KEY);
-              if (savedDraft) setStudioSlots(JSON.parse(savedDraft));
-              else setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
+              if (savedDraft) {
+                try {
+                  setStudioSlots(JSON.parse(savedDraft));
+                } catch {
+                  localStorage.removeItem(STUDIO_DRAFT_KEY);
+                  setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
+                }
+              } else {
+                setStudioSlots(MODEL_INVENTORY.map(modelSlotToStudio));
+              }
               const currentModel = MODEL_INVENTORY.find(m => m.outfit.some(d => d.id === activeDotId));
               if (currentModel) setSelectedModelId(currentModel.id);
               setIsStudioMode(true);
