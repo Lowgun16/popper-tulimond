@@ -10,6 +10,9 @@ export interface LookbookContext {
   price: string;
   type: AccessType;
   lookbook: string[];
+  story?: string;
+  materials?: string;
+  sizeGuide?: string;
 }
 
 export interface StudioDot {

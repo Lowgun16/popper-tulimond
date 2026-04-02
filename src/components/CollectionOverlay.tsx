@@ -598,7 +598,13 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
       </div>
       
       {lookbookDot && (
-        <LookbookOverlay dot={lookbookDot} onClose={() => setLookbookDot(null)} />
+        <LookbookOverlay
+          item={lookbookDot}
+          onClose={() => setLookbookDot(null)}
+          onAddToCart={(_item, _size) => {
+            // Cart integration placeholder — wire to cart provider when available
+          }}
+        />
       )}
     </div>
   );
