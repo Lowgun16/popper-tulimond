@@ -44,6 +44,8 @@
 
 ### Jack
 
+**Physical Description:** Caucasian male, approximately 50s. Strong, weathered build. The embodiment of the Showstopper archetype — a man whose authority is earned and visible without announcement.
+
 | Look ID | File | Garment | Archetype | Sleeve | Crop | Environment |
 |---------|------|---------|-----------|--------|------|-------------|
 | **Jack_L01** | `models/Jack/Show.Long.Mid.Brick.jpeg` | The Constable | Showstopper (Ivory) | Long | Mid | Brick |
@@ -54,6 +56,8 @@
 ---
 
 ### Jerome
+
+**Physical Description:** Black male, early 30s, powerfully built. The embodiment of the Heartbreaker archetype — depth, danger, and controlled intensity.
 
 | Look ID | File | Garment | Archetype | Sleeve | Crop | Environment |
 |---------|------|---------|-----------|--------|------|-------------|

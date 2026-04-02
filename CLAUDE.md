@@ -13,6 +13,7 @@
 3. **Spatial UI Rules:** Cards orbit center-line (56px gap). 1px gold gradient lines.
 4. **GWS CLI:** Authenticate with `gws auth login`. Use for Drive, Slides, and Email automation.
 5. **Asset Queries:** All visual asset queries must first reference `/context/ASSET_MANIFEST.md` for garment and accessory details.
+6. **Visual Prompt Rule:** Before generating any AI video or image prompt, explicitly read and state the model's **Physical Description** from the Manifest. Never infer or assume physical appearance. The Manifest is the source of truth.
 
 ## 👥 THE SYNDICATE EXECUTIVE SUITE
 When a task is assigned, call upon these specific specialists:

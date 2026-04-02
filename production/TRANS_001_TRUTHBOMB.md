@@ -90,7 +90,7 @@
 
 > Cinematic 3-second looping video. Use the provided reference image as the exact character and wardrobe source.
 >
-> The subject is a Black man in his early 30s, powerfully built, wearing an ivory long-sleeve structured shirt with a clean, architectural collar. He stands with his arms crossed, perfectly still. Low-angle medium-close framing — camera below chest height, angled upward. He is centered with equal negative space on both sides of frame.
+> The subject is a Caucasian man in his 50s, strong and weathered build, wearing an ivory long-sleeve structured shirt with a clean, architectural collar. He stands with his arms crossed, perfectly still. Low-angle medium-close framing — camera below chest height, angled upward. He is centered with equal negative space on both sides of frame.
 >
 > Lighting is chiaroscuro — a sharp white rim-light traces the collar and shoulder seam of the ivory shirt with surgical precision. The shadow side falls into deep, crushed black with no detail. A subtle cool blue-teal edge light touches the shadow side. Warm amber catches the brick texture behind him and the weave of the shirt on the lit side.
 >
@@ -108,7 +108,7 @@
 
 > Cinematic fashion short. 9:16 vertical. 3 seconds, seamless loop.
 >
-> Subject: A Black man, early 30s, powerfully built, standing perfectly still with arms crossed. He wears an ivory long-sleeve structured shirt — The Constable — with a clean architectural collar. The shirt is the most luminous element in the frame.
+> Subject: A Caucasian man, 50s, strong and weathered build, standing perfectly still with arms crossed. He wears an ivory long-sleeve structured shirt — The Constable — with a clean architectural collar. The shirt is the most luminous element in the frame.
 >
 > Framing: Low-angle medium-close. Camera sits below chest height, angled upward. Subject is dead center. Center-weighted symmetry. The collar bisects the upper third of the frame.
 >
