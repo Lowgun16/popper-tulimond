@@ -35,7 +35,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     scale: "md:scale-[0.72]",
     mobileScale: "scale-[0.72]",
     zIndex: 30,
-    imageSrc: "/models/Angel/Angel-pro-lit.png",
+    imageSrc: "/assets/models/Angel/Angel-pro-lit.png",
     outfit: [
       {
         id: "lounge-showstopper",
@@ -67,7 +67,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     scale: "md:scale-[0.79]",
     mobileScale: "scale-[0.79]",
     zIndex: 29,
-    imageSrc: "/models/Jerome/Jerome-pro-lit.png",
+    imageSrc: "/assets/models/Jerome/Jerome-pro-lit.png",
     outfit: [
       {
         id: "center-showstopper",
@@ -99,7 +99,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     scale: "md:scale-[0.73]",
     mobileScale: "scale-[0.73]",
     zIndex: 20,
-    imageSrc: "/models/Jack/Jack-pro-lit.png",
+    imageSrc: "/assets/models/Jack/Jack-pro-lit.png",
     outfit: [
       {
         id: "vault-showstopper",
@@ -131,7 +131,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     scale: "md:scale-[0.73]",
     mobileScale: "scale-[0.73]",
     zIndex: 30,
-    imageSrc: "/models/Ethan/Ethan-pro-lit.png",
+    imageSrc: "/assets/models/Ethan/Ethan-pro-lit.png",
     outfit: [
       {
         id: "rack-showstopper",

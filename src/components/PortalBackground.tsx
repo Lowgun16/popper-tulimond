@@ -47,7 +47,7 @@ export default function PortalBackground({
               style={{ opacity: insideOpacity, filter: insideFilter }}
             >
               <Image
-                src="/inside-store-tall.png"
+                src="/assets/branding/inside-store-tall.png"
                 alt="Inside Popper Tulimond"
                 fill
                 className="object-cover object-center"
@@ -62,7 +62,7 @@ export default function PortalBackground({
               style={{ clipPath: insideClipPath, filter: insideFilter }}
             >
               <Image
-                src="/inside-store-wide.png"
+                src="/assets/branding/inside-store-wide.png"
                 alt="Inside Popper Tulimond"
                 fill
                 className="object-cover object-center"
@@ -99,7 +99,7 @@ export default function PortalBackground({
           }}
         >
           <Image
-            src="/storefront-tall.png"
+            src="/assets/branding/storefront-tall.png"
             alt="Popper Tulimond storefront"
             fill
             className="object-cover object-center"
@@ -122,7 +122,7 @@ export default function PortalBackground({
           }}
         >
           <Image
-            src="/storefront.png"
+            src="/assets/branding/storefront.png"
             alt="Popper Tulimond storefront"
             fill
             className="object-cover object-center"
