@@ -368,21 +368,32 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   return (
     <motion.div
       className={isStudioMode ? "absolute pointer-events-auto origin-bottom" : `absolute pointer-events-auto origin-bottom ${slot.position} ${slot.mobileScale} ${slot.scale}`}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: revealed ? 1 : 0, y: revealed ? 0 : 16 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: revealed ? index * 0.18 : 0 }}
       style={{
-        opacity: revealed ? 1 : 0,
         zIndex: isSelected ? 4000 : (slot.zIndex || 20 + index),
-        ...(isStudioMode && studioSlot ? { left, bottom, scale: studioSlot.scale, transformOrigin: "bottom center" } : {})
+        ...(isStudioMode && studioSlot ? { left, bottom, transformOrigin: "bottom center", scale: studioSlot.scale } : {})
       }}
       onPointerDown={(e) => {
-        if (isStudioMode) {
-          e.stopPropagation();
-          onSelect?.();
-        }
-      }}
-      drag={isStudioMode && isSelected}
-      dragMomentum={false}
-      onDrag={(_, info) => {
-        if (isStudioMode && isSelected) onModelDrag?.(slot.id, info.delta.x, info.delta.y);
+        if (!isStudioMode) return;
+        e.stopPropagation();
+        onSelect?.();
+        if (!isSelected) return;
+        // Manual drag — delta per move event, avoids Framer transform conflict
+        let prevX = e.clientX;
+        let prevY = e.clientY;
+        const onMove = (m: PointerEvent) => {
+          onModelDrag?.(slot.id, m.clientX - prevX, m.clientY - prevY);
+          prevX = m.clientX;
+          prevY = m.clientY;
+        };
+        const onUp = () => {
+          window.removeEventListener("pointermove", onMove);
+          window.removeEventListener("pointerup", onUp);
+        };
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
       }}
     >
       <div ref={modelContainerRef} className="relative w-fit h-fit model-container">
