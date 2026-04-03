@@ -13,7 +13,7 @@ export interface CartItem {
   price: string;
 }
 
-interface CartDrawerProps {
+export interface CartDrawerProps {
   isOpen: boolean;
   items: CartItem[];
   onClose: () => void;

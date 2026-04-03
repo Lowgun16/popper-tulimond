@@ -11,7 +11,7 @@ export default function Home() {
 
   const handleAddToCart = useCallback((item: LookbookContext, size: string) => {
     const newItem: CartItem = {
-      id: `${item.name}-${item.colorway}-${size}-${Date.now()}`,
+      id: `${item.name}-${Math.random().toString(36).slice(2, 9)}`,
       name: item.name,
       collection: item.collection,
       colorway: item.colorway,

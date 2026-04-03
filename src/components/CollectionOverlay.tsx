@@ -249,11 +249,12 @@ interface PulseDotProps {
   onStudioDotDrop?: (id: string, top: number, left: number) => void;
   onDotTap: () => void;
   onToggleDot: (id: string | null) => void;
+  onOpenLookbook?: (ctx: LookbookContext) => void;
 }
 
 function PulseDot({
   item, studioDot, tapped, isStudioMode, modelContainerRef,
-  onStudioDotDrop, onDotTap, onToggleDot,
+  onStudioDotDrop, onDotTap, onToggleDot, onOpenLookbook,
 }: PulseDotProps) {
   const dot = studioDot ?? item!;
   const dotRef = useRef<HTMLDivElement>(null);
@@ -314,7 +315,10 @@ function PulseDot({
             item={dot}
             layout={layout}
             onClose={() => onToggleDot(null)}
-            onAction={onDotTap}
+            onAction={() => {
+              onToggleDot(null);
+              onOpenLookbook?.(dot as LookbookContext);
+            }}
           />
         )}
       </AnimatePresence>
@@ -345,7 +349,7 @@ interface ModelStageProps {
   onOpenLookbook?: (ctx: LookbookContext) => void;
 }
 
-function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelected, onSelect, onStudioDotDrop, onModelDrag, onUpdateStudioSlot, activeDotId, onToggleDot }: ModelStageProps) {
+function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelected, onSelect, onStudioDotDrop, onModelDrag, onUpdateStudioSlot, activeDotId, onToggleDot, onOpenLookbook }: ModelStageProps) {
   const imageSrc = isStudioMode && studioSlot ? studioSlot.imageSrc : slot.imageSrc;
   const shadow = (isStudioMode && studioSlot) ? studioSlot.shadow : (slot.shadow ?? DEFAULT_SHADOW);
 
@@ -429,6 +433,7 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
             onStudioDotDrop={onStudioDotDrop}
             onToggleDot={onToggleDot}
             onDotTap={() => onToggleDot(activeDotId === dot.id ? null : dot.id)}
+            onOpenLookbook={onOpenLookbook}
           />
         ))}
       </div>
