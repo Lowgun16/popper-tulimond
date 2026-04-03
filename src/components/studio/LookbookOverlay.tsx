@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { LookbookContext } from "./studioTypes";
+import OverlayPortal from "@/components/OverlayPortal";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -281,6 +282,7 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
   const sizeGuide = item.sizeGuide ?? DEFAULT_SIZE_GUIDE;
 
   return (
+    <OverlayPortal>
     <AnimatePresence>
       {item && (
         <>
@@ -571,5 +573,6 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
         </>
       )}
     </AnimatePresence>
+    </OverlayPortal>
   );
 }

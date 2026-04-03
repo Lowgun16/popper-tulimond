@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import OverlayPortal from "@/components/OverlayPortal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -49,6 +50,7 @@ export default function CartDrawer({
   const formattedTotal = `$${total.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
   return (
+    <OverlayPortal>
     <AnimatePresence>
       {isOpen && (
         <>
@@ -312,5 +314,6 @@ export default function CartDrawer({
         </>
       )}
     </AnimatePresence>
+    </OverlayPortal>
   );
 }

@@ -258,6 +258,7 @@ function PulseDot({
 }: PulseDotProps) {
   const dot = studioDot ?? item!;
   const dotRef = useRef<HTMLDivElement>(null);
+  const innerDotRef = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState<CardLayout | null>(null);
 
   // Recompute layout whenever the card is tapped open
@@ -266,16 +267,17 @@ function PulseDot({
       setLayout(null);
       return;
     }
-    const dotEl = dotRef.current;
-    const containerEl = modelContainerRef.current;
-    if (!dotEl || !containerEl) return;
-
-    const dotRect = dotEl.getBoundingClientRect();
-    const modelRect = containerEl.getBoundingClientRect();
-    const dotX = dotRect.left + dotRect.width / 2;
-    const dotY = dotRect.top + dotRect.height / 2;
-
-    setLayout(computeLayout(dotX, dotY, modelRect));
+    const frame = requestAnimationFrame(() => {
+      const dotEl = innerDotRef.current;
+      const containerEl = modelContainerRef?.current ?? null;
+      if (!dotEl) return;
+      const dotRect = dotEl.getBoundingClientRect();
+      const modelRect = containerEl ? containerEl.getBoundingClientRect() : new DOMRect();
+      const dotX = dotRect.left + dotRect.width / 2;
+      const dotY = dotRect.top + dotRect.height / 2;
+      setLayout(computeLayout(dotX, dotY, modelRect));
+    });
+    return () => cancelAnimationFrame(frame);
   }, [tapped, isStudioMode, modelContainerRef]);
 
   const handleDragEnd = (e: React.PointerEvent | MouseEvent | TouchEvent, info: { point: { x: number; y: number } }) => {
@@ -298,7 +300,7 @@ function PulseDot({
           className="flex items-center justify-center w-11 h-11 -mt-[22px] -ml-[22px] cursor-pointer"
           drag={isStudioMode} dragMomentum={false} onDragEnd={handleDragEnd as Parameters<typeof motion.div>[0]["onDragEnd"]} onTap={onDotTap}
         >
-          <div className="w-3 h-3 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] animate-pulse" />
+          <div ref={innerDotRef} className="w-3 h-3 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] animate-pulse" />
         </motion.div>
       </div>
 
