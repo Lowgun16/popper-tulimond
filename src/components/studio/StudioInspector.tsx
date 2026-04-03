@@ -72,13 +72,13 @@ export function StudioInspector({
       className="fixed left-0 top-0 bottom-0 z-[6000] flex flex-col shadow-2xl"
       animate={{ x: sidebarOpen ? 0 : "-100%" }}
       transition={{ type: "tween", duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-      onPointerDown={(e) => e.stopPropagation()} 
+      onPointerDown={(e) => e.stopPropagation()}
       style={{
         width: "min(85vw, 320px)",
         background: isMobile ? "rgba(0,0,0,0.85)" : "rgba(8,8,8,0.98)",
         borderRight: "1px solid rgba(212,184,150,0.15)",
         backdropFilter: "blur(24px)",
-        pointerEvents: "auto",
+        pointerEvents: sidebarOpen ? "auto" : "none",
       }}
     >
       <div className="pt-6 pb-4 flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}>

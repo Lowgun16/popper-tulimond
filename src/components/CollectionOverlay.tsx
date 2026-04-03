@@ -378,7 +378,6 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
       }}
       onPointerDown={(e) => {
         if (!isStudioMode) return;
-        e.stopPropagation();
         onSelect?.();
         // Attach drag immediately — select + drag start in one press
         let prevX = e.clientX;
@@ -501,12 +500,14 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
   }, []);
 
   return (
-    <div 
-      className="absolute inset-0 z-[5000] main-container" 
-      // FIX: Ensure interactions are ON if Studio is ON, regardless of "active" walk-in state
-      style={{ pointerEvents: (active || isStudioMode) ? "auto" : "none" }} 
-      onPointerDown={(e) => { 
-          if (isStudioMode) setSelectedModelId(null); 
+    <div
+      className="absolute inset-0 z-[5000] main-container"
+      style={{ pointerEvents: (active || isStudioMode) ? "auto" : "none" }}
+      onPointerDown={(e) => {
+          // Only deselect when clicking the bare background — not a model
+          if (isStudioMode && (e.target as HTMLElement).classList.contains("main-container")) {
+            setSelectedModelId(null);
+          }
       }}
     >
       {isStudioMode && (
