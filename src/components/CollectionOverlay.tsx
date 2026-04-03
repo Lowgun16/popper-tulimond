@@ -373,14 +373,14 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: revealed ? index * 0.18 : 0 }}
       style={{
         zIndex: isSelected ? 4000 : (slot.zIndex || 20 + index),
+        cursor: isStudioMode ? (isSelected ? "grabbing" : "grab") : undefined,
         ...(isStudioMode && studioSlot ? { left, bottom, transformOrigin: "bottom center", scale: studioSlot.scale } : {})
       }}
       onPointerDown={(e) => {
         if (!isStudioMode) return;
         e.stopPropagation();
         onSelect?.();
-        if (!isSelected) return;
-        // Manual drag — delta per move event, avoids Framer transform conflict
+        // Attach drag immediately — select + drag start in one press
         let prevX = e.clientX;
         let prevY = e.clientY;
         const onMove = (m: PointerEvent) => {
