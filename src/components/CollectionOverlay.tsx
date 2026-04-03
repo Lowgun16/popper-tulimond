@@ -16,6 +16,7 @@ import { MODEL_INVENTORY } from "@/data/inventory";
 import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import { DEFAULT_SHADOW } from "./studio/studioTypes";
 import { LookbookOverlay } from "./studio/LookbookOverlay";
+import OverlayPortal from "@/components/OverlayPortal";
 
 const STUDIO_DRAFT_KEY = "tulimond-studio-draft";
 
@@ -304,26 +305,26 @@ function PulseDot({
         </motion.div>
       </div>
 
-      {/* Elbow connector rendered into fixed overlay */}
+      {/* Connector + card escape Portal's overflow:hidden via OverlayPortal */}
       {!isStudioMode && (
-        <ElbowConnector layout={layout} visible={tapped} />
+        <OverlayPortal>
+          <ElbowConnector layout={layout} visible={tapped} />
+          <AnimatePresence>
+            {tapped && layout && (
+              <ObsidianCard
+                id={dot.id}
+                item={dot}
+                layout={layout}
+                onClose={() => onToggleDot(null)}
+                onAction={() => {
+                  onToggleDot(null);
+                  onOpenLookbook?.(dot as LookbookContext);
+                }}
+              />
+            )}
+          </AnimatePresence>
+        </OverlayPortal>
       )}
-
-      {/* Obsidian card rendered at fixed viewport position */}
-      <AnimatePresence>
-        {!isStudioMode && tapped && layout && (
-          <ObsidianCard
-            id={dot.id}
-            item={dot}
-            layout={layout}
-            onClose={() => onToggleDot(null)}
-            onAction={() => {
-              onToggleDot(null);
-              onOpenLookbook?.(dot as LookbookContext);
-            }}
-          />
-        )}
-      </AnimatePresence>
     </>
   );
 }

@@ -305,39 +305,41 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
           />
 
           {/*
-            Panel — Critical Fix 3:
-            Centering is handled entirely via Framer Motion's x/y style props so
-            Framer never clobbers a CSS transform. The CSS class no longer sets
-            transform; it only carries layout dimensions and border-radius.
-
-            Animation:
-              initial  → starts below the viewport (y: "100vh")
-              animate  → slides up to the centered position (y: "-50%")
-              exit     → slides back down below the viewport (y: "100vh")
+            Panel wrapper — fullscreen fixed, flexbox-centered.
+            The wrapper slides up (y: "100%" → 0), the inner panel is
+            centered via alignItems/justifyContent. No left/top/x/y
+            transform mixing — no conflicts possible.
           */}
           <motion.div
             key="lookbook-panel"
-            initial={{ y: "100vh" }}
-            animate={{ y: "-50%" }}
-            exit={{ y: "100vh" }}
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 32, stiffness: 300 }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 601,
+              pointerEvents: "none",
+            }}
+          >
+          <div
             onClick={(e) => e.stopPropagation()}
-            // Rec 3: dialog accessibility attributes
             role="dialog"
             aria-modal={true}
             aria-label="Product Lookbook"
+            className="lookbook-panel"
             style={{
-              position: "fixed",
-              left: "50%",
-              top: "50%",
-              x: "-50%",   // Framer Motion translateX — centering owned by Framer
-              zIndex: 601,
+              pointerEvents: "auto",
               background: "#121212",
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
+              position: "relative",
             }}
-            className="lookbook-panel"
           >
             {/* Close button */}
             <button
@@ -546,26 +548,20 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
                 </div>
               </div>
             </div>
+          </div>
           </motion.div>
 
-          {/* Panel dimensions + responsive styles (no transform here — owned by Framer) */}
+          {/* Panel sizing — no transform overrides needed, flexbox wrapper handles centering */}
           <style>{`
             .lookbook-panel {
-              /* Desktop: 9:16 centered, max 90dvh */
-              max-height: 90dvh;
               height: 90dvh;
               width: calc(90dvh * 9 / 16);
               border-radius: 4px;
             }
-
-            /* Mobile override */
             @media (max-width: 767px) {
               .lookbook-panel {
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
+                width: 100vw !important;
                 height: 100dvh !important;
-                max-height: 100dvh !important;
                 border-radius: 0 !important;
               }
             }
