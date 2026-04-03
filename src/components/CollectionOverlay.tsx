@@ -371,7 +371,7 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
       style={{
         opacity: revealed ? 1 : 0,
         zIndex: isSelected ? 4000 : (slot.zIndex || 20 + index),
-        ...(isStudioMode ? { left, bottom } : {})
+        ...(isStudioMode && studioSlot ? { left, bottom, scale: studioSlot.scale, transformOrigin: "bottom center" } : {})
       }}
       onPointerDown={(e) => {
         if (isStudioMode) {
@@ -414,8 +414,8 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
             </div>
           </div>
         )}
-        <img src={imageSrc} alt="" className="absolute inset-0 h-full w-full pointer-events-none select-none" style={{ filter: `brightness(0) blur(${shadow.blur}px) opacity(${shadow.opacity})`, transform: `translate(${shadow.offsetX}px, ${shadow.offsetY}px) scaleX(${shadow.scaleX}) scaleY(${shadow.scaleY})`, transformOrigin: "bottom center", scale }} />
-        <img src={imageSrc} alt="" className="h-[40vh] md:h-[80vh] w-auto object-bottom select-none" style={{ filter: "brightness(0.85) contrast(1.1)", scale }} />
+        <img src={imageSrc} alt="" className="absolute inset-0 h-full w-full pointer-events-none select-none" style={{ filter: `brightness(0) blur(${shadow.blur}px) opacity(${shadow.opacity})`, transform: `translate(${shadow.offsetX}px, ${shadow.offsetY}px) scaleX(${shadow.scaleX}) scaleY(${shadow.scaleY})`, transformOrigin: "bottom center" }} />
+        <img src={imageSrc} alt="" className="h-[40vh] md:h-[80vh] w-auto object-bottom select-none" style={{ filter: "brightness(0.85) contrast(1.1)" }} />
         {dots.map((dot: OutfitItem | StudioDot) => (
           <PulseDot
             key={dot.id}
