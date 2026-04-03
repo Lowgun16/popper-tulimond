@@ -27,7 +27,8 @@ const STUDIO_DRAFT_KEY = "tulimond-studio-draft";
 const CARD_W = 184;
 const CARD_APPROX_H = 190; // approximate rendered height for placement math
 const EDGE = 12;           // minimum margin from any viewport edge
-const ELBOW_H = 28;        // length of the horizontal elbow segment from dot
+const ELBOW_H = 36;        // horizontal arm length from dot to elbow corner
+const ELBOW_V = 44;        // vertical arm length from elbow corner to card edge
 const GOLD = "#C4A456";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -42,8 +43,9 @@ interface CardLayout {
   /** Dot origin circle center in viewport coords */
   dotX: number;
   dotY: number;
-  /** X coordinate of the elbow corner (where horizontal meets vertical segment) */
+  /** Elbow corner coords (where horizontal arm meets vertical arm) */
   elbowX: number;
+  elbowY: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -63,17 +65,15 @@ function computeLayout(
   type Vertical = "above" | "below";
 
   const tryPlace = (hSide: Side, vSide: Vertical): CardLayout | null => {
-    // Card left edge
-    const cardLeft =
-      hSide === "right"
-        ? dotX + ELBOW_H
-        : dotX - ELBOW_H - CARD_W;
+    // Elbow corner — end of the horizontal arm, start of the vertical arm
+    const elbowX = hSide === "right" ? dotX + ELBOW_H : dotX - ELBOW_H;
+    const elbowY = vSide === "above" ? dotY - ELBOW_V : dotY + ELBOW_V;
 
-    // Card top edge
-    const cardTop =
-      vSide === "above"
-        ? dotY - CARD_APPROX_H
-        : dotY;
+    // Card is anchored at the elbow corner
+    // Horizontal: card's left edge aligns with elbowX (right side) or right edge with elbowX (left side)
+    const cardLeft = hSide === "right" ? elbowX : elbowX - CARD_W;
+    // Vertical: card's bottom edge at elbowY (above) or top edge at elbowY (below)
+    const cardTop = vSide === "above" ? elbowY - CARD_APPROX_H : elbowY;
 
     // Viewport bounds check
     if (cardLeft < EDGE) return null;
@@ -81,7 +81,7 @@ function computeLayout(
     if (cardTop < EDGE) return null;
     if (cardTop + CARD_APPROX_H > vh - EDGE) return null;
 
-    // Model overlap check: card rect must not intersect modelRect
+    // Model overlap check
     const cardRight = cardLeft + CARD_W;
     const cardBottom = cardTop + CARD_APPROX_H;
     const overlapsModel =
@@ -91,31 +91,22 @@ function computeLayout(
       cardBottom > modelRect.top;
     if (overlapsModel) return null;
 
-    // Build elbow path
-    // Segment 1: horizontal from dot to elbow corner
-    const elbowX = hSide === "right" ? dotX + ELBOW_H : dotX - ELBOW_H;
-    // Segment 2: vertical from elbowX to card corner
-    const cardCornerY = vSide === "above" ? cardTop + CARD_APPROX_H : cardTop;
-    const elbowPath = `M ${dotX} ${dotY} H ${elbowX} V ${cardCornerY}`;
+    // Connector: dot → horizontal arm → vertical arm → elbow corner (= card near-corner)
+    const elbowPath = `M ${dotX} ${dotY} H ${elbowX} V ${elbowY}`;
 
-    return { cardLeft, cardTop, elbowPath, dotX, dotY, elbowX };
+    return { cardLeft, cardTop, elbowPath, dotX, dotY, elbowX, elbowY };
   };
 
   // Fallback: clamp to viewport, ignore model overlap (last resort)
   const fallback = (): CardLayout => {
     const spaceRight = vw - dotX - ELBOW_H;
     const hSide: Side = spaceRight >= CARD_W + EDGE ? "right" : "left";
-    const cardLeft = Math.max(
-      EDGE,
-      Math.min(
-        hSide === "right" ? dotX + ELBOW_H : dotX - ELBOW_H - CARD_W,
-        vw - CARD_W - EDGE
-      )
-    );
-    const cardTop = Math.max(EDGE, Math.min(dotY - CARD_APPROX_H, vh - CARD_APPROX_H - EDGE));
     const elbowX = hSide === "right" ? dotX + ELBOW_H : dotX - ELBOW_H;
-    const elbowPath = `M ${dotX} ${dotY} H ${elbowX} V ${cardTop + CARD_APPROX_H}`;
-    return { cardLeft, cardTop, elbowPath, dotX, dotY, elbowX };
+    const elbowY = Math.max(EDGE + CARD_APPROX_H, Math.min(dotY - ELBOW_V, vh - EDGE));
+    const cardLeft = Math.max(EDGE, Math.min(hSide === "right" ? elbowX : elbowX - CARD_W, vw - CARD_W - EDGE));
+    const cardTop = Math.max(EDGE, Math.min(elbowY - CARD_APPROX_H, vh - CARD_APPROX_H - EDGE));
+    const elbowPath = `M ${dotX} ${dotY} H ${elbowX} V ${elbowY}`;
+    return { cardLeft, cardTop, elbowPath, dotX, dotY, elbowX, elbowY };
   };
 
   return (
@@ -159,7 +150,7 @@ function ElbowConnector({ layout, visible }: { layout: CardLayout | null; visibl
         style={{ strokeLinejoin: "round" } as React.CSSProperties}
       />
       {/* Elbow corner circle */}
-      <circle cx={layout.elbowX} cy={layout.dotY} r={3} fill="#C4A456" opacity={0.6} />
+      <circle cx={layout.elbowX} cy={layout.elbowY} r={3} fill="#C4A456" opacity={0.6} />
     </svg>
   );
 }
