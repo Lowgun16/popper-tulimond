@@ -440,7 +440,12 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
 // Main Overlay Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function CollectionOverlay({ opacity }: { opacity: MotionValue<number> }) {
+interface CollectionOverlayProps {
+  opacity: MotionValue<number>;
+  onAddToCart: (item: LookbookContext, size: string) => void;
+}
+
+export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOverlayProps) {
   const router = useRouter();
   const [active, setActive] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -601,8 +606,9 @@ export default function CollectionOverlay({ opacity }: { opacity: MotionValue<nu
         <LookbookOverlay
           item={lookbookDot}
           onClose={() => setLookbookDot(null)}
-          onAddToCart={(_item, _size) => {
-            // Cart integration placeholder — wire to cart provider when available
+          onAddToCart={(item, size) => {
+            onAddToCart(item, size);
+            setLookbookDot(null);
           }}
         />
       )}
