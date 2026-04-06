@@ -13,6 +13,11 @@ export interface OutfitItem {
   type: "public" | "vault";
   dotPosition: string;
   lookbook?: string[];
+  sizes: string[];
+  sizeChart?: Record<string, { chest: string; length: string }>;
+  materials?: string;
+  story?: string;
+  sizeGuide?: string;
 }
 
 export interface ModelSlot {
@@ -46,6 +51,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         type: "public",
         dotPosition: "top-[30.0%] left-[85.0%]",
         lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } },
+        story: "Built for the man who doesn't need to announce himself. The Constable's ivory Showstopper is the uniform of quiet authority.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
       },
       {
         id: "lounge-heartbreaker",
@@ -56,6 +66,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         type: "vault",
         dotPosition: "top-[50.0%] left-[45.0%]",
         lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } },
+        story: "Dark grey was chosen because it forgives nothing. The Constable's Heartbreaker is for the man who already knows what he's worth.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
       },
     ],
     shadow: { offsetX: 0, offsetY: 8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
@@ -78,6 +93,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         type: "public",
         dotPosition: "top-[30.0%] left-[57.4%]",
         lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } },
+        story: "Built for the man who doesn't need to announce himself. The Constable's ivory Showstopper is the uniform of quiet authority.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
       },
       {
         id: "center-heartbreaker",
@@ -88,6 +108,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         type: "vault",
         dotPosition: "top-[45.0%] left-[40.0%]",
         lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } },
+        story: "Dark grey was chosen because it forgives nothing. The Constable's Heartbreaker is for the man who already knows what he's worth.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
       },
     ],
     shadow: { offsetX: 0, offsetY: -18, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
@@ -110,6 +135,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         type: "public",
         dotPosition: "top-[35.0%] left-[51.6%]",
         lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } },
+        story: "Built for the man who doesn't need to announce himself. The Constable's ivory Showstopper is the uniform of quiet authority.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
       },
       {
         id: "vault-heartbreaker",
@@ -120,6 +150,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         type: "vault",
         dotPosition: "top-[47.0%] left-[42.0%]",
         lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } },
+        story: "Dark grey was chosen because it forgives nothing. The Constable's Heartbreaker is for the man who already knows what he's worth.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
       },
     ],
     shadow: { offsetX: -28, offsetY: -42, scaleX: 0.90, scaleY: 0.080, opacity: 0.35, blur: 14 },
@@ -142,6 +177,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         type: "public",
         dotPosition: "top-[58.0%] left-[88.0%]",
         lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } },
+        story: "Built for the man who doesn't need to announce himself. The Constable's ivory Showstopper is the uniform of quiet authority.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
       },
       {
         id: "rack-heartbreaker",
@@ -152,6 +192,11 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         type: "vault",
         dotPosition: "top-[50.0%] left-[40.0%]",
         lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } },
+        story: "Dark grey was chosen because it forgives nothing. The Constable's Heartbreaker is for the man who already knows what he's worth.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
       },
     ],
     shadow: { offsetX: 0, offsetY: 0, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },

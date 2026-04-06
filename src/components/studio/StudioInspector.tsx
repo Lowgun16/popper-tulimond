@@ -72,13 +72,13 @@ export function StudioInspector({
       className="fixed left-0 top-0 bottom-0 z-[6000] flex flex-col shadow-2xl"
       animate={{ x: sidebarOpen ? 0 : "-100%" }}
       transition={{ type: "tween", duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-      onPointerDown={(e) => e.stopPropagation()} 
+      onPointerDown={(e) => e.stopPropagation()}
       style={{
         width: "min(85vw, 320px)",
         background: isMobile ? "rgba(0,0,0,0.85)" : "rgba(8,8,8,0.98)",
         borderRight: "1px solid rgba(212,184,150,0.15)",
         backdropFilter: "blur(24px)",
-        pointerEvents: "auto",
+        pointerEvents: sidebarOpen ? "auto" : "none",
       }}
     >
       <div className="pt-6 pb-4 flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", paddingLeft: sidePad, paddingRight: sidePad }}>
@@ -160,7 +160,7 @@ export function StudioInspector({
       </div>
     </motion.div>
 
-    <button onPointerDown={() => setSidebarOpen(!sidebarOpen)} className="fixed top-1/2 -translate-y-1/2 z-[6001] flex items-center justify-center" style={{ left: sidebarOpen ? "min(85vw, 320px)" : 0, transition: "left 0.28s cubic-bezier(0.4, 0, 0.2, 1)", width: 32, height: 64, background: "rgba(212,184,150,0.9)", borderRadius: "0 4px 4px 0", color: "black", fontWeight: "bold" }}>{sidebarOpen ? "‹" : "›"}</button>
+    <button onPointerDown={() => setSidebarOpen(!sidebarOpen)} className="fixed top-1/2 -translate-y-1/2 z-[6001] flex items-center justify-center" style={{ left: sidebarOpen ? "min(85vw, 320px)" : 0, transition: "left 0.28s cubic-bezier(0.4, 0, 0.2, 1)", width: 32, height: 64, background: "rgba(212,184,150,0.9)", borderRadius: "0 4px 4px 0", color: "black", fontWeight: "bold", pointerEvents: "auto" }}>{sidebarOpen ? "‹" : "›"}</button>
     </>
   );
 }
@@ -211,19 +211,121 @@ function TextInput({ label, value, onChange }: any) {
 }
 
 function DotEditor({ dot, onUpdate, onRemove }: any) {
+  const [expanded, setExpanded] = React.useState(false);
   return (
-    <div className="p-4 bg-white/5 border border-white/10">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-[8px] font-bold tracking-[0.3em] uppercase text-[#D4B896]">{dot.type}</span>
-        <button className="text-red-500/60 text-[10px]" onPointerDown={(e: any) => { e.stopPropagation(); onRemove(); }}>✕</button>
-      </div>
-      <div className="flex flex-col gap-2">
-        <TextInput label="Name" value={dot.name} onChange={(v: string) => onUpdate({ name: v })} />
-        <div className="grid grid-cols-2 gap-2 mt-2">
-            <div><p className="text-[7px] uppercase text-white/30 mb-1">Top %</p><NumInput value={dot.topPct} min={0} max={100} onChange={(v: number) => onUpdate({ topPct: v })} /></div>
-            <div><p className="text-[7px] uppercase text-white/30 mb-1">Left %</p><NumInput value={dot.leftPct} min={0} max={100} onChange={(v: number) => onUpdate({ leftPct: v })} /></div>
+    <div className="bg-white/5 border border-white/10">
+      {/* Header row — always visible */}
+      <div className="flex items-center justify-between px-4 py-3 cursor-pointer" onPointerDown={(e: any) => { e.stopPropagation(); setExpanded(x => !x); }}>
+        <div className="flex items-center gap-2">
+          <span className="text-[8px] font-bold tracking-[0.3em] uppercase" style={{ color: dot.type === "vault" ? "#A07850" : "#D4B896" }}>{dot.type === "vault" ? "⚿ VAULT" : "◉ PUBLIC"}</span>
+          <span className="text-[9px] text-white/60 truncate max-w-[120px]">{dot.name || "Unnamed"}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-white/30 text-[10px]">{expanded ? "▲" : "▼"}</span>
+          <button className="text-red-500/60 text-[10px]" onPointerDown={(e: any) => { e.stopPropagation(); onRemove(); }}>✕</button>
         </div>
       </div>
+
+      {expanded && (
+        <div className="px-4 pb-4 flex flex-col gap-3 border-t border-white/5">
+          {/* Card content */}
+          <p className="text-[7px] uppercase tracking-[0.3em] text-[#D4B896]/50 mt-3 mb-1">Card Content</p>
+          <TextInput label="Item Name" value={dot.name} onChange={(v: string) => onUpdate({ name: v })} />
+          <TextInput label="Collection" value={dot.collection} onChange={(v: string) => onUpdate({ collection: v })} />
+          <TextInput label="Colorway" value={dot.colorway} onChange={(v: string) => onUpdate({ colorway: v })} />
+          <TextInput label="Price" value={dot.price} onChange={(v: string) => onUpdate({ price: v })} />
+
+          {/* Access type toggle */}
+          <div className="flex items-center gap-3 mt-1">
+            <span className="text-[9px] uppercase tracking-wider text-white/40 min-w-[80px]">Access</span>
+            <div className="flex gap-2">
+              {(["public", "vault"] as const).map((t) => (
+                <button key={t} className="text-[8px] uppercase tracking-widest px-3 py-1.5 border transition-all duration-150"
+                  style={{ borderColor: dot.type === t ? "#D4B896" : "rgba(255,255,255,0.1)", color: dot.type === t ? "#000" : "rgba(255,255,255,0.5)", background: dot.type === t ? "#D4B896" : "transparent" } as React.CSSProperties}
+                  onPointerDown={(e: any) => { e.stopPropagation(); onUpdate({ type: t }); }}
+                >{t}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sizes */}
+          <div className="mt-1">
+            <p className="text-[7px] uppercase tracking-[0.3em] text-white/30 mb-1.5">Sizes (comma separated)</p>
+            <input
+              className="w-full text-[10px] text-white/70 py-2 px-3 bg-white/5 border border-white/10 outline-none"
+              value={(dot.sizes ?? []).join(", ")}
+              onChange={(e: any) => onUpdate({ sizes: e.target.value.split(",").map((s: string) => s.trim()).filter(Boolean) })}
+              placeholder="S, M, L, XL, XXL"
+              onPointerDown={(e: any) => e.stopPropagation()}
+            />
+          </div>
+
+          {/* Size Chart — Chest & Length per size */}
+          {(dot.sizes ?? []).length > 0 && (
+            <div className="mt-1">
+              <p className="text-[7px] uppercase tracking-[0.3em] text-white/30 mb-2">Size Chart</p>
+              <div className="flex flex-col gap-1.5">
+                <div className="grid grid-cols-3 gap-1">
+                  <span className="text-[7px] uppercase text-[#D4B896]/50 text-center">Size</span>
+                  <span className="text-[7px] uppercase text-[#D4B896]/50 text-center">Chest</span>
+                  <span className="text-[7px] uppercase text-[#D4B896]/50 text-center">Length</span>
+                </div>
+                {(dot.sizes ?? []).map((size: string) => {
+                  const chart = dot.sizeChart ?? {};
+                  const row = chart[size] ?? { chest: "", length: "" };
+                  return (
+                    <div key={size} className="grid grid-cols-3 gap-1 items-center">
+                      <span className="text-[9px] text-white/50 text-center uppercase">{size}</span>
+                      <input
+                        className="text-[10px] text-white/70 py-1 px-2 bg-white/5 border border-white/10 outline-none text-center"
+                        value={row.chest}
+                        placeholder='38"'
+                        onChange={(e: any) => onUpdate({ sizeChart: { ...chart, [size]: { ...row, chest: e.target.value } } })}
+                        onPointerDown={(e: any) => e.stopPropagation()}
+                      />
+                      <input
+                        className="text-[10px] text-white/70 py-1 px-2 bg-white/5 border border-white/10 outline-none text-center"
+                        value={row.length}
+                        placeholder='29"'
+                        onChange={(e: any) => onUpdate({ sizeChart: { ...chart, [size]: { ...row, length: e.target.value } } })}
+                        onPointerDown={(e: any) => e.stopPropagation()}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Position */}
+          <p className="text-[7px] uppercase tracking-[0.3em] text-[#D4B896]/50 mt-2 mb-1">Position</p>
+          <div className="grid grid-cols-2 gap-2">
+            <div><p className="text-[7px] uppercase text-white/30 mb-1">Top %</p><NumInput value={dot.topPct} min={0} max={100} onChange={(v: number) => onUpdate({ topPct: v })} /></div>
+            <div><p className="text-[7px] uppercase text-white/30 mb-1">Left %</p><NumInput value={dot.leftPct} min={0} max={100} onChange={(v: number) => onUpdate({ leftPct: v })} /></div>
+          </div>
+
+          {/* Long-form copy */}
+          <p className="text-[7px] uppercase tracking-[0.3em] text-[#D4B896]/50 mt-2 mb-1">Lookbook Copy</p>
+          <TextArea label="Story" value={dot.story ?? ""} onChange={(v: string) => onUpdate({ story: v })} />
+          <TextArea label="Materials" value={dot.materials ?? ""} onChange={(v: string) => onUpdate({ materials: v })} />
+          <TextArea label="Size Guide" value={dot.sizeGuide ?? ""} onChange={(v: string) => onUpdate({ sizeGuide: v })} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TextArea({ label, value, onChange }: any) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-[8px] uppercase tracking-wider text-white/40">{label}</span>
+      <textarea
+        className="w-full text-[10px] text-white/70 py-2 px-3 bg-white/5 border border-white/10 outline-none resize-none"
+        rows={3}
+        value={value}
+        onChange={(e: any) => onChange(e.target.value)}
+        onPointerDown={(e: any) => e.stopPropagation()}
+      />
     </div>
   );
 }

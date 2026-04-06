@@ -53,7 +53,7 @@ export default function Hero() {
         variants={fadeIn}
       >
         <Image
-          src="/logo-horizontal.png"
+          src="/assets/branding/logo-horizontal.png"
           alt="Popper Tulimond"
           width={280}
           height={80}
@@ -165,7 +165,7 @@ export default function Hero() {
           variants={fadeUp}
         >
           <Image
-            src="/logo-emblem.png"
+            src="/assets/branding/logo-emblem.png"
             alt="PT Seal"
             width={90}
             height={90}

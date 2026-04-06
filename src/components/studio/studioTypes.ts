@@ -10,6 +10,11 @@ export interface LookbookContext {
   price: string;
   type: AccessType;
   lookbook: string[];
+  story?: string;
+  materials?: string;
+  sizeGuide?: string;
+  sizes?: string[];
+  sizeChart?: Record<string, { chest: string; length: string }>;
 }
 
 export interface StudioDot {
@@ -22,6 +27,11 @@ export interface StudioDot {
   topPct: number;   // 0–100, relative to model container height
   leftPct: number;  // 0–100, relative to model container width
   lookbook: string[];
+  sizes?: string[];
+  sizeChart?: Record<string, { chest: string; length: string }>;
+  story?: string;
+  materials?: string;
+  sizeGuide?: string;
 }
 
 // ── Shadow plane config ───────────────────────────────────────────────────────
