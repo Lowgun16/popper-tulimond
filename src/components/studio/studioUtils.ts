@@ -53,6 +53,11 @@ interface RawOutfitItem {
   type: AccessType;
   dotPosition: string;
   lookbook?: string[];
+  sizes?: string[];
+  sizeChart?: Record<string, { chest: string; length: string }>;
+  story?: string;
+  materials?: string;
+  sizeGuide?: string;
 }
 
 interface RawModelSlot {
@@ -88,6 +93,11 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
       topPct,
       leftPct: dLeft,
       lookbook: item.lookbook ?? [],
+      sizes: item.sizes ?? [],
+      sizeChart: item.sizeChart ?? {},
+      story: item.story ?? "",
+      materials: item.materials ?? "",
+      sizeGuide: item.sizeGuide ?? "",
     };
   });
 
@@ -148,6 +158,15 @@ export function exportInventoryCode(slots: StudioSlot[]): string {
         const paths = dot.lookbook.map((p) => `"${p}"`).join(", ");
         lines.push(`        lookbook: [${paths}],`);
       }
+      const sizes = dot.sizes && dot.sizes.length > 0 ? dot.sizes.map((s) => `"${s}"`).join(", ") : `"S", "M", "L", "XL", "XXL"`;
+      lines.push(`        sizes: [${sizes}],`);
+      if (dot.sizeChart && Object.keys(dot.sizeChart).length > 0) {
+        const entries = Object.entries(dot.sizeChart).map(([k, v]) => `${JSON.stringify(k)}: { chest: ${JSON.stringify(v.chest)}, length: ${JSON.stringify(v.length)} }`).join(", ");
+        lines.push(`        sizeChart: { ${entries} },`);
+      }
+      if (dot.story) lines.push(`        story: ${JSON.stringify(dot.story)},`);
+      if (dot.materials) lines.push(`        materials: ${JSON.stringify(dot.materials)},`);
+      if (dot.sizeGuide) lines.push(`        sizeGuide: ${JSON.stringify(dot.sizeGuide)},`);
       lines.push(`      },`);
     }
 

@@ -6,7 +6,6 @@ import {
   motion,
   AnimatePresence,
   type MotionValue,
-  useMotionValue,
   useMotionValueEvent,
 } from "framer-motion";
 import { StudioInspector } from "./studio/StudioInspector";
@@ -249,9 +248,10 @@ function PulseDot({
   onStudioDotDrop, onDotTap, onToggleDot, onOpenLookbook,
 }: PulseDotProps) {
   const dot = studioDot ?? item!;
-  const dotRef = useRef<HTMLDivElement>(null);
   const innerDotRef = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState<CardLayout | null>(null);
+  // Pointer-capture drag state — same approach as model drag
+  const dotDragRef = useRef<{ startX: number; startY: number; startTopPct: number; startLeftPct: number; moved: boolean } | null>(null);
 
   // Recompute layout whenever the card is tapped open
   useEffect(() => {
@@ -265,35 +265,62 @@ function PulseDot({
       if (!dotEl) return;
       const dotRect = dotEl.getBoundingClientRect();
       const modelRect = containerEl ? containerEl.getBoundingClientRect() : new DOMRect();
-      const dotX = dotRect.left + dotRect.width / 2;
-      const dotY = dotRect.top + dotRect.height / 2;
-      setLayout(computeLayout(dotX, dotY, modelRect));
+      const cx = dotRect.left + dotRect.width / 2;
+      const cy = dotRect.top + dotRect.height / 2;
+      setLayout(computeLayout(cx, cy, modelRect));
     });
     return () => cancelAnimationFrame(frame);
   }, [tapped, isStudioMode, modelContainerRef]);
 
-  const handleDragEnd = (e: React.PointerEvent | MouseEvent | TouchEvent, info: { point: { x: number; y: number } }) => {
-    const container = modelContainerRef.current;
-    if (!container || !isStudioMode) return;
-    const rect = container.getBoundingClientRect();
-    const x = Math.max(0, Math.min(100, ((info.point.x - window.scrollX - rect.left) / rect.width) * 100));
-    const y = Math.max(0, Math.min(100, ((info.point.y - window.scrollY - rect.top) / rect.height) * 100));
-    onStudioDotDrop?.(dot.id, y, x);
-  };
-
   return (
     <>
       <div
-        ref={dotRef}
+        data-studio-handle="dot"
         className={`absolute z-20 ${!isStudioMode && item ? item.dotPosition : ""}`}
-        style={isStudioMode && studioDot ? { top: `${studioDot.topPct}%`, left: `${studioDot.leftPct}%` } : {}}
+        style={isStudioMode && studioDot ? { top: `${studioDot.topPct}%`, left: `${studioDot.leftPct}%`, touchAction: "none" } : {}}
+        onPointerDown={isStudioMode ? (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          e.currentTarget.setPointerCapture(e.pointerId);
+          dotDragRef.current = {
+            startX: e.clientX,
+            startY: e.clientY,
+            startTopPct: studioDot?.topPct ?? 50,
+            startLeftPct: studioDot?.leftPct ?? 50,
+            moved: false,
+          };
+        } : undefined}
+        onPointerMove={isStudioMode ? (e) => {
+          if (!dotDragRef.current) return;
+          const container = modelContainerRef.current;
+          if (!container) return;
+          const { startX, startY, startTopPct, startLeftPct } = dotDragRef.current;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dotDragRef.current.moved = true;
+          // offsetWidth/Height = natural (unscaled) container dimensions
+          // getBoundingClientRect = scaled visual dimensions
+          // dividing viewport delta by scale factor gives us natural-space delta
+          const naturalW = container.offsetWidth;
+          const naturalH = container.offsetHeight;
+          const rect = container.getBoundingClientRect();
+          const scaleX = rect.width / naturalW;
+          const scaleY = rect.height / naturalH;
+          const newLeft = startLeftPct + (dx / scaleX / naturalW) * 100;
+          const newTop = startTopPct + (dy / scaleY / naturalH) * 100;
+          onStudioDotDrop?.(dot.id, Math.max(0, Math.min(100, newTop)), Math.max(0, Math.min(100, newLeft)));
+        } : undefined}
+        onPointerUp={isStudioMode ? (e) => {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+          if (dotDragRef.current && !dotDragRef.current.moved) onDotTap();
+          dotDragRef.current = null;
+        } : undefined}
+        onPointerCancel={isStudioMode ? () => { dotDragRef.current = null; } : undefined}
+        onClick={!isStudioMode ? onDotTap : undefined}
       >
-        <motion.div
-          className="flex items-center justify-center w-11 h-11 -mt-[22px] -ml-[22px] cursor-pointer"
-          drag={isStudioMode} dragMomentum={false} onDragEnd={handleDragEnd as Parameters<typeof motion.div>[0]["onDragEnd"]} onTap={onDotTap}
-        >
+        <div className="flex items-center justify-center w-11 h-11 -mt-[22px] -ml-[22px] cursor-pointer">
           <div ref={innerDotRef} className="w-3 h-3 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] animate-pulse" />
-        </motion.div>
+        </div>
       </div>
 
       {/* Connector + card escape Portal's overflow:hidden via OverlayPortal */}
@@ -355,6 +382,9 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   // Ref passed to PulseDot so it can measure the model container bounding box
   const modelContainerRef = useRef<HTMLDivElement>(null);
 
+  // Drag start snapshot — lets us compute absolute position without delta accumulation
+  const dragStartRef = useRef<{ startX: number; startY: number; startLeftPct: number; startBottomPct: number } | null>(null);
+
   // Refs holding the active resize-drag listeners so they can be cleaned up on unmount
   const resizeMoveRef = useRef<((e: PointerEvent) => void) | null>(null);
   const resizeUpRef = useRef<(() => void) | null>(null);
@@ -365,82 +395,117 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
     };
   }, []);
 
+  const innerContent = (
+    <div ref={modelContainerRef} className="relative w-fit h-fit model-container">
+      {isStudioMode && isSelected && (
+        <div className="absolute inset-0 border-2 border-[#D4B896] pointer-events-none z-50">
+          <div className="absolute top-0 left-0 bg-[#D4B896] text-black text-[8px] px-1 font-bold uppercase tracking-tighter">SELECTED</div>
+          <div
+            data-studio-handle="resize"
+            className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#D4B896] pointer-events-auto cursor-ns-resize flex items-center justify-center shadow-lg"
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              e.currentTarget.setPointerCapture(e.pointerId);
+              const startY = e.clientY;
+              const startScale = scale;
+              const onPointerMove = (m: PointerEvent) => {
+                onUpdateStudioSlot?.(slot.id, { scale: Math.max(0.1, startScale + (startY - m.clientY) * 0.005) });
+              };
+              const onPointerUp = () => {
+                window.removeEventListener("pointermove", onPointerMove);
+                window.removeEventListener("pointerup", onPointerUp);
+                resizeMoveRef.current = null;
+                resizeUpRef.current = null;
+              };
+              resizeMoveRef.current = onPointerMove;
+              resizeUpRef.current = onPointerUp;
+              window.addEventListener("pointermove", onPointerMove);
+              window.addEventListener("pointerup", onPointerUp);
+            }}
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            <span className="text-black text-[12px] font-bold">⇳</span>
+          </div>
+        </div>
+      )}
+      <img src={imageSrc} alt="" className="absolute inset-0 h-full w-full pointer-events-none select-none" draggable={false} onContextMenu={(e) => e.preventDefault()} style={{ filter: `brightness(0) blur(${shadow.blur}px) opacity(${shadow.opacity})`, transform: `translate(${shadow.offsetX}px, ${shadow.offsetY}px) scaleX(${shadow.scaleX}) scaleY(${shadow.scaleY})`, transformOrigin: "bottom center" }} />
+      <img src={imageSrc} alt="" className="h-[40vh] md:h-[80vh] w-auto object-bottom select-none" draggable={false} onContextMenu={(e) => e.preventDefault()} style={{ filter: "brightness(0.85) contrast(1.1)" }} />
+      {dots.map((dot: OutfitItem | StudioDot) => (
+        <PulseDot
+          key={dot.id}
+          item={isStudioMode ? undefined : (dot as OutfitItem)}
+          studioDot={isStudioMode ? (dot as StudioDot) : undefined}
+          tapped={activeDotId === dot.id}
+          isStudioMode={isStudioMode}
+          modelContainerRef={modelContainerRef}
+          onStudioDotDrop={onStudioDotDrop}
+          onToggleDot={onToggleDot}
+          onDotTap={() => onToggleDot(activeDotId === dot.id ? null : dot.id)}
+          onOpenLookbook={onOpenLookbook}
+        />
+      ))}
+    </div>
+  );
+
+  // Studio mode: plain div, pointer capture, absolute-from-start positioning
+  // No window listeners, no delta accumulation, no FM transform conflicts
+  if (isStudioMode && studioSlot) {
+    return (
+      <div
+        className="absolute pointer-events-auto"
+        style={{
+          left,
+          bottom,
+          zIndex: isSelected ? 4000 : (slot.zIndex || 20 + index),
+          transform: `scale(${scale})`,
+          transformOrigin: "bottom center",
+          cursor: dragStartRef.current ? "grabbing" : "grab",
+          touchAction: "none",
+        }}
+        onPointerDown={(e) => {
+          if ((e.target as HTMLElement).closest("[data-studio-handle]")) return;
+          e.preventDefault();
+          e.currentTarget.setPointerCapture(e.pointerId);
+          onSelect?.();
+          dragStartRef.current = {
+            startX: e.clientX,
+            startY: e.clientY,
+            startLeftPct: studioSlot.leftPct,
+            startBottomPct: studioSlot.bottomPct,
+          };
+        }}
+        onPointerMove={(e) => {
+          if (!dragStartRef.current) return;
+          const { startX, startY, startLeftPct, startBottomPct } = dragStartRef.current;
+          const vw = window.innerWidth;
+          const vh = window.innerHeight;
+          const newLeft = startLeftPct + ((e.clientX - startX) / vw) * 100;
+          const newBottom = startBottomPct - ((e.clientY - startY) / vh) * 100;
+          onModelDrag?.(slot.id, newLeft, newBottom);
+        }}
+        onPointerUp={(e) => {
+          dragStartRef.current = null;
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        }}
+        onPointerCancel={() => { dragStartRef.current = null; }}
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        {innerContent}
+      </div>
+    );
+  }
+
+  // Normal mode: Framer Motion reveal animation
   return (
     <motion.div
-      className={isStudioMode ? "absolute pointer-events-auto origin-bottom" : `absolute pointer-events-auto origin-bottom ${slot.position} ${slot.mobileScale} ${slot.scale}`}
+      className={`absolute pointer-events-auto origin-bottom ${slot.position} ${slot.mobileScale} ${slot.scale}`}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: revealed ? 1 : 0, y: revealed ? 0 : 16 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: revealed ? index * 0.18 : 0 }}
-      style={{
-        zIndex: isSelected ? 4000 : (slot.zIndex || 20 + index),
-        cursor: isStudioMode ? (isSelected ? "grabbing" : "grab") : undefined,
-        ...(isStudioMode && studioSlot ? { left, bottom, transformOrigin: "bottom center", scale: studioSlot.scale } : {})
-      }}
-      onPointerDown={(e) => {
-        if (!isStudioMode) return;
-        onSelect?.();
-        // Attach drag immediately — select + drag start in one press
-        let prevX = e.clientX;
-        let prevY = e.clientY;
-        const onMove = (m: PointerEvent) => {
-          onModelDrag?.(slot.id, m.clientX - prevX, m.clientY - prevY);
-          prevX = m.clientX;
-          prevY = m.clientY;
-        };
-        const onUp = () => {
-          window.removeEventListener("pointermove", onMove);
-          window.removeEventListener("pointerup", onUp);
-        };
-        window.addEventListener("pointermove", onMove);
-        window.addEventListener("pointerup", onUp);
-      }}
+      style={{ zIndex: slot.zIndex || 20 + index }}
     >
-      <div ref={modelContainerRef} className="relative w-fit h-fit model-container">
-        {isStudioMode && isSelected && (
-          <div className="absolute inset-0 border-2 border-[#D4B896] pointer-events-none z-50">
-            <div className="absolute top-0 left-0 bg-[#D4B896] text-black text-[8px] px-1 font-bold uppercase tracking-tighter">SELECTED</div>
-            <div
-              className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#D4B896] pointer-events-auto cursor-ns-resize flex items-center justify-center shadow-lg"
-              onPointerDown={(e) => {
-                e.stopPropagation();
-                const startY = e.clientY;
-                const startScale = scale;
-                const onPointerMove = (m: PointerEvent) => {
-                  onUpdateStudioSlot?.(slot.id, { scale: Math.max(0.1, startScale + (startY - m.clientY) * 0.005) });
-                };
-                const onPointerUp = () => {
-                  window.removeEventListener("pointermove", onPointerMove);
-                  window.removeEventListener("pointerup", onPointerUp);
-                  resizeMoveRef.current = null;
-                  resizeUpRef.current = null;
-                };
-                resizeMoveRef.current = onPointerMove;
-                resizeUpRef.current = onPointerUp;
-                window.addEventListener("pointermove", onPointerMove);
-                window.addEventListener("pointerup", onPointerUp);
-              }}
-            >
-              <span className="text-black text-[12px] font-bold">⇳</span>
-            </div>
-          </div>
-        )}
-        <img src={imageSrc} alt="" className="absolute inset-0 h-full w-full pointer-events-none select-none" style={{ filter: `brightness(0) blur(${shadow.blur}px) opacity(${shadow.opacity})`, transform: `translate(${shadow.offsetX}px, ${shadow.offsetY}px) scaleX(${shadow.scaleX}) scaleY(${shadow.scaleY})`, transformOrigin: "bottom center" }} />
-        <img src={imageSrc} alt="" className="h-[40vh] md:h-[80vh] w-auto object-bottom select-none" style={{ filter: "brightness(0.85) contrast(1.1)" }} />
-        {dots.map((dot: OutfitItem | StudioDot) => (
-          <PulseDot
-            key={dot.id}
-            item={isStudioMode ? undefined : (dot as OutfitItem)}
-            studioDot={isStudioMode ? (dot as StudioDot) : undefined}
-            tapped={activeDotId === dot.id}
-            isStudioMode={isStudioMode}
-            modelContainerRef={modelContainerRef}
-            onStudioDotDrop={onStudioDotDrop}
-            onToggleDot={onToggleDot}
-            onDotTap={() => onToggleDot(activeDotId === dot.id ? null : dot.id)}
-            onOpenLookbook={onOpenLookbook}
-          />
-        ))}
-      </div>
+      {innerContent}
     </motion.div>
   );
 }
@@ -479,16 +544,10 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
     setStudioSlots((prev) => prev.map((s) => s.id === slotId ? { ...s, dots: s.dots.map((d) => (d.id === dotId ? { ...d, ...patch } : d)) } : s));
   }, []);
 
-  const handleModelDrag = useCallback((slotId: string, deltaX: number, deltaY: number) => {
-    const rect = document.querySelector(".main-container")?.getBoundingClientRect();
-    if (!rect) return;
-    const slot = studioSlots.find(s => s.id === slotId);
-    if (!slot) return;
-    updateSlot(slotId, { 
-      leftPct: slot.leftPct + (deltaX / rect.width) * 100, 
-      bottomPct: slot.bottomPct - (deltaY / rect.height) * 100 
-    });
-  }, [studioSlots, updateSlot]);
+  // Receives absolute pct values computed from drag-start snapshot — no accumulation, no drift
+  const handleModelDrag = useCallback((slotId: string, newLeftPct: number, newBottomPct: number) => {
+    setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, leftPct: newLeftPct, bottomPct: newBottomPct } : s));
+  }, []);
 
   const handleClearDraft = useCallback(() => {
     const confirmed = window.confirm("Are you sure you want to delete your changes from this session?");
@@ -511,9 +570,9 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
       }}
     >
       {isStudioMode && (
-        <div 
-          className="fixed inset-y-0 left-0 w-[400px] z-[6000]" 
-          onPointerDown={(e) => e.stopPropagation()} 
+        <div
+          className="fixed inset-y-0 left-0 w-[400px] z-[6000]"
+          style={{ pointerEvents: "none" }}
         >
           <StudioInspector
             slots={studioSlots} 
@@ -535,7 +594,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
             }}
             copyConfirm={copyConfirm}
             onAddDot={(slotId) => {
-              const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "TULIMOND", colorway: "N/A", price: "$0", type: "public", topPct: 50, leftPct: 50, lookbook: [] };
+              const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "The Constable", colorway: "", price: "", type: "public", topPct: 50, leftPct: 50, lookbook: [], sizes: ["S", "M", "L", "XL", "XXL"], sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } }, story: "", materials: "", sizeGuide: "" };
               setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s));
             }}
             onRemoveDot={(slotId, dotId) => {

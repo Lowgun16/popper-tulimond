@@ -19,14 +19,13 @@ function isVideo(src: string): boolean {
   return /\.(mp4|webm)$/i.test(src.split("?")[0]);
 }
 
-const SIZES = ["S", "M", "L", "XL"] as const;
-type Size = (typeof SIZES)[number];
-
-const SIZE_CHART: Record<Size, { chest: string; length: string }> = {
-  S:  { chest: '38"', length: '28"' },
-  M:  { chest: '40"', length: '29"' },
-  L:  { chest: '42"', length: '30"' },
-  XL: { chest: '44"', length: '31"' },
+const DEFAULT_SIZES = ["S", "M", "L", "XL", "XXL"];
+const DEFAULT_SIZE_CHART: Record<string, { chest: string; length: string }> = {
+  S:   { chest: '38"', length: '28"' },
+  M:   { chest: '40"', length: '29"' },
+  L:   { chest: '42"', length: '30"' },
+  XL:  { chest: '44"', length: '31"' },
+  XXL: { chest: '46"', length: '32"' },
 };
 
 // Default copy
@@ -280,6 +279,8 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
   const story = item.story ?? DEFAULT_STORY;
   const materials = item.materials ?? DEFAULT_MATERIALS;
   const sizeGuide = item.sizeGuide ?? DEFAULT_SIZE_GUIDE;
+  const sizes = item.sizes && item.sizes.length > 0 ? item.sizes : DEFAULT_SIZES;
+  const sizeChart = item.sizeChart && Object.keys(item.sizeChart).length > 0 ? item.sizeChart : DEFAULT_SIZE_CHART;
 
   return (
     <OverlayPortal>
@@ -476,16 +477,16 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
                         </tr>
                       </thead>
                       <tbody>
-                        {SIZES.map((size) => (
+                        {sizes.map((size) => (
                           <tr key={size}>
                             <td style={{ padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", color: "var(--color-cream, #EDE6D6)", fontSize: "0.75rem" }}>
                               {size}
                             </td>
                             <td style={{ padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", color: "var(--color-cream, #EDE6D6)", fontSize: "0.75rem" }}>
-                              {SIZE_CHART[size].chest}
+                              {sizeChart[size]?.chest ?? "—"}
                             </td>
                             <td style={{ padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", color: "var(--color-cream, #EDE6D6)", fontSize: "0.75rem" }}>
-                              {SIZE_CHART[size].length}
+                              {sizeChart[size]?.length ?? "—"}
                             </td>
                           </tr>
                         ))}
@@ -496,8 +497,8 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
                   {/* Size Selector */}
                   <div style={{ marginBottom: 28 }}>
                     <p className="type-eyebrow" style={{ marginBottom: 12 }}>Select Size</p>
-                    <div style={{ display: "flex", gap: 10 }}>
-                      {SIZES.map((size) => {
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                      {sizes.map((size) => {
                         const isSelected = selectedSize === size;
                         return (
                           <button
