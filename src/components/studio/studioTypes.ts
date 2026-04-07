@@ -2,6 +2,28 @@
 
 export type AccessType = "public" | "vault";
 
+// ── Lookbook media types ──────────────────────────────────────────────────────
+
+/** A single media item in a hotspot's lookbook carousel */
+export interface LookbookItem {
+  url: string;
+  tags: Record<string, string>; // e.g. { "Color": "Showstopper", "Sleeve": "Long" }
+}
+
+/** One selectable value within a filter dimension */
+export interface FilterOption {
+  value: string;       // e.g. "Showstopper"
+  subtitle?: string;   // e.g. "(ivory)" — shown beneath the button label
+}
+
+/** One filter row shown in the Lookbook popup */
+export interface FilterDimension {
+  name: string;              // e.g. "Color" or "Sleeve"
+  options: FilterOption[];
+}
+
+// ── Shared context passed to LookbookOverlay ─────────────────────────────────
+
 /** Minimal shape shared by StudioDot + OutfitItem for the overlay */
 export interface LookbookContext {
   name: string;
@@ -9,13 +31,16 @@ export interface LookbookContext {
   colorway: string;
   price: string;
   type: AccessType;
-  lookbook: string[];
+  lookbook: LookbookItem[];
+  filterDimensions?: FilterDimension[];
   story?: string;
   materials?: string;
   sizeGuide?: string;
   sizes?: string[];
   sizeChart?: Record<string, { chest: string; length: string }>;
 }
+
+// ── StudioDot ─────────────────────────────────────────────────────────────────
 
 export interface StudioDot {
   id: string;
@@ -26,7 +51,8 @@ export interface StudioDot {
   type: AccessType;
   topPct: number;   // 0–100, relative to model container height
   leftPct: number;  // 0–100, relative to model container width
-  lookbook: string[];
+  lookbook: LookbookItem[];
+  filterDimensions: FilterDimension[];
   sizes?: string[];
   sizeChart?: Record<string, { chest: string; length: string }>;
   story?: string;
@@ -58,11 +84,11 @@ export const DEFAULT_SHADOW: ShadowConfig = {
 
 export interface StudioSlot {
   id: string;
-  displayName: string; // shown in bounding box label; editable alias
+  displayName: string;
   imageSrc: string;
-  leftPct: number;     // position as % of viewport width
-  bottomPct: number;   // position as % of viewport height
-  scale: number;       // e.g. 1.0, 0.9, 0.8
+  leftPct: number;
+  bottomPct: number;
+  scale: number;
   zIndex: number;
   dots: StudioDot[];
   shadow: ShadowConfig;
