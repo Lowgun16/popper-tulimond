@@ -45,3 +45,8 @@ next-env.d.ts
 
 # brainstorm sessions
 .superpowers/
+
+# builder generated assets
+/public/garments/
+/public/renders/
+src/data/correctionLog.json
