@@ -139,9 +139,35 @@ Once a Garment Truth exists for a character's default size, the team can request
 
 ### Output Actions
 After a render is generated the team can:
+- **Edit This Render** — sends the VTON output directly into the Garment Editor for correction (see Post-Transfer Correction below)
 - **Approve & Save to Lookbook** — writes the image into the existing lookbook data layer
 - **Regenerate** — runs another VTON pass (slightly different result)
 - **Discard** — no action, no cost logged
+
+---
+
+## Post-Transfer Correction Loop
+
+VTON transfer is high-fidelity but not perfect. Color may shift slightly, shirt length may change, and fit details (sleeve compression, placket drape) may not exactly match the Garment Truth. This is expected — and the workflow accounts for it.
+
+### How it works
+
+When a VTON render is sent to **Edit This Render**, it opens in the Garment Editor with the full slider and structural edit toolset available — same tools, same interface, but now operating on the character render rather than the isolated Garment Truth.
+
+The team corrects only what the VTON got wrong: extend the sleeve, restore the color, tighten the placket. When satisfied, they press **Approve for [Character Name]**. This saves the corrected image as that character's approved render for this garment. It does not modify the original Garment Truth — Jerome's perfect reference stays locked.
+
+Each character ends up with their own approved render per garment, corrected to their specific body. The correction is done once per character per garment — after that, VTON transfers are the starting point and the character's corrections are already known.
+
+### Correction Profiles (v2 — learning system)
+
+Every correction made in post-transfer editing is logged: character, garment, adjustment type, direction, and magnitude. For example: "Angel — sleeve length — extend — 15px" or "Jack — color warmth — +8."
+
+After enough corrections accumulate for a given character, the system identifies consistent patterns. When a new VTON render is generated for Angel, the system automatically applies Angel's known correction profile before showing the result to the team — pre-correcting the errors it always makes for that body type.
+
+Over time, renders arrive already corrected, or close to it. The manual correction loop shrinks to only genuine edge cases.
+
+**V1:** Manual correction loop — Edit This Render → adjust → Approve for Character  
+**V2:** Correction profiles logged automatically, applied on next render for that character
 
 ---
 
@@ -192,6 +218,8 @@ Future Phase 2 (customer try-on) will let customers upload their own photo. The 
 
 1. Team can take a Nano Banana PNG to an approved Garment Truth in under 20 minutes
 2. An approved garment can be transferred to any character in under 90 seconds with one button press
-3. Color, fabric texture, placket shape, and sleeve details are preserved in the transfer
-4. Output images drop into the existing lookbook without format changes
-5. The tool works on a phone
+3. A VTON render with issues can be corrected and approved for a specific character in under 10 minutes
+4. Corrections are non-destructive — the original Garment Truth is never modified by post-transfer edits
+5. Color, fabric texture, placket shape, and sleeve details are preserved or correctable to match the Garment Truth
+6. Output images drop into the existing lookbook without format changes
+7. The tool works on a phone
