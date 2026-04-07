@@ -594,7 +594,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
             }}
             copyConfirm={copyConfirm}
             onAddDot={(slotId) => {
-              const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "The Constable", colorway: "", price: "", type: "public", topPct: 50, leftPct: 50, lookbook: [], sizes: ["S", "M", "L", "XL", "XXL"], sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } }, story: "", materials: "", sizeGuide: "" };
+              const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "The Constable", colorway: "", price: "", type: "public", topPct: 50, leftPct: 50, lookbook: [], filterDimensions: [], sizes: ["S", "M", "L", "XL", "XXL"], sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } }, story: "", materials: "", sizeGuide: "" };
               setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s));
             }}
             onRemoveDot={(slotId, dotId) => {

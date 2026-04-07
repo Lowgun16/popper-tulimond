@@ -1,5 +1,5 @@
 // src/components/studio/studioUtils.ts
-import type { StudioDot, StudioSlot, AccessType, ShadowConfig } from "./studioTypes";
+import type { StudioDot, StudioSlot, AccessType, ShadowConfig, LookbookItem, FilterDimension } from "./studioTypes";
 import { DEFAULT_SHADOW } from "./studioTypes";
 
 // ── Parsers ──────────────────────────────────────────────────────────────────
@@ -52,7 +52,8 @@ interface RawOutfitItem {
   price: string;
   type: AccessType;
   dotPosition: string;
-  lookbook?: string[];
+  lookbook?: LookbookItem[];
+  filterDimensions?: FilterDimension[];
   sizes?: string[];
   sizeChart?: Record<string, { chest: string; length: string }>;
   story?: string;
@@ -93,6 +94,7 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
       topPct,
       leftPct: dLeft,
       lookbook: item.lookbook ?? [],
+      filterDimensions: item.filterDimensions ?? [],
       sizes: item.sizes ?? [],
       sizeChart: item.sizeChart ?? {},
       story: item.story ?? "",
@@ -116,18 +118,14 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
 
 // ── Exporter ─────────────────────────────────────────────────────────────────
 
-/** * Generate the FULL src/data/inventory.ts file content.
- * This includes the imports so you can "Select All -> Delete -> Paste".
- */
+/** Generate the MODEL_INVENTORY array content for pasting into src/data/inventory.ts */
 export function exportInventoryCode(slots: StudioSlot[]): string {
-  // 1. ADD THE HEADER (Imports)
   const lines: string[] = [
     `import { ModelSlot } from "@/components/studio/studioTypes";`,
     ``,
     `export const MODEL_INVENTORY: ModelSlot[] = [`
   ];
 
-  // 2. BUILD THE DATA
   for (const slot of slots) {
     const l  = slot.leftPct.toFixed(1);
     const b  = slot.bottomPct.toFixed(1);
@@ -152,16 +150,51 @@ export function exportInventoryCode(slots: StudioSlot[]): string {
       lines.push(`        price: "${dot.price}",`);
       lines.push(`        type: "${dot.type}",`);
       lines.push(`        dotPosition: "top-[${dot.topPct.toFixed(1)}%] left-[${dot.leftPct.toFixed(1)}%]",`);
+
+      // filterDimensions
+      if (!dot.filterDimensions || dot.filterDimensions.length === 0) {
+        lines.push(`        filterDimensions: [],`);
+      } else {
+        lines.push(`        filterDimensions: [`);
+        for (const dim of dot.filterDimensions) {
+          lines.push(`          {`);
+          lines.push(`            name: ${JSON.stringify(dim.name)},`);
+          lines.push(`            options: [`);
+          for (const opt of dim.options) {
+            if (opt.subtitle) {
+              lines.push(`              { value: ${JSON.stringify(opt.value)}, subtitle: ${JSON.stringify(opt.subtitle)} },`);
+            } else {
+              lines.push(`              { value: ${JSON.stringify(opt.value)} },`);
+            }
+          }
+          lines.push(`            ],`);
+          lines.push(`          },`);
+        }
+        lines.push(`        ],`);
+      }
+
+      // lookbook
       if (!dot.lookbook || dot.lookbook.length === 0) {
         lines.push(`        lookbook: [],`);
       } else {
-        const paths = dot.lookbook.map((p) => `"${p}"`).join(", ");
-        lines.push(`        lookbook: [${paths}],`);
+        lines.push(`        lookbook: [`);
+        for (const media of dot.lookbook) {
+          const tagEntries = Object.entries(media.tags)
+            .map(([k, v]) => `${JSON.stringify(k)}: ${JSON.stringify(v)}`)
+            .join(", ");
+          lines.push(`          { url: ${JSON.stringify(media.url)}, tags: { ${tagEntries} } },`);
+        }
+        lines.push(`        ],`);
       }
-      const sizes = dot.sizes && dot.sizes.length > 0 ? dot.sizes.map((s) => `"${s}"`).join(", ") : `"S", "M", "L", "XL", "XXL"`;
+
+      const sizes = dot.sizes && dot.sizes.length > 0
+        ? dot.sizes.map((s) => `"${s}"`).join(", ")
+        : `"S", "M", "L", "XL", "XXL"`;
       lines.push(`        sizes: [${sizes}],`);
       if (dot.sizeChart && Object.keys(dot.sizeChart).length > 0) {
-        const entries = Object.entries(dot.sizeChart).map(([k, v]) => `${JSON.stringify(k)}: { chest: ${JSON.stringify(v.chest)}, length: ${JSON.stringify(v.length)} }`).join(", ");
+        const entries = Object.entries(dot.sizeChart)
+          .map(([k, v]) => `${JSON.stringify(k)}: { chest: ${JSON.stringify(v.chest)}, length: ${JSON.stringify(v.length)} }`)
+          .join(", ");
         lines.push(`        sizeChart: { ${entries} },`);
       }
       if (dot.story) lines.push(`        story: ${JSON.stringify(dot.story)},`);
