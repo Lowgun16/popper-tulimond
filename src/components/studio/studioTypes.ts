@@ -7,7 +7,8 @@ export type AccessType = "public" | "vault";
 /** A single media item in a hotspot's lookbook carousel */
 export interface LookbookItem {
   url: string;
-  tags: Record<string, string>; // e.g. { "Color": "Showstopper", "Sleeve": "Long" }
+  /** Keys must match FilterDimension.name values for filters to work */
+  tags: Record<string, string>;
 }
 
 /** One selectable value within a filter dimension */
@@ -29,6 +30,7 @@ export interface LookbookContext {
   name: string;
   collection: string;
   colorway: string;
+  /** Price as a display string, e.g. "$179" */
   price: string;
   type: AccessType;
   lookbook: LookbookItem[];
@@ -42,22 +44,11 @@ export interface LookbookContext {
 
 // ── StudioDot ─────────────────────────────────────────────────────────────────
 
-export interface StudioDot {
+export interface StudioDot extends LookbookContext {
   id: string;
-  name: string;
-  collection: string;
-  colorway: string;
-  price: string;
-  type: AccessType;
   topPct: number;   // 0–100, relative to model container height
   leftPct: number;  // 0–100, relative to model container width
-  lookbook: LookbookItem[];
-  filterDimensions: FilterDimension[];
-  sizes?: string[];
-  sizeChart?: Record<string, { chest: string; length: string }>;
-  story?: string;
-  materials?: string;
-  sizeGuide?: string;
+  filterDimensions: FilterDimension[]; // narrows optional → required
 }
 
 // ── Shadow plane config ───────────────────────────────────────────────────────
