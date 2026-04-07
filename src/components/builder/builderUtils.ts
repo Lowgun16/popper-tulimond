@@ -13,13 +13,14 @@ export function makeCorrectionEntry(
   direction: StructuralEditDirection | "set",
   magnitude: number
 ): CorrectionLogEntry {
+  const now = Date.now();
   return {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    id: `${now}-${Math.random().toString(36).slice(2, 9)}`,
     characterId,
     garmentId,
     editType,
     direction,
     magnitude,
-    timestamp: Date.now(),
+    timestamp: now,
   };
 }
