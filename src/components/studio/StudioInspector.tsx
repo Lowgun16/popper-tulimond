@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
-import type { StudioSlot, StudioDot, ShadowConfig, AccessType } from "./studioTypes";
+import type { StudioSlot, StudioDot, ShadowConfig, AccessType, LookbookItem, FilterDimension } from "./studioTypes";
 
 interface Props {
   slots: StudioSlot[];
@@ -309,6 +309,125 @@ function DotEditor({ dot, onUpdate, onRemove }: any) {
           <TextArea label="Story" value={dot.story ?? ""} onChange={(v: string) => onUpdate({ story: v })} />
           <TextArea label="Materials" value={dot.materials ?? ""} onChange={(v: string) => onUpdate({ materials: v })} />
           <TextArea label="Size Guide" value={dot.sizeGuide ?? ""} onChange={(v: string) => onUpdate({ sizeGuide: v })} />
+
+          {/* ── Filter Dimensions ── */}
+          <p className="text-[7px] uppercase tracking-[0.3em] text-[#D4B896]/50 mt-3 mb-1">Filter Dimensions</p>
+          {(dot.filterDimensions ?? []).map((dim: FilterDimension, dimIdx: number) => (
+            <div key={dimIdx} className="bg-white/5 border border-white/10 p-2 mb-2">
+              {/* Dimension name + remove */}
+              <div className="flex items-center gap-2 mb-2">
+                <input
+                  className="flex-1 text-[10px] text-white/70 py-1 px-2 bg-white/5 border border-white/10 outline-none"
+                  value={dim.name}
+                  placeholder='Name (e.g. "Color")'
+                  onChange={(e) => {
+                    const dims = [...(dot.filterDimensions ?? [])];
+                    dims[dimIdx] = { ...dims[dimIdx], name: e.target.value };
+                    onUpdate({ filterDimensions: dims });
+                  }}
+                  onPointerDown={(e: any) => e.stopPropagation()}
+                />
+                <button
+                  className="text-red-500/60 text-[10px] shrink-0"
+                  onPointerDown={(e: any) => {
+                    e.stopPropagation();
+                    onUpdate({ filterDimensions: (dot.filterDimensions ?? []).filter((_: any, i: number) => i !== dimIdx) });
+                  }}
+                >✕</button>
+              </div>
+              {/* Options */}
+              {dim.options.map((opt, optIdx: number) => (
+                <div key={optIdx} className="flex items-center gap-1 mb-1">
+                  <input
+                    className="flex-1 text-[10px] text-white/70 py-1 px-2 bg-white/5 border border-white/10 outline-none"
+                    value={opt.value}
+                    placeholder="Value"
+                    onChange={(e) => {
+                      const dims = [...(dot.filterDimensions ?? [])];
+                      const opts = [...dims[dimIdx].options];
+                      opts[optIdx] = { ...opts[optIdx], value: e.target.value };
+                      dims[dimIdx] = { ...dims[dimIdx], options: opts };
+                      onUpdate({ filterDimensions: dims });
+                    }}
+                    onPointerDown={(e: any) => e.stopPropagation()}
+                  />
+                  <input
+                    className="flex-1 text-[10px] text-white/40 py-1 px-2 bg-white/5 border border-white/10 outline-none"
+                    value={opt.subtitle ?? ""}
+                    placeholder="(subtitle)"
+                    onChange={(e) => {
+                      const dims = [...(dot.filterDimensions ?? [])];
+                      const opts = [...dims[dimIdx].options];
+                      opts[optIdx] = { ...opts[optIdx], subtitle: e.target.value || undefined };
+                      dims[dimIdx] = { ...dims[dimIdx], options: opts };
+                      onUpdate({ filterDimensions: dims });
+                    }}
+                    onPointerDown={(e: any) => e.stopPropagation()}
+                  />
+                  <button
+                    className="text-red-500/60 text-[10px] shrink-0"
+                    onPointerDown={(e: any) => {
+                      e.stopPropagation();
+                      const dims = [...(dot.filterDimensions ?? [])];
+                      dims[dimIdx] = { ...dims[dimIdx], options: dims[dimIdx].options.filter((_: any, i: number) => i !== optIdx) };
+                      onUpdate({ filterDimensions: dims });
+                    }}
+                  >✕</button>
+                </div>
+              ))}
+              <button
+                className="text-[8px] uppercase tracking-widest text-[#D4B896]/50 mt-1 hover:text-[#D4B896]"
+                onPointerDown={(e: any) => {
+                  e.stopPropagation();
+                  const dims = [...(dot.filterDimensions ?? [])];
+                  dims[dimIdx] = { ...dims[dimIdx], options: [...dims[dimIdx].options, { value: "" }] };
+                  onUpdate({ filterDimensions: dims });
+                }}
+              >+ Option</button>
+            </div>
+          ))}
+          <button
+            className="w-full text-[9px] tracking-widest uppercase py-2 border border-[#D4B896]/20 text-[#D4B896]/50 hover:text-[#D4B896] mb-2"
+            onPointerDown={(e: any) => {
+              e.stopPropagation();
+              onUpdate({ filterDimensions: [...(dot.filterDimensions ?? []), { name: "", options: [] }] });
+            }}
+          >+ Add Dimension</button>
+
+          {/* ── Lookbook Media ── */}
+          <p className="text-[7px] uppercase tracking-[0.3em] text-[#D4B896]/50 mt-3 mb-1">
+            Lookbook Media ({dot.lookbook.length})
+          </p>
+          <LookbookUrlInput
+            onAdd={(url: string) => onUpdate({ lookbook: [...dot.lookbook, { url, tags: {} }] })}
+          />
+          {dot.lookbook.map((media: LookbookItem, idx: number) => (
+            <LookbookItemEditor
+              key={idx}
+              item={media}
+              index={idx}
+              total={dot.lookbook.length}
+              dimensions={dot.filterDimensions ?? []}
+              onUpdate={(patch: Partial<LookbookItem>) => {
+                const lb = [...dot.lookbook];
+                lb[idx] = { ...lb[idx], ...patch };
+                onUpdate({ lookbook: lb });
+              }}
+              onMoveUp={() => {
+                if (idx === 0) return;
+                const lb = [...dot.lookbook];
+                [lb[idx - 1], lb[idx]] = [lb[idx], lb[idx - 1]];
+                onUpdate({ lookbook: lb });
+              }}
+              onMoveDown={() => {
+                if (idx === dot.lookbook.length - 1) return;
+                const lb = [...dot.lookbook];
+                [lb[idx], lb[idx + 1]] = [lb[idx + 1], lb[idx]];
+                onUpdate({ lookbook: lb });
+              }}
+              onRemove={() => onUpdate({ lookbook: dot.lookbook.filter((_: any, i: number) => i !== idx) })}
+            />
+          ))}
         </div>
       )}
     </div>
@@ -326,6 +445,107 @@ function TextArea({ label, value, onChange }: any) {
         onChange={(e: any) => onChange(e.target.value)}
         onPointerDown={(e: any) => e.stopPropagation()}
       />
+    </div>
+  );
+}
+
+function LookbookUrlInput({ onAdd }: { onAdd: (url: string) => void }) {
+  const [draft, setDraft] = React.useState("");
+  return (
+    <div className="flex gap-1 mb-2">
+      <input
+        className="flex-1 text-[10px] text-white/70 py-1.5 px-2 bg-white/5 border border-white/10 outline-none"
+        value={draft}
+        placeholder="Paste Cloudinary URL..."
+        onChange={(e) => setDraft(e.target.value)}
+        onPointerDown={(e) => e.stopPropagation()}
+      />
+      <button
+        className="text-[9px] uppercase tracking-wider px-3 py-1.5 border border-[#D4B896]/30 text-[#D4B896]/60 hover:text-[#D4B896] shrink-0"
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          const url = draft.trim();
+          if (!url) return;
+          onAdd(url);
+          setDraft("");
+        }}
+      >+ Add</button>
+    </div>
+  );
+}
+
+function LookbookItemEditor({
+  item, index, total, dimensions, onUpdate, onMoveUp, onMoveDown, onRemove,
+}: {
+  item: LookbookItem;
+  index: number;
+  total: number;
+  dimensions: FilterDimension[];
+  onUpdate: (patch: Partial<LookbookItem>) => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onRemove: () => void;
+}) {
+  const isVid = /\.(mp4|webm)$/i.test(item.url.split("?")[0]);
+  const filename = item.url.split("/").pop()?.split("?")[0] ?? item.url;
+
+  return (
+    <div className="flex flex-col gap-1 bg-white/5 border border-white/10 p-2 mb-1">
+      {/* Top row: reorder arrows + type icon + filename + remove */}
+      <div className="flex items-center gap-1">
+        <div className="flex flex-col gap-0.5 shrink-0">
+          <button
+            className="text-[8px] leading-none px-1"
+            style={{ color: index === 0 ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.4)" }}
+            disabled={index === 0}
+            onPointerDown={(e) => { e.stopPropagation(); onMoveUp(); }}
+          >▲</button>
+          <button
+            className="text-[8px] leading-none px-1"
+            style={{ color: index === total - 1 ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.4)" }}
+            disabled={index === total - 1}
+            onPointerDown={(e) => { e.stopPropagation(); onMoveDown(); }}
+          >▼</button>
+        </div>
+        <span className="text-[9px] shrink-0" style={{ color: isVid ? "#C4A456" : "rgba(255,255,255,0.4)" }}>
+          {isVid ? "▶" : "□"}
+        </span>
+        <span className="flex-1 text-[9px] text-white/50 truncate min-w-0">{filename}</span>
+        <button
+          className="text-red-500/60 text-[10px] shrink-0"
+          onPointerDown={(e) => { e.stopPropagation(); onRemove(); }}
+        >✕</button>
+      </div>
+
+      {/* Tag selector per dimension */}
+      {dimensions.map((dim) => (
+        <div key={dim.name} className="flex items-center gap-1 flex-wrap">
+          <span className="text-[7px] uppercase text-white/30 shrink-0" style={{ minWidth: 40 }}>{dim.name}</span>
+          <div className="flex gap-1 flex-wrap">
+            {dim.options.map((opt) => {
+              const isActive = item.tags[dim.name] === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  className="text-[7px] uppercase tracking-wider px-2 py-0.5 border transition-all"
+                  style={{
+                    borderColor: isActive ? "#D4B896" : "rgba(255,255,255,0.1)",
+                    color: isActive ? "#D4B896" : "rgba(255,255,255,0.4)",
+                    background: isActive ? "rgba(212,184,150,0.05)" : "transparent",
+                  }}
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    const newTags = { ...item.tags };
+                    if (isActive) { delete newTags[dim.name]; }
+                    else { newTags[dim.name] = opt.value; }
+                    onUpdate({ tags: newTags });
+                  }}
+                >{opt.value}</button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
