@@ -42,3 +42,8 @@ next-env.d.ts
 
 # worktrees
 .worktrees/
+
+# builder generated assets
+/public/garments/
+/public/renders/
+src/data/correctionLog.json
