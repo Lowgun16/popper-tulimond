@@ -38,7 +38,7 @@ export interface LookbookContext {
   story?: string;
   materials?: string;
   sizeGuide?: string;
-  sizes?: string[];
+  sizes: string[];
   sizeChart?: Record<string, { chest: string; length: string }>;
 }
 

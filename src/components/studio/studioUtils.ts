@@ -148,7 +148,7 @@ export function exportInventoryCode(slots: StudioSlot[]): string {
       lines.push(`        collection: "${dot.collection}",`);
       lines.push(`        colorway: "${dot.colorway}",`);
       lines.push(`        price: "${dot.price}",`);
-      lines.push(`        type: "${dot.type}",`);
+      lines.push(`        type: ${JSON.stringify(dot.type)},`);
       lines.push(`        dotPosition: "top-[${dot.topPct.toFixed(1)}%] left-[${dot.leftPct.toFixed(1)}%]",`);
 
       // filterDimensions
@@ -187,9 +187,7 @@ export function exportInventoryCode(slots: StudioSlot[]): string {
         lines.push(`        ],`);
       }
 
-      const sizes = dot.sizes && dot.sizes.length > 0
-        ? dot.sizes.map((s) => `"${s}"`).join(", ")
-        : `"S", "M", "L", "XL", "XXL"`;
+      const sizes = (dot.sizes ?? []).map((s) => JSON.stringify(s)).join(", ");
       lines.push(`        sizes: [${sizes}],`);
       if (dot.sizeChart && Object.keys(dot.sizeChart).length > 0) {
         const entries = Object.entries(dot.sizeChart)
