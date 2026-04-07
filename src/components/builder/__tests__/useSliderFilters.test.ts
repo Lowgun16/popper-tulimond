@@ -47,4 +47,22 @@ describe("buildCSSFilter", () => {
     expect(result).toContain("hue-rotate(15deg)");
     expect(result).toContain("brightness(110%)");
   });
+
+  it("includes sepia when warmth is positive", () => {
+    const result = buildCSSFilter({ ...base, warmth: 50 });
+    expect(result).toContain("sepia(15%)");
+  });
+
+  it("includes sepia when warmth is negative", () => {
+    const result = buildCSSFilter({ ...base, warmth: -50 });
+    expect(result).toContain("sepia(15%)");
+  });
+
+  it("merges hue and warmth into single hue-rotate", () => {
+    const result = buildCSSFilter({ ...base, hue: 30, warmth: 20 });
+    // warmth > 0 applies -10deg offset, so total = 30 + (-10) = 20deg
+    expect(result).toContain("hue-rotate(20deg)");
+    // Should NOT have two separate hue-rotate tokens
+    expect(result.match(/hue-rotate/g)?.length).toBe(1);
+  });
 });

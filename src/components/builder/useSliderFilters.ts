@@ -10,15 +10,16 @@ import { DEFAULT_SLIDER_STATE } from "./builderTypes";
  */
 export function buildCSSFilter(state: SliderState): string {
   const parts: string[] = [];
-  if (state.hue !== 0) parts.push(`hue-rotate(${state.hue}deg)`);
+  // Accumulate hue contributions from both hue slider and warmth compensation
+  const warmthHueOffset = state.warmth !== 0 ? (state.warmth > 0 ? -10 : 10) : 0;
+  const totalHue = state.hue + warmthHueOffset;
+  if (totalHue !== 0) parts.push(`hue-rotate(${totalHue}deg)`);
   if (state.saturation !== 0) parts.push(`saturate(${100 + state.saturation}%)`);
   if (state.brightness !== 0) parts.push(`brightness(${100 + state.brightness}%)`);
   if (state.contrast !== 0) parts.push(`contrast(${100 + state.contrast}%)`);
-  // warmth is approximated as a sepia + hue combo
   if (state.warmth !== 0) {
     const sepia = Math.abs(state.warmth) * 0.3;
     parts.push(`sepia(${sepia}%)`);
-    parts.push(`hue-rotate(${state.warmth > 0 ? -10 : 10}deg)`);
   }
   return parts.join(" ");
 }

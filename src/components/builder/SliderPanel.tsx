@@ -46,6 +46,7 @@ export function SliderPanel({ sliders, onChange, onReset }: Props) {
           Instant Adjustments
         </span>
         <button
+          type="button"
           onClick={onReset}
           className="text-[9px] uppercase tracking-widest text-[#D4B896]/40 hover:text-[#D4B896]/70"
         >
