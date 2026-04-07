@@ -7,6 +7,9 @@
 - **The Red Gun:** Unassuming icon behind the side seam. Restrained power.
 - **Tech Stack:** Next.js (Custom APIs), Framer Motion, Tailwind CSS.
 
+## 🚀 PRODUCTION CONFIG DEPLOY (HOTSPOT / CARD UPDATES)
+If the user pastes a block starting with `import { ModelSlot }` or `export const MODEL_INVENTORY`, treat it as a **Production Config deploy**. Immediately replace only the `MODEL_INVENTORY` array in `src/data/inventory.ts`, preserving the file's existing imports and interface definitions. Do not touch any other file. No explanation needed — just do it.
+
 ## 🛠️ OPERATIONAL RULES (DO NOT IGNORE)
 1. **Plan Before Code:** Always draft a step-by-step Plan before modifying files.
 2. **The "Next.js" Warning:** This version has breaking changes. Always check `node_modules/next/dist/docs/` before assuming standard conventions.
