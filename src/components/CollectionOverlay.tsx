@@ -451,7 +451,7 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   // Studio mode: plain div, pointer capture, absolute-from-start positioning
   // No window listeners, no delta accumulation, no FM transform conflicts
   if (isStudioMode && studioSlot) {
-    const posKey = studioSlot.positionMode === "right" ? "right" : "left";
+    const posKey = (studioSlot.positionMode ?? "left") === "right" ? "right" : "left";
     const posStyle = posKey === "right" ? { right: left } : { left };
     return (
       <div

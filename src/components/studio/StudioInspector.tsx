@@ -124,7 +124,7 @@ export function StudioInspector({
                 <div className="flex gap-2">
                   {(["left", "right"] as const).map((mode) => (
                     <button key={mode} className="text-[8px] uppercase tracking-widest px-3 py-1.5 border transition-all duration-150"
-                      style={{ borderColor: selected.positionMode === mode ? "#D4B896" : "rgba(255,255,255,0.1)", color: selected.positionMode === mode ? "#000" : "rgba(255,255,255,0.5)", background: selected.positionMode === mode ? "#D4B896" : "transparent" } as React.CSSProperties}
+                      style={{ borderColor: (selected.positionMode ?? "left") === mode ? "#D4B896" : "rgba(255,255,255,0.1)", color: (selected.positionMode ?? "left") === mode ? "#000" : "rgba(255,255,255,0.5)", background: (selected.positionMode ?? "left") === mode ? "#D4B896" : "transparent" } as React.CSSProperties}
                       onPointerDown={(e: any) => { e.stopPropagation(); onUpdateSlot(selected.id, { positionMode: mode }); }}
                     >{mode === "left" ? "← LEFT" : "RIGHT →"}</button>
                   ))}
