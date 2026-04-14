@@ -119,6 +119,17 @@ export function StudioInspector({
         {selected ? (
           <div className="py-6 flex flex-col gap-8" style={{ paddingLeft: sidePad, paddingRight: sidePad }}>
             <Section label="Spatial Config">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-[9px] uppercase tracking-wider text-white/40 min-w-[80px]">Position</span>
+                <div className="flex gap-2">
+                  {(["left", "right"] as const).map((mode) => (
+                    <button key={mode} className="text-[8px] uppercase tracking-widest px-3 py-1.5 border transition-all duration-150"
+                      style={{ borderColor: selected.positionMode === mode ? "#D4B896" : "rgba(255,255,255,0.1)", color: selected.positionMode === mode ? "#000" : "rgba(255,255,255,0.5)", background: selected.positionMode === mode ? "#D4B896" : "transparent" } as React.CSSProperties}
+                      onPointerDown={(e: any) => { e.stopPropagation(); onUpdateSlot(selected.id, { positionMode: mode }); }}
+                    >{mode === "left" ? "← LEFT" : "RIGHT →"}</button>
+                  ))}
+                </div>
+              </div>
               <Row label="Horizontal %"><NumInput value={selected.leftPct} onChange={(v: number) => onUpdateSlot(selected.id, { leftPct: v })} /></Row>
               <Row label="Depth %"><NumInput value={selected.bottomPct} onChange={(v: number) => onUpdateSlot(selected.id, { bottomPct: v })} /></Row>
               <Row label="Scale Factor"><NumInput value={selected.scale} step={0.05} min={0.2} max={2.5} onChange={(v: number) => onUpdateSlot(selected.id, { scale: v })} /></Row>

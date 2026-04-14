@@ -383,7 +383,7 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   const modelContainerRef = useRef<HTMLDivElement>(null);
 
   // Drag start snapshot — lets us compute absolute position without delta accumulation
-  const dragStartRef = useRef<{ startX: number; startY: number; startLeftPct: number; startBottomPct: number } | null>(null);
+  const dragStartRef = useRef<{ startX: number; startY: number; startLeftPct: number; startBottomPct: number; positionMode: "left" | "right" } | null>(null);
 
   // Refs holding the active resize-drag listeners so they can be cleaned up on unmount
   const resizeMoveRef = useRef<((e: PointerEvent) => void) | null>(null);
@@ -451,11 +451,13 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   // Studio mode: plain div, pointer capture, absolute-from-start positioning
   // No window listeners, no delta accumulation, no FM transform conflicts
   if (isStudioMode && studioSlot) {
+    const posKey = studioSlot.positionMode === "right" ? "right" : "left";
+    const posStyle = posKey === "right" ? { right: left } : { left };
     return (
       <div
         className="absolute pointer-events-auto"
         style={{
-          left,
+          ...posStyle,
           bottom,
           zIndex: isSelected ? 4000 : (slot.zIndex || 20 + index),
           transform: `scale(${scale})`,
@@ -473,11 +475,12 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
             startY: e.clientY,
             startLeftPct: studioSlot.leftPct,
             startBottomPct: studioSlot.bottomPct,
+            positionMode: studioSlot.positionMode,
           };
         }}
         onPointerMove={(e) => {
           if (!dragStartRef.current) return;
-          const { startX, startY, startLeftPct, startBottomPct } = dragStartRef.current;
+          const { startX, startY, startLeftPct, startBottomPct, positionMode } = dragStartRef.current;
           const vw = window.innerWidth;
           const vh = window.innerHeight;
           const newLeft = startLeftPct + ((e.clientX - startX) / vw) * 100;
@@ -605,7 +608,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
             onSwapImage={(id, src) => updateSlot(id, { imageSrc: src })}
             onAddSlot={() => {
                const id = `patron-${Date.now()}`;
-               setStudioSlots(prev => [...prev, { id, displayName: "New Patron", imageSrc: "/model-center.png", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [], shadow: { ...DEFAULT_SHADOW } }]);
+               setStudioSlots(prev => [...prev, { id, displayName: "New Patron", imageSrc: "/model-center.png", positionMode: "left", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [], shadow: { ...DEFAULT_SHADOW } }]);
                setSelectedModelId(id);
             }}
             onRemoveSlot={(slotId) => {

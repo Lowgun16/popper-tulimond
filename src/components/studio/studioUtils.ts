@@ -13,7 +13,7 @@ export function parseDotPosition(pos: string): { topPct: number; leftPct: number
   };
 }
 
-export function parseModelPosition(pos: string): { leftPct: number; bottomPct: number } {
+export function parseModelPosition(pos: string): { leftPct: number; bottomPct: number; positionMode: "left" | "right" } {
   const mdLeft    = pos.match(/md:left-\[(-?[\d.]+)%\]/)?.[1];
   const baseLeft  = pos.match(/(?<!md:)left-\[(-?[\d.]+)%\]/)?.[1];
   const mdRight   = pos.match(/md:right-\[(-?[\d.]+)%\]/)?.[1];
@@ -25,16 +25,20 @@ export function parseModelPosition(pos: string): { leftPct: number; bottomPct: n
   const rightRaw = mdRight ?? baseRight;
 
   let leftPct: number;
+  let positionMode: "left" | "right";
   if (leftRaw !== undefined) {
     leftPct = parseFloat(leftRaw);
+    positionMode = "left";
   } else if (rightRaw !== undefined) {
-    leftPct = 100 - parseFloat(rightRaw) - 12;
+    leftPct = parseFloat(rightRaw);
+    positionMode = "right";
   } else {
     leftPct = 30;
+    positionMode = "left";
   }
 
   const bottomPct = parseFloat(mdBottom ?? baseBottom ?? "5");
-  return { leftPct, bottomPct };
+  return { leftPct, bottomPct, positionMode };
 }
 
 export function parseScale(scale: string): number {
@@ -79,7 +83,7 @@ function defaultDisplayName(id: string): string {
 }
 
 export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
-  const { leftPct, bottomPct } = parseModelPosition(slot.position);
+  const { leftPct, bottomPct, positionMode } = parseModelPosition(slot.position);
   const scale = parseScale(slot.scale);
 
   const dots: StudioDot[] = slot.outfit.map((item) => {
@@ -107,6 +111,7 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
     id: slot.id,
     displayName: slot.displayName ?? defaultDisplayName(slot.id),
     imageSrc: slot.imageSrc,
+    positionMode,
     leftPct,
     bottomPct,
     scale,
@@ -134,7 +139,8 @@ export function exportInventoryCode(slots: StudioSlot[]): string {
     lines.push(`  {`);
     lines.push(`    id: "${slot.id}",`);
     lines.push(`    displayName: "${slot.displayName}",`);
-    lines.push(`    position: "left-[${l}%] md:left-[${l}%] bottom-[${b}%] md:bottom-[${b}%]",`);
+    const posKey = slot.positionMode === "right" ? "right" : "left";
+    lines.push(`    position: "${posKey}-[${l}%] md:${posKey}-[${l}%] bottom-[${b}%] md:bottom-[${b}%]",`);
     lines.push(`    scale: "md:scale-[${sc}]",`);
     lines.push(`    mobileScale: "scale-[${sc}]",`);
     lines.push(`    zIndex: ${slot.zIndex},`);

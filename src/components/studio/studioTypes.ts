@@ -77,7 +77,8 @@ export interface StudioSlot {
   id: string;
   displayName: string;
   imageSrc: string;
-  leftPct: number;
+  positionMode: "left" | "right";  // Use left: or right: CSS positioning
+  leftPct: number;  // Percentage from left edge (when mode = "left")
   bottomPct: number;
   scale: number;
   zIndex: number;
