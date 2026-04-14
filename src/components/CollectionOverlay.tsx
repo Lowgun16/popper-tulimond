@@ -545,8 +545,10 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
   }, []);
 
   // Receives absolute pct values computed from drag-start snapshot — no accumulation, no drift
+  // Clamped to ±50% off-screen: allows 50% off either edge, then stops (no squishing)
   const handleModelDrag = useCallback((slotId: string, newLeftPct: number, newBottomPct: number) => {
-    setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, leftPct: newLeftPct, bottomPct: newBottomPct } : s));
+    const clampedLeftPct = Math.max(-50, Math.min(150, newLeftPct));
+    setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, leftPct: clampedLeftPct, bottomPct: newBottomPct } : s));
   }, []);
 
   const handleClearDraft = useCallback(() => {
