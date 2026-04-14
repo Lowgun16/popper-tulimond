@@ -3,42 +3,76 @@
 // Set VTON_PROVIDER=replicate in .env.local to switch to paid Replicate.
 import { NextRequest, NextResponse } from "next/server";
 
-const HF_SPACE_URL = "https://yisol-idm-vton.hf.space/run/predict";
+const HF_BASE = "https://yisol-idm-vton.hf.space";
 const REPLICATE_URL = "https://api.replicate.com/v1/predictions";
 const REPLICATE_MODEL = "cuuupid/idm-vton:906425dbca90663ff5427624839572cc56ea7d380343d13e2a4c4b09d3f0c30f";
+
+async function uploadToHF(base64: string, filename: string): Promise<string> {
+  const blob = Buffer.from(base64, "base64");
+  const formData = new FormData();
+  formData.append("files", new Blob([blob], { type: "image/png" }), filename);
+  const res = await fetch(`${HF_BASE}/upload`, {
+    method: "POST",
+    body: formData,
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!res.ok) throw new Error(`HF upload failed: ${res.status}`);
+  const json = await res.json();
+  // Returns array of paths
+  const path: string = Array.isArray(json) ? json[0] : json;
+  return path;
+}
+
+function fileData(path: string, name: string) {
+  return { path, orig_name: name, meta: { _type: "gradio.FileData" } };
+}
 
 async function runHuggingFace(
   personBase64: string,
   garmentBase64: string
 ): Promise<string> {
-  const response = await fetch(HF_SPACE_URL, {
+  // Step 1: upload both images
+  const [personPath, garmentPath] = await Promise.all([
+    uploadToHF(personBase64, "person.png"),
+    uploadToHF(garmentBase64, "garment.png"),
+  ]);
+
+  // Step 2: call the /tryon endpoint
+  const response = await fetch(`${HF_BASE}/run/predict`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
+      fn_index: 0,
       data: [
-        { data: `data:image/png;base64,${personBase64}`, type: "base64" },
-        { data: `data:image/png;base64,${garmentBase64}`, type: "base64" },
-        "Upper body",
-        true,
-        true,
-        30,
-        42,
+        // EditorData (background image, no layers)
+        { background: fileData(personPath, "person.png"), layers: [], composite: null },
+        // Garment FileData
+        fileData(garmentPath, "garment.png"),
+        "Upper body garment",
+        true,  // is_checked (auto mask)
+        false, // is_checked_crop
+        30,    // denoise_steps
+        42,    // seed
       ],
     }),
-    signal: AbortSignal.timeout(120_000), // 2 min timeout
+    signal: AbortSignal.timeout(120_000),
   });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`HF API error ${response.status}: ${text.slice(0, 200)}`);
+    throw new Error(`HF API error ${response.status}: ${text.slice(0, 300)}`);
   }
 
   const json = await response.json();
-  // HF returns data array; first element is the result image
-  const raw: string = json.data?.[0]?.data ?? json.data?.[0];
-  if (!raw) throw new Error("HF returned empty data");
-  // Strip data URI prefix if present
-  return raw.replace(/^data:image\/\w+;base64,/, "");
+  // Returns FileData objects; fetch the result image URL
+  const resultFile = json.data?.[0];
+  if (!resultFile) throw new Error("HF returned empty data");
+
+  const imageUrl: string = resultFile.url ?? `${HF_BASE}/file=${resultFile.path}`;
+  const imgRes = await fetch(imageUrl, { signal: AbortSignal.timeout(30_000) });
+  if (!imgRes.ok) throw new Error(`Failed to fetch result image: ${imgRes.status}`);
+  const buf = await imgRes.arrayBuffer();
+  return Buffer.from(buf).toString("base64");
 }
 
 async function runReplicate(
