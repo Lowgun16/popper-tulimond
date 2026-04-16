@@ -383,7 +383,7 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   const modelContainerRef = useRef<HTMLDivElement>(null);
 
   // Drag start snapshot — lets us compute absolute position without delta accumulation
-  const dragStartRef = useRef<{ startX: number; startY: number; startLeftPct: number; startBottomPct: number; positionMode: "left" | "right" } | null>(null);
+  const dragStartRef = useRef<{ startX: number; startY: number; startLeftPct: number; startBottomPct: number } | null>(null);
 
   // Refs holding the active resize-drag listeners so they can be cleaned up on unmount
   const resizeMoveRef = useRef<((e: PointerEvent) => void) | null>(null);
@@ -451,13 +451,11 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   // Studio mode: plain div, pointer capture, absolute-from-start positioning
   // No window listeners, no delta accumulation, no FM transform conflicts
   if (isStudioMode && studioSlot) {
-    const posKey = (studioSlot.positionMode ?? "left") === "right" ? "right" : "left";
-    const posStyle = posKey === "right" ? { right: left } : { left };
     return (
       <div
         className="absolute pointer-events-auto"
         style={{
-          ...posStyle,
+          left,
           bottom,
           zIndex: isSelected ? 4000 : (slot.zIndex || 20 + index),
           transform: `scale(${scale})`,
@@ -475,12 +473,11 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
             startY: e.clientY,
             startLeftPct: studioSlot.leftPct,
             startBottomPct: studioSlot.bottomPct,
-            positionMode: studioSlot.positionMode,
           };
         }}
         onPointerMove={(e) => {
           if (!dragStartRef.current) return;
-          const { startX, startY, startLeftPct, startBottomPct, positionMode } = dragStartRef.current;
+          const { startX, startY, startLeftPct, startBottomPct } = dragStartRef.current;
           const vw = window.innerWidth;
           const vh = window.innerHeight;
           const newLeft = startLeftPct + ((e.clientX - startX) / vw) * 100;
@@ -548,10 +545,8 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
   }, []);
 
   // Receives absolute pct values computed from drag-start snapshot — no accumulation, no drift
-  // Clamped to ±50% off-screen: allows 50% off either edge, then stops (no squishing)
   const handleModelDrag = useCallback((slotId: string, newLeftPct: number, newBottomPct: number) => {
-    const clampedLeftPct = Math.max(-50, Math.min(150, newLeftPct));
-    setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, leftPct: clampedLeftPct, bottomPct: newBottomPct } : s));
+    setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, leftPct: newLeftPct, bottomPct: newBottomPct } : s));
   }, []);
 
   const handleClearDraft = useCallback(() => {
@@ -568,7 +563,6 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
       className="absolute inset-0 z-[5000] main-container"
       style={{ pointerEvents: (active || isStudioMode) ? "auto" : "none" }}
       onPointerDown={(e) => {
-          // Only deselect when clicking the bare background — not a model
           if (isStudioMode && (e.target as HTMLElement).classList.contains("main-container")) {
             setSelectedModelId(null);
           }
@@ -583,7 +577,6 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
             slots={studioSlots} 
             selectedId={selectedModelId} 
             onSelectSlot={(id: string) => {
-                console.log("Inspector selecting character:", id);
                 setSelectedModelId(id);
             }} 
             onUpdateSlot={updateSlot} 
@@ -608,7 +601,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
             onSwapImage={(id, src) => updateSlot(id, { imageSrc: src })}
             onAddSlot={() => {
                const id = `patron-${Date.now()}`;
-               setStudioSlots(prev => [...prev, { id, displayName: "New Patron", imageSrc: "/model-center.png", positionMode: "left", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [], shadow: { ...DEFAULT_SHADOW } }]);
+               setStudioSlots(prev => [...prev, { id, displayName: "New Patron", imageSrc: "/model-center.png", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [], shadow: { ...DEFAULT_SHADOW } }]);
                setSelectedModelId(id);
             }}
             onRemoveSlot={(slotId) => {
@@ -620,15 +613,6 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
                if (s) updateSlot(id, { shadow: { ...s.shadow, ...patch } });
             }}
           />
-          
-          <div className="absolute bottom-24 right-[-140px] pointer-events-auto">
-             <button 
-                onPointerDown={handleClearDraft}
-                className="px-4 py-2 bg-red-900/40 border border-red-500/50 text-red-200 text-[8px] uppercase tracking-[0.2em] backdrop-blur-md hover:bg-red-900/60 transition-all duration-300"
-             >
-                ⚠ Clear Session Draft
-             </button>
-          </div>
         </div>
       )}
 
@@ -647,10 +631,22 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
         </div>
       )}
 
-      {process.env.NEXT_PUBLIC_STUDIO_ENABLED === "true" && (
-      <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[6100]">
+      {/* Studio Controls Stack */}
+      <div className="fixed bottom-10 right-10 flex flex-col items-end gap-3 pointer-events-auto z-[9999]" style={{ minWidth: '150px' }}>
+        {isStudioMode && (
+          <button
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              handleClearDraft();
+            }}
+            className="px-4 py-2 bg-red-600/90 hover:bg-red-600 border border-white/20 text-[9px] uppercase tracking-widest text-white backdrop-blur-xl transition-all shadow-2xl"
+          >
+            ⚠ Clear Session Draft
+          </button>
+        )}
+
         <button
-          className="px-6 py-3 bg-black/90 border border-white/20 text-[10px] uppercase tracking-widest text-white backdrop-blur-xl"
+          className="px-6 py-3 bg-black/95 border border-white/30 text-[10px] uppercase tracking-widest text-white backdrop-blur-xl shadow-2xl"
           style={isStudioMode ? { color: "#D4B896", borderColor: "#D4B896" } : {}}
           onPointerDown={(e) => {
             e.stopPropagation();
@@ -677,8 +673,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
           {isStudioMode ? "✕ Close Studio" : "⊙ Studio Mode"}
         </button>
       </div>
-      )}
-      
+
       {lookbookDot && (
         <LookbookOverlay
           item={lookbookDot}
