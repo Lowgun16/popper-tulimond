@@ -119,6 +119,7 @@ export function StudioInspector({
         {selected ? (
           <div className="py-6 flex flex-col gap-8" style={{ paddingLeft: sidePad, paddingRight: sidePad }}>
             <Section label="Spatial Config">
+          
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-[9px] uppercase tracking-wider text-white/40 min-w-[80px]">Position</span>
                 <div className="flex gap-2">
