@@ -601,7 +601,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
             onSwapImage={(id, src) => updateSlot(id, { imageSrc: src })}
             onAddSlot={() => {
                const id = `patron-${Date.now()}`;
-               setStudioSlots(prev => [...prev, { id, displayName: "New Patron", imageSrc: "/model-center.png", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [], shadow: { ...DEFAULT_SHADOW } }]);
+               setStudioSlots(prev => [...prev, { id, displayName: "New Patron", imageSrc: "/model-center.png", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [] as any, positionMode: "absolute", shadow: { ...DEFAULT_SHADOW } }]);
                setSelectedModelId(id);
             }}
             onRemoveSlot={(slotId) => {
