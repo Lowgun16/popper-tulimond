@@ -374,7 +374,9 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
   const imageSrc = isStudioMode && studioSlot ? studioSlot.imageSrc : slot.imageSrc;
   const shadow = (isStudioMode && studioSlot) ? studioSlot.shadow : (slot.shadow ?? DEFAULT_SHADOW);
 
-  const left = isStudioMode && studioSlot ? `${studioSlot.leftPct}%` : "";
+  const isRightMode = isStudioMode && studioSlot && studioSlot.positionMode === "right";
+  const left = isStudioMode && studioSlot && !isRightMode ? `${studioSlot.leftPct}%` : "";
+  const right = isRightMode ? `${studioSlot!.leftPct}%` : "";
   const bottom = isStudioMode && studioSlot ? `${studioSlot.bottomPct}%` : "";
   const scale = isStudioMode && studioSlot ? studioSlot.scale : 1;
   const dots = isStudioMode && studioSlot ? studioSlot.dots : slot.outfit;
@@ -455,7 +457,7 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
       <div
         className="absolute pointer-events-auto"
         style={{
-          left,
+          ...(isRightMode ? { right } : { left }),
           bottom,
           zIndex: isSelected ? 4000 : (slot.zIndex || 20 + index),
           transform: `scale(${scale})`,
@@ -480,7 +482,9 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
           const { startX, startY, startLeftPct, startBottomPct } = dragStartRef.current;
           const vw = window.innerWidth;
           const vh = window.innerHeight;
-          const newLeft = startLeftPct + ((e.clientX - startX) / vw) * 100;
+          // Right-anchored: dragging right decreases the right% value
+          const dx = (e.clientX - startX) / vw * 100;
+          const newLeft = isRightMode ? startLeftPct - dx : startLeftPct + dx;
           const newBottom = startBottomPct - ((e.clientY - startY) / vh) * 100;
           onModelDrag?.(slot.id, newLeft, newBottom);
         }}
@@ -569,51 +573,63 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
       }}
     >
       {isStudioMode && (
-        <div
-          className="fixed inset-y-0 left-0 w-[400px] z-[6000]"
-          style={{ pointerEvents: "none" }}
-        >
-          <StudioInspector
-            slots={studioSlots} 
-            selectedId={selectedModelId} 
-            onSelectSlot={(id: string) => {
-                setSelectedModelId(id);
-            }} 
-            onUpdateSlot={updateSlot} 
-            onUpdateDot={updateDot} 
-            onSave={async () => {
-                localStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify(studioSlots));
-                setSaveConfirm(true);
-                setTimeout(() => setSaveConfirm(false), 2000);
-            }} 
-            onCopyCode={() => {
-              navigator.clipboard.writeText(exportInventoryCode(studioSlots));
-              setCopyConfirm(true); setTimeout(() => setCopyConfirm(false), 2000);
-            }}
-            copyConfirm={copyConfirm}
-            onAddDot={(slotId) => {
-              const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "The Constable", colorway: "", price: "", type: "public", topPct: 50, leftPct: 50, lookbook: [], filterDimensions: [], sizes: ["S", "M", "L", "XL", "XXL"], sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } }, story: "", materials: "", sizeGuide: "" };
-              setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s));
-            }}
-            onRemoveDot={(slotId, dotId) => {
-              setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: s.dots.filter(d => d.id !== dotId) } : s));
-            }}
-            onSwapImage={(id, src) => updateSlot(id, { imageSrc: src })}
-            onAddSlot={() => {
-               const id = `patron-${Date.now()}`;
-               setStudioSlots(prev => [...prev, { id, displayName: "New Patron", imageSrc: "/model-center.png", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [] as any, positionMode: "left" as any, shadow: { ...DEFAULT_SHADOW } }]);
-               setSelectedModelId(id);
-            }}
-            onRemoveSlot={(slotId) => {
-               setStudioSlots(prev => prev.filter(s => s.id !== slotId));
-               setSelectedModelId(null);
-            }}
-            onUpdateShadow={(id, patch) => {
-               const s = studioSlots.find(sl => sl.id === id);
-               if (s) updateSlot(id, { shadow: { ...s.shadow, ...patch } });
-            }}
-          />
-        </div>
+        <StudioInspector
+          slots={studioSlots}
+          selectedId={selectedModelId}
+          onSelectSlot={(id: string) => setSelectedModelId(id)}
+          onUpdateSlot={updateSlot}
+          onUpdateDot={updateDot}
+          onSave={async () => {
+            localStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify(studioSlots));
+            setSaveConfirm(true);
+            setTimeout(() => setSaveConfirm(false), 2000);
+          }}
+          onCopyCode={() => {
+            const code = exportInventoryCode(studioSlots);
+            const fallback = () => {
+              const ta = document.createElement("textarea");
+              ta.value = code;
+              ta.style.cssText = "position:fixed;opacity:0;top:0;left:0";
+              document.body.appendChild(ta);
+              ta.focus();
+              ta.select();
+              document.execCommand("copy");
+              document.body.removeChild(ta);
+              setCopyConfirm(true);
+              setTimeout(() => setCopyConfirm(false), 2000);
+            };
+            if (navigator.clipboard) {
+              navigator.clipboard.writeText(code).then(() => {
+                setCopyConfirm(true);
+                setTimeout(() => setCopyConfirm(false), 2000);
+              }).catch(fallback);
+            } else {
+              fallback();
+            }
+          }}
+          copyConfirm={copyConfirm}
+          onAddDot={(slotId) => {
+            const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "The Constable", colorway: "", price: "", type: "public", topPct: 50, leftPct: 50, lookbook: [], filterDimensions: [], sizes: ["S", "M", "L", "XL", "XXL"], sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } }, story: "", materials: "", sizeGuide: "" };
+            setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s));
+          }}
+          onRemoveDot={(slotId, dotId) => {
+            setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: s.dots.filter(d => d.id !== dotId) } : s));
+          }}
+          onSwapImage={(id, src) => updateSlot(id, { imageSrc: src })}
+          onAddSlot={() => {
+            const id = `patron-${Date.now()}`;
+            setStudioSlots(prev => [...prev, { id, displayName: "New Patron", imageSrc: "/model-center.png", leftPct: 40, bottomPct: 5, scale: 0.85, zIndex: 25, dots: [] as any, positionMode: "left" as any, shadow: { ...DEFAULT_SHADOW } }]);
+            setSelectedModelId(id);
+          }}
+          onRemoveSlot={(slotId) => {
+            setStudioSlots(prev => prev.filter(s => s.id !== slotId));
+            setSelectedModelId(null);
+          }}
+          onUpdateShadow={(id, patch) => {
+            const s = studioSlots.find(sl => sl.id === id);
+            if (s) updateSlot(id, { shadow: { ...s.shadow, ...patch } });
+          }}
+        />
       )}
 
       {isStudioMode 
@@ -632,7 +648,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
       )}
 
       {/* Studio Controls Stack */}
-      <div className="fixed bottom-10 right-10 flex flex-col items-end gap-3 pointer-events-auto z-[9999]" style={{ minWidth: '150px' }}>
+      <div className="fixed bottom-10 right-10 flex flex-col items-end gap-3 pointer-events-auto z-[5999]" style={{ minWidth: '150px' }}>
         {isStudioMode && (
           <button
             onPointerDown={(e) => {
