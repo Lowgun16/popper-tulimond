@@ -647,7 +647,8 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
         </div>
       )}
 
-      {/* Studio Controls Stack */}
+      {/* Studio Controls Stack — only rendered when studio is enabled */}
+      {process.env.NEXT_PUBLIC_STUDIO_ENABLED === "true" && (
       <div className="fixed bottom-10 right-10 flex flex-col items-end gap-3 pointer-events-auto z-[5999]" style={{ minWidth: '150px' }}>
         {isStudioMode && (
           <button
@@ -689,6 +690,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
           {isStudioMode ? "✕ Close Studio" : "⊙ Studio Mode"}
         </button>
       </div>
+      )}
 
       {lookbookDot && (
         <LookbookOverlay
