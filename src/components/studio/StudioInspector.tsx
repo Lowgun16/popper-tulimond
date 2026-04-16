@@ -47,6 +47,8 @@ export function StudioInspector({
   copyConfirm,
   onSave,
 }: Props) {
+  const isStudioEnabled = process.env.NEXT_PUBLIC_STUDIO_ENABLED === 'true';
+  if (!isStudioEnabled) return null;
   const selected = selectedId ? (slots.find((s) => s.id === selectedId) ?? null) : null;
   const [saveState, setSaveState] = React.useState<"idle" | "saving" | "saved" | "error">("idle");
   const isMobile = useMobile();
