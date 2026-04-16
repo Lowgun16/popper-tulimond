@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const studioEnabled = process.env.STUDIO_ENABLED === "true";
+  const studioEnabled = process.env.NEXT_PUBLIC_STUDIO_ENABLED === "true";
 
   if (!studioEnabled && request.nextUrl.pathname.startsWith("/studio")) {
     return new NextResponse(null, { status: 404 });

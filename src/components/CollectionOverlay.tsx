@@ -647,12 +647,13 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
         </div>
       )}
 
+      {process.env.NEXT_PUBLIC_STUDIO_ENABLED === "true" && (
       <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-auto z-[6100]">
-        <button 
+        <button
           className="px-6 py-3 bg-black/90 border border-white/20 text-[10px] uppercase tracking-widest text-white backdrop-blur-xl"
           style={isStudioMode ? { color: "#D4B896", borderColor: "#D4B896" } : {}}
-          onPointerDown={(e) => { 
-            e.stopPropagation(); 
+          onPointerDown={(e) => {
+            e.stopPropagation();
             if (isStudioMode) {
               setIsStudioMode(false);
             } else {
@@ -676,6 +677,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
           {isStudioMode ? "✕ Close Studio" : "⊙ Studio Mode"}
         </button>
       </div>
+      )}
       
       {lookbookDot && (
         <LookbookOverlay
