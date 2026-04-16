@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const studioEnabled = process.env.STUDIO_ENABLED === "true";
 
   if (!studioEnabled && request.nextUrl.pathname.startsWith("/studio")) {
-    return NextResponse.notFound();
+    return new NextResponse(null, { status: 404 });
   }
 
   return NextResponse.next();
