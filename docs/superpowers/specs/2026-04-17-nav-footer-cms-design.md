@@ -60,16 +60,18 @@ All brand pages (Vault, About, The Protocol, Contact) open as **full-screen over
 
 ### 2b. About
 
-**Purpose:** Brand philosophy. The soul of the brand for new visitors.
+**Purpose:** Brand philosophy. Converting visitors to the philosophy — not through selling, but through recognition. These men have *felt* this, but nobody gave it a name until now. The About page names it.
+
+**Reference document:** [`context/DISPATCH_001_THE_VOID.md`](../../context/DISPATCH_001_THE_VOID.md) — the canonical voice and soul of the brand. All About page copy and any build decision touching brand voice should be informed by this dispatch.
 
 **Content (editable via Edit Pages):**
-- Brand statement / manifesto
+- Brand statement / manifesto — drawn from Dispatch 001 tone and language
 - "Pas pour tout le monde" — Not for everyone. The meaning behind the name.
-- The four characters (Angel, Jack, Jerome, Ethan) and what they represent
 - The Hierarchy of Competence philosophy
-- The Red Gun — what it means, where to find it
+- The Silent Contract — what Popper Tulimond is and is not
+- The Red Gun — what it means, where to find it on the garment
 
-**Format:** Long-form editorial. Rich text blocks, optional images. No purchase CTAs.
+**Format:** Long-form editorial. Rich text blocks, optional images. No purchase CTAs. No references to the Patron characters — the About page is about the man reading it, not the models wearing the clothes.
 
 ---
 
@@ -77,15 +79,17 @@ All brand pages (Vault, About, The Protocol, Contact) open as **full-screen over
 
 **Purpose:** Explains the Fight Night / new member initiation system. Critical for new visitors who can't figure out why they can't buy.
 
-**Visual design:** Torn index card on dark background.
+**Visual design:** Index card on dark background. Clean edges — no torn effect.
 - Paper: aged cream gradient (`#EDE8DC → #E0D9C8`)
 - Font: `Courier New` monospace throughout
 - Rotation: `-1.2deg` (slightly crooked — intentional)
-- Left edge: jagged SVG torn effect
+- Edges: clean, straight. No torn SVG effect.
 - Pin: red circle (`#8B1A1A`) at top center — the Red Gun color
-- Red gun: outline SVG, vertical orientation (barrel up), bottom-right corner, `~15% opacity`. Matches the actual embroidered tag on the garment.
+- **Bottom-right image slot:** swappable image area for either the red gun outline SVG or a red wax seal. Size and position adjustable via Edit Pages. Default: red gun outline at ~15% opacity.
 - Rule numbers: `01 —`, `02 —`, `03 —` in Red Gun red
 - Card is displayed centered on the dark overlay background
+
+**Card image swap:** The entire card background can be replaced with a custom photo (e.g. a real photographed business card, aged paper, etc.) via Edit Pages. When a custom image is set it replaces the CSS gradient — all text remains on top, editable.
 
 **The three rules (editable):**
 ```
@@ -97,11 +101,11 @@ All brand pages (Vault, About, The Protocol, Contact) open as **full-screen over
 **CTA (bottom of card):**
 ```
 Text CONSTABLE for early access.
-15 minutes before the door opens.
+15 minutes before the door opens to the public.
 ```
 Clicking this CTA triggers the SMS signup sheet (Section 6).
 
-**All text is editable via Edit Pages.** The card layout, torn edge, gun, and pin are structural — not editable as text, but the card itself can be replaced with a photographed torn business card image if the founder prefers 100% realistic texture. This is a simple image swap in Edit Pages.
+**All text is editable via Edit Pages.** The bottom-right image slot (gun or wax seal) is also swappable and resizable via Edit Pages without a deploy.
 
 ---
 
