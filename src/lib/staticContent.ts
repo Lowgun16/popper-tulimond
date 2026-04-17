@@ -1,22 +1,27 @@
 // src/lib/staticContent.ts
+// All hardcoded page content. Phase B will replace this with database-driven values via the same exported shapes.
 
 export const ABOUT_CONTENT = {
   headline: "Pas pour tout le monde.",
   subheadline: "Not for everyone.",
   sections: [
     {
+      id: "billboard",
       title: "The Billboard",
       body: `There is a brand that needs you.\n\nNot the way a craftsman needs his materials. The way a parasite needs a host. The way a name needs a body to be carried across a room so that other people can read it.\n\nLouis Vuitton. Balenciaga. The houses that spent thirty years printing their identity onto the chests, backs, and shoulders of men who believed they were buying status — and were, in fact, being rented as walking media.\n\nThe monogram that covers the chest does not celebrate you. It uses you.\n\nThis is what a hollow brand does: it borrows your presence and calls it prestige.`,
     },
     {
+      id: "foundation",
       title: "The Foundation",
       body: `Other brands put their name on your chest.\n\nWe put our mark at the back-bottom of the shirt.\n\nThis is not modesty. This is architecture.\n\nA foundation does not stand beside the building and demand credit. It is beneath the building, holding it up, invisible in its function and absolute in its necessity.\n\nYou are the presence.\n\nWe are the ground beneath it.`,
     },
     {
+      id: "meal",
       title: "The Meal",
       body: `You've spent your life making sure everyone else was full.\n\nYou checked the plate before yours. You made sure the table had enough before you sat down. You ate last — not because you were told to, but because that is the kind of man you are.\n\nWe see that. Not as a sacrifice to be rewarded. Not as a debt to be repaid.\n\nAs the truth of who you are.\n\nSit down. The table is set.`,
     },
     {
+      id: "silent-contract",
       title: "The Silent Contract",
       body: `We do not put our name where your name should be. We do not borrow your presence to run our campaign.\n\nWe build for the man who has been building for everyone else.\n\nThe Silent Contract is not a tagline. It is a promise: We do not build for the stage.\n\nWe build for the man who holds it up.`,
     },
@@ -36,7 +41,13 @@ export const PROTOCOL_CONTENT = {
   ctaSubtext: "15 minutes before the door opens to the public.",
 } as const;
 
-export const CONTACT_CONTENT = {
+export const CONTACT_CONTENT: {
+  headline: string;
+  address: { line1: string; line2: string };
+  phone: string;
+  email: string;
+  note: string;
+} = {
   headline: "Contact",
   address: {
     line1: "Popper Tulimond HQ",
@@ -45,7 +56,7 @@ export const CONTACT_CONTENT = {
   phone: "",                   // Update before Stripe activation
   email: "",                   // Update before Stripe activation
   note: "For fastest resolution, review The Protocol or reach out via the form below. We read every message.",
-} as const;
+};
 
 export const TERMS_CONTENT = {
   title: "Terms of Use",
