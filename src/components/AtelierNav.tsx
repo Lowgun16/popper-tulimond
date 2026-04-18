@@ -45,7 +45,7 @@ export default function AtelierNav({ opacity, onNavClick, footerOpen, onLegalCli
         priority
       />
 
-      <div className="flex items-center gap-6 md:gap-10">
+      <div className="flex items-center gap-3 md:gap-8">
         {NAV_LINKS.map((link) => (
           <button
             key={link.id}
@@ -66,17 +66,19 @@ export default function AtelierNav({ opacity, onNavClick, footerOpen, onLegalCli
           </button>
         ))}
 
-        <span aria-hidden="true" style={{ color: "rgba(240,232,215,0.15)", fontSize: "12px" }}>|</span>
-        <button
-          type="button"
-          onClick={onLegalClick}
-          className="type-eyebrow py-3 px-1 bg-transparent border-none cursor-pointer transition-colors duration-300"
-          style={{ color: "var(--color-parchment)", opacity: footerOpen ? 0.9 : 0.4, fontSize: "9px", letterSpacing: "0.2em" }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.75")}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = footerOpen ? "0.9" : "0.4")}
-        >
-          {footerOpen ? "Close Footer" : "Legal"}
-        </button>
+        <div className="hidden md:flex items-center gap-2">
+          <span aria-hidden="true" style={{ color: "rgba(240,232,215,0.15)", fontSize: "12px" }}>|</span>
+          <button
+            type="button"
+            onClick={onLegalClick}
+            className="type-eyebrow py-3 px-1 bg-transparent border-none cursor-pointer transition-colors duration-300"
+            style={{ color: "var(--color-parchment)", opacity: footerOpen ? 0.9 : 0.4, fontSize: "9px", letterSpacing: "0.2em" }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.75")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = footerOpen ? "0.9" : "0.4")}
+          >
+            {footerOpen ? "Close Footer" : "Legal"}
+          </button>
+        </div>
       </div>
     </motion.nav>
   );
