@@ -718,6 +718,16 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
         />
       )}
 
+      {/* Nav scrim — gradient from dark to transparent so nav text/dot are legible over the bar ceiling */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 pointer-events-none z-[49]"
+        style={{
+          opacity,
+          height: "22vh",
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 100%)",
+        }}
+      />
+
       {/* Nav — moved here from Portal to share overlay state */}
       <AtelierNav
         opacity={opacity}
