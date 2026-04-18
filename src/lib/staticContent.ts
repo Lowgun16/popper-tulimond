@@ -37,8 +37,8 @@ export const PROTOCOL_CONTENT = {
     { number: "02", text: "Slots are finite. Once we sell out, we close. No exceptions." },
     { number: "03", text: "The Constable is your only way in." },
   ],
-  cta: "Text CONSTABLE for early access.",
-  ctaSubtext: "15 minutes before the door opens to the public.",
+  cta: "Tap here for 15-minute early access",
+  ctaSubtext: "Text CONSTABLE when we send you the number. You'll get in before the public does.",
 } as const;
 
 export const CONTACT_CONTENT: {
