@@ -22,6 +22,8 @@ import ProtocolOverlay from "./overlays/ProtocolOverlay";
 import ContactOverlay from "./overlays/ContactOverlay";
 import FooterOverlay from "./FooterOverlay";
 import FooterBar from "./FooterBar";
+import LegalContentOverlay from "./overlays/LegalContentOverlay";
+import type { LegalPage } from "./overlays/LegalContentOverlay";
 import SmsSignupSheet from "./SmsSignupSheet";
 import ProtocolGate from "./ProtocolGate";
 import AtelierNav from "./AtelierNav";
@@ -549,6 +551,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
   const [smsOpen, setSmsOpen] = useState(false);
   const [smsSource, setSmsSource] = useState<"protocol_cta" | "blocked_purchase">("protocol_cta");
   const [protocolGateOpen, setProtocolGateOpen] = useState(false);
+  const [activeLegalPage, setActiveLegalPage] = useState<LegalPage | null>(null);
 
   useMotionValueEvent(opacity, "change", (v) => {
     setActive(v > 0.05);
@@ -744,7 +747,21 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
       />
 
       {/* Footer overlay */}
-      <FooterOverlay isOpen={footerOpen} onClose={() => setFooterOpen(false)} />
+      <FooterOverlay
+        isOpen={footerOpen}
+        onClose={() => setFooterOpen(false)}
+        onLegalOpen={(page) => {
+          setFooterOpen(false);
+          setActiveLegalPage(page);
+        }}
+      />
+
+      {/* Legal content overlay */}
+      <LegalContentOverlay
+        isOpen={activeLegalPage !== null}
+        onClose={() => setActiveLegalPage(null)}
+        page={activeLegalPage}
+      />
 
       {/* Brand page overlays */}
       <AboutOverlay isOpen={activeOverlay === "about"} onClose={() => setActiveOverlay(null)} />
