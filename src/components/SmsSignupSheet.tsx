@@ -46,7 +46,8 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
       console.log("[SmsSignup] Payload (Phase A stub):", payload);
       await new Promise<void>((r) => setTimeout(r, 600));
       setSubmitted(true);
-    } catch {
+    } catch (err) {
+      console.error("[SmsSignup] Submission error:", err);
       setError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
