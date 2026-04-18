@@ -1,0 +1,80 @@
+// src/components/FooterOverlay.tsx
+"use client";
+
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+
+interface FooterOverlayProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const LEGAL_LINKS = [
+  { label: "Terms of Use",           href: "/terms" },
+  { label: "Privacy Policy",         href: "/privacy" },
+  { label: "Shipping & Fulfillment", href: "/shipping" },
+  { label: "Refund Policy",          href: "/refund" },
+  { label: "Contact Us",             href: "/contact-us" },
+] as const;
+
+const GOLD = "#C4A456";
+
+export default function FooterOverlay({ isOpen, onClose }: FooterOverlayProps) {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "100%" }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed bottom-0 left-0 right-0 z-[5900]"
+          style={{
+            height: "40vh",
+            background: "rgba(8,8,8,0.97)",
+            backdropFilter: "blur(20px)",
+            borderTop: `1px solid rgba(196,164,86,0.35)`,
+          }}
+        >
+          <div className="flex flex-col justify-center h-full px-8 md:px-16">
+            <nav aria-label="Legal pages">
+              <ul style={{ display: "flex", flexDirection: "column", gap: "16px", listStyle: "none", padding: 0, margin: 0 }}>
+                {LEGAL_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      onClick={onClose}
+                      style={{
+                        fontFamily: "var(--font-title, serif)",
+                        fontSize: "11px",
+                        letterSpacing: "0.25em",
+                        textTransform: "uppercase",
+                        color: "rgba(240,232,215,0.6)",
+                        textDecoration: "none",
+                        transition: "color 0.2s",
+                      }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = GOLD)}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "rgba(240,232,215,0.6)")}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <p style={{
+              fontFamily: "var(--font-body, sans-serif)",
+              fontSize: "9px",
+              color: "rgba(240,232,215,0.2)",
+              letterSpacing: "0.15em",
+              marginTop: "24px",
+            }}>
+              © {new Date().getFullYear()} Popper Tulimond. All rights reserved.
+            </p>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
