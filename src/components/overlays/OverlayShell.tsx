@@ -61,7 +61,7 @@ export default function OverlayShell({ isOpen, onClose, children, label }: Overl
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-y-0 right-0 z-[6001] w-full md:w-[640px] overflow-y-auto"
+            className="fixed inset-y-0 right-0 z-[6001] w-full md:w-[640px] flex flex-col"
             style={{
               background: "rgba(12,12,12,0.97)",
               backdropFilter: "blur(24px)",
@@ -69,18 +69,21 @@ export default function OverlayShell({ isOpen, onClose, children, label }: Overl
               borderLeft: "1px solid rgba(255,255,255,0.06)",
             }}
           >
-            {/* Close button */}
-            <button
-              ref={closeButtonRef}
-              onClick={onClose}
-              aria-label="Close"
-              className="absolute top-6 right-6 z-10 flex items-center justify-center w-8 h-8"
-              style={{ color: "rgba(255,255,255,0.5)", fontSize: 18, background: "none", border: "none", cursor: "pointer" }}
-            >
-              ✕
-            </button>
+            {/* Close button — stays visible while content scrolls */}
+            <div className="flex-none flex justify-end px-6 pt-6 pb-2">
+              <button
+                ref={closeButtonRef}
+                onClick={onClose}
+                aria-label="Close"
+                className="flex items-center justify-center w-8 h-8"
+                style={{ color: "rgba(255,255,255,0.5)", fontSize: 18, background: "none", border: "none", cursor: "pointer" }}
+              >
+                ✕
+              </button>
+            </div>
 
-            <div className="px-8 py-12 md:px-12">
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-8 pb-12 md:px-12">
               {children}
             </div>
           </motion.div>
