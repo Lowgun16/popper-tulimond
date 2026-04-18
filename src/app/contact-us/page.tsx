@@ -5,15 +5,18 @@ export const metadata = { title: "Contact Us — Popper Tulimond" };
 
 export default function ContactUsPage() {
   const { address, phone, email, note } = CONTACT_CONTENT;
+  const optionalLines = [
+    phone ? `Phone: ${phone}` : null,
+    email ? `Email: ${email}` : null,
+  ].filter((x): x is string => x !== null);
+
   const lines = [
     address.line1,
     address.line2,
-    "",
-    phone ? `Phone: ${phone}` : "",
-    email ? `Email: ${email}` : "",
+    ...(optionalLines.length ? ["", ...optionalLines] : []),
     "",
     note,
-  ].filter((line, i, arr) => !(line === "" && arr[i - 1] === "")).join("\n");
+  ].join("\n");
 
   return (
     <LegalPageLayout title="Contact Us" lastUpdated="April 2026">
