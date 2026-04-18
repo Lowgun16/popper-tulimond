@@ -92,6 +92,8 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
               border: "1px solid rgba(255,255,255,0.1)",
               borderTop: `2px solid ${GOLD}`,
               padding: "36px 32px 28px",
+              maxHeight: "90vh",
+              overflowY: "auto" as const,
             }}
           >
             <button

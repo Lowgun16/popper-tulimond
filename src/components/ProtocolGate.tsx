@@ -45,6 +45,8 @@ export default function ProtocolGate({ isOpen, onClose, onViewProtocol, onReques
               border: "1px solid rgba(255,255,255,0.08)",
               borderTop: `1px solid rgba(196,164,86,0.4)`,
               padding: "36px 32px",
+              maxHeight: "90vh",
+              overflowY: "auto" as const,
             }}
           >
             <button
