@@ -79,7 +79,7 @@ export default function VaultOverlay({
   const items = getUniqueItems();
 
   return (
-    <OverlayShell isOpen={isOpen} onClose={onClose} label="The Vault — Popper Tulimond">
+    <OverlayShell isOpen={isOpen} onClose={onClose} label="The Vault">
       <p style={{ ...eyebrowStyle, marginBottom: "16px" }}>Popper Tulimond</p>
       <h1 style={{
         fontFamily: "var(--font-display, serif)",
@@ -107,12 +107,14 @@ export default function VaultOverlay({
 
             <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
               <button
+                type="button"
                 style={lookbookBtnStyle}
-                onClick={() => onOpenLookbook(item as LookbookContext)}
+                onClick={() => onOpenLookbook({ ...item, lookbook: item.lookbook ?? [] })}
               >
                 Lookbook
               </button>
               <button
+                type="button"
                 style={sizeBtnStyle}
                 onClick={onProtocolGate}
               >

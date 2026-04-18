@@ -10,7 +10,16 @@ interface ContactOverlayProps {
   onClose: () => void;
 }
 
-const labelStyle: CSSProperties = {
+const eyebrowStyle: CSSProperties = {
+  fontFamily: "var(--font-title, serif)",
+  fontSize: "9px",
+  letterSpacing: "0.35em",
+  textTransform: "uppercase",
+  color: "rgba(196,164,86,0.6)",
+  marginBottom: "8px",
+};
+
+const fieldLabelStyle: CSSProperties = {
   fontFamily: "var(--font-title, serif)",
   fontSize: "9px",
   letterSpacing: "0.35em",
@@ -29,7 +38,7 @@ const valueStyle: CSSProperties = {
 export default function ContactOverlay({ isOpen, onClose }: ContactOverlayProps) {
   return (
     <OverlayShell isOpen={isOpen} onClose={onClose} label="Contact Popper Tulimond">
-      <p style={{ ...labelStyle, marginBottom: "16px" }}>Popper Tulimond</p>
+      <p style={{ ...eyebrowStyle, marginBottom: "16px" }}>Popper Tulimond</p>
       <h1 style={{
         fontFamily: "var(--font-display, serif)",
         fontSize: "clamp(24px, 4vw, 36px)",
@@ -44,7 +53,7 @@ export default function ContactOverlay({ isOpen, onClose }: ContactOverlayProps)
       <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
         {/* Address */}
         <div>
-          <p style={labelStyle}>Headquarters</p>
+          <p style={fieldLabelStyle}>Headquarters</p>
           <p style={valueStyle}>
             {CONTACT_CONTENT.address.line1}<br />
             {CONTACT_CONTENT.address.line2}
@@ -54,7 +63,7 @@ export default function ContactOverlay({ isOpen, onClose }: ContactOverlayProps)
         {/* Phone — only shown when populated */}
         {CONTACT_CONTENT.phone && (
           <div>
-            <p style={labelStyle}>Phone</p>
+            <p style={fieldLabelStyle}>Phone</p>
             <a href={`tel:${CONTACT_CONTENT.phone}`} style={{ ...valueStyle, textDecoration: "none" }}>
               {CONTACT_CONTENT.phone}
             </a>
@@ -64,7 +73,7 @@ export default function ContactOverlay({ isOpen, onClose }: ContactOverlayProps)
         {/* Email — only shown when populated */}
         {CONTACT_CONTENT.email && (
           <div>
-            <p style={labelStyle}>Email</p>
+            <p style={fieldLabelStyle}>Email</p>
             <a href={`mailto:${CONTACT_CONTENT.email}`} style={{ ...valueStyle, textDecoration: "none" }}>
               {CONTACT_CONTENT.email}
             </a>
