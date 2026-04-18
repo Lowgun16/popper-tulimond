@@ -727,7 +727,7 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
         style={{
           opacity,
           height: "22vh",
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 100%)",
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%)",
         }}
       />
 
@@ -737,6 +737,16 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
         onNavClick={(page) => setActiveOverlay(page)}
         footerOpen={footerOpen}
         onLegalClick={() => setFooterOpen((v) => !v)}
+      />
+
+      {/* Bottom scrim — gradient from transparent to dark so "View Footer" is legible over the floor */}
+      <motion.div
+        className="fixed bottom-0 left-0 right-0 pointer-events-none z-[5799]"
+        style={{
+          opacity,
+          height: "14vh",
+          background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)",
+        }}
       />
 
       {/* Footer bar — fixed bottom toggle */}
