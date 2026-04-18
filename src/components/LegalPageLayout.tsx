@@ -86,7 +86,7 @@ export default function LegalPageLayout({ title, lastUpdated, children }: LegalP
         <p style={{
           fontFamily: "var(--font-body, sans-serif)",
           fontSize: "10px",
-          color: "rgba(240,232,215,0.2)",
+          color: "rgba(240,232,215,0.5)",
           letterSpacing: "0.15em",
         }}>
           © {new Date().getFullYear()} Popper Tulimond. All rights reserved.

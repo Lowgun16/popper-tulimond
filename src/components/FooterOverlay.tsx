@@ -37,12 +37,33 @@ export default function FooterOverlay({ isOpen, onClose }: FooterOverlayProps) {
           }}
         >
           <div className="flex flex-col justify-center h-full px-8 md:px-16">
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+              <button
+                type="button"
+                onClick={onClose}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-title, serif)",
+                  fontSize: "8px",
+                  letterSpacing: "0.3em",
+                  textTransform: "uppercase",
+                  color: "rgba(240,232,215,0.6)",
+                  padding: "4px 0",
+                }}
+              >
+                Close Footer ✕
+              </button>
+            </div>
             <nav aria-label="Legal pages">
               <ul style={{ display: "flex", flexDirection: "column", gap: "16px", listStyle: "none", padding: 0, margin: 0 }}>
                 {LEGAL_LINKS.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       onClick={onClose}
                       style={{
                         fontFamily: "var(--font-title, serif)",
@@ -66,7 +87,7 @@ export default function FooterOverlay({ isOpen, onClose }: FooterOverlayProps) {
             <p style={{
               fontFamily: "var(--font-body, sans-serif)",
               fontSize: "9px",
-              color: "rgba(240,232,215,0.2)",
+              color: "rgba(240,232,215,0.5)",
               letterSpacing: "0.15em",
               marginTop: "24px",
             }}>
