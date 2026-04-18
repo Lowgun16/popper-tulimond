@@ -36,7 +36,7 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup }:
   return (
     <OverlayShell isOpen={isOpen} onClose={onClose} label="The Protocol">
       {/* Dark background fills the overlay shell; card is centered within */}
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", minHeight: "80vh", paddingTop: "20px" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100%" }}>
 
         {/* The Card */}
         <div style={{
@@ -100,7 +100,7 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup }:
           <div style={{ width: "100%", height: "1px", background: "#9a8a6a", marginBottom: "18px" }} />
 
           {/* CTA */}
-          <p style={{
+          <div style={{
             fontFamily: "'Courier New', monospace",
             fontSize: "10px", color: "#4a3f2f", lineHeight: 1.65,
           }}>
@@ -117,7 +117,7 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup }:
             </button>
             <br />
             <span style={{ color: "#4a3f2f" }}>{PROTOCOL_CONTENT.ctaSubtext}</span>
-          </p>
+          </div>
 
           {/* Bottom-right image slot — swappable via Edit Pages (Phase B) */}
           {/* To swap: replace this div's contents with <img src="..." /> */}
