@@ -50,34 +50,34 @@ export const CONTACT_CONTENT: {
 } = {
   headline: "Contact",
   address: {
-    line1: "Popper Tulimond HQ",
-    line2: "Las Vegas, NV",    // Update with full address before Stripe activation
+    line1: "8925 W Flamingo Rd. Unit 227",
+    line2: "Las Vegas, NV 89147",
   },
-  phone: "",                   // Update before Stripe activation
-  email: "",                   // Update before Stripe activation
+  phone: "(702) 546-1344",
+  email: "Support@poppertulimond.com",
   note: "For fastest resolution, review The Protocol or reach out via the form below. We read every message.",
 };
 
 export const TERMS_CONTENT = {
   title: "Terms of Use",
   lastUpdated: "April 2026",
-  body: `PLACEHOLDER — Replace with actual Terms of Use before going live.\n\nThese terms govern your use of poppertulimond.com. By accessing the site you agree to these terms.`,
+  body: `Agreement to Terms\nBy accessing our website, you agree to be bound by these Terms of Use and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.\n\nIntellectual Property\nAll content on this site, including but not limited to text, graphics, logos, and shirt designs, is the property of Popper Tulimond and is protected by copyright and trademark laws. You may not reproduce or use our designs without express written permission.\n\nProducts and Pricing\nWe reserve the right to modify or discontinue any product at any time. Prices for our shirts are subject to change without notice. While we strive for color accuracy in our photos, we cannot guarantee that your monitor's display of any color will be 100% accurate.\n\nAccuracy of Billing\nYou agree to provide current, complete, and accurate purchase and account information for all purchases. We reserve the right to refuse any order you place with us. In the event that we make a change to or cancel an order, we will attempt to notify you via the email provided.\n\nLimitation of Liability\nPopper Tulimond shall not be held liable for any indirect, incidental, or consequential damages resulting from the use of our products or website. Our liability is limited to the amount paid for the product in question.\n\nGoverning Law\nThese terms are governed by and construed in accordance with the laws of the State of Nevada, and you irrevocably submit to the exclusive jurisdiction of the courts in that location.`,
 } as const;
 
 export const PRIVACY_CONTENT = {
   title: "Privacy Policy",
   lastUpdated: "April 2026",
-  body: `PLACEHOLDER — Replace with actual Privacy Policy before going live.\n\nWe collect only what we need to process your order and communicate with you.`,
+  body: `Information We Collect\nWhen you purchase something from our store, as part of the buying and selling process, we collect the personal information you give us such as your name, address, and email address.\n\nConsent\nWhen you provide us with personal information to complete a transaction, verify your credit card, place an order, or arrange for a delivery, we imply that you consent to our collecting it and using it for that specific reason only.\n\nSecurity\nTo protect your personal information, we take reasonable precautions and follow industry best practices to make sure it is not inappropriately lost, misused, accessed, disclosed, altered, or destroyed. Your credit card information is encrypted using secure socket layer technology (SSL) and stored with AES-256 encryption via our payment processor, Stripe.\n\nThird-Party Services\nIn general, the third-party providers used by us will only collect, use, and disclose your information to the extent necessary to allow them to perform the services they provide to us (such as payment processing and shipping).`,
 } as const;
 
 export const SHIPPING_CONTENT = {
   title: "Shipping & Fulfillment",
   lastUpdated: "April 2026",
-  body: `PLACEHOLDER — Replace with actual Shipping Policy before going live.\n\nOrders are fulfilled within [X] business days of purchase.`,
+  body: `Standard Shipping (In-Stock Items)\nFor items currently in stock, orders are processed within 2–3 business days.\n\nPre-Orders\nAt Popper Tulimond, we prioritize quality over mass production. To ensure each shirt meets our standards, many of our items are sold on a Pre-Order basis.\n\nEstimated Ship Dates: Any item designated as a "Pre-Order" will have an estimated shipping date clearly listed on the product page. Please note that this date is an estimate based on our current manufacturing capacity.\n\nDelayed Fulfillment: Because we produce in limited runs to maintain exclusivity and quality, high sales volume may occasionally extend our standard lead times.\n\nTransparency: If your order is delayed more than 7 business days beyond the original estimate, we will notify you via email with an updated timeline and the option to maintain or cancel your order.`,
 } as const;
 
 export const REFUND_CONTENT = {
   title: "Refund Policy",
   lastUpdated: "April 2026",
-  body: `PLACEHOLDER — Replace with actual Refund Policy before going live.\n\nAll sales are final unless the item arrives damaged or defective.`,
+  body: `Our Guarantee\nAt Popper Tulimond, we take pride in the quality of our apparel. If you are not completely satisfied with your purchase, we are here to help.\n\nReturns\nYou have 30 calendar days to return an item from the date you received it. To be eligible for a return, your item must be unworn, unwashed, and in the same condition that you received it. It must be in the original packaging with all tags attached.\n\nRefunds\nOnce we receive your item, we will inspect it and notify you of the status of your refund. If approved, we will initiate a refund to your original method of payment. You will receive the credit within a certain amount of days, depending on your card issuer's policies.\n\nShipping Costs\nYou will be responsible for paying for your own shipping costs for returning your item. Return shipping costs are non-refundable, but in the event of a refund, we will refund the initial shipping expense as part of the refund.\n\nWhere To Return\n8925 W Flamingo Rd. Unit 227\nLas Vegas, NV 89147`,
 } as const;
