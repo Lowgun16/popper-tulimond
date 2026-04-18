@@ -16,6 +16,16 @@ import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import { DEFAULT_SHADOW } from "./studio/studioTypes";
 import { LookbookOverlay } from "./studio/LookbookOverlay";
 import OverlayPortal from "@/components/OverlayPortal";
+import AboutOverlay from "./overlays/AboutOverlay";
+import VaultOverlay from "./overlays/VaultOverlay";
+import ProtocolOverlay from "./overlays/ProtocolOverlay";
+import ContactOverlay from "./overlays/ContactOverlay";
+import FooterOverlay from "./FooterOverlay";
+import FooterBar from "./FooterBar";
+import SmsSignupSheet from "./SmsSignupSheet";
+import ProtocolGate from "./ProtocolGate";
+import AtelierNav from "./AtelierNav";
+import type { NavPage } from "./AtelierNav";
 
 const STUDIO_DRAFT_KEY = "tulimond-studio-draft";
 
@@ -534,6 +544,11 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
   const [lookbookDot, setLookbookDot] = useState<LookbookContext | null>(null);
   const [copyConfirm, setCopyConfirm] = useState(false);
   const [saveConfirm, setSaveConfirm] = useState(false);
+  const [activeOverlay, setActiveOverlay] = useState<NavPage | null>(null);
+  const [footerOpen, setFooterOpen] = useState(false);
+  const [smsOpen, setSmsOpen] = useState(false);
+  const [smsSource, setSmsSource] = useState<"protocol_cta" | "blocked_purchase">("protocol_cta");
+  const [protocolGateOpen, setProtocolGateOpen] = useState(false);
 
   useMotionValueEvent(opacity, "change", (v) => {
     setActive(v > 0.05);
@@ -702,6 +717,71 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
           }}
         />
       )}
+
+      {/* Nav — moved here from Portal to share overlay state */}
+      <AtelierNav
+        opacity={opacity}
+        onNavClick={(page) => setActiveOverlay(page)}
+        footerOpen={footerOpen}
+        onLegalClick={() => setFooterOpen((v) => !v)}
+      />
+
+      {/* Footer bar — fixed bottom toggle */}
+      <FooterBar
+        navOpacity={opacity}
+        footerOpen={footerOpen}
+        onToggle={() => setFooterOpen((v) => !v)}
+      />
+
+      {/* Footer overlay */}
+      <FooterOverlay isOpen={footerOpen} onClose={() => setFooterOpen(false)} />
+
+      {/* Brand page overlays */}
+      <AboutOverlay isOpen={activeOverlay === "about"} onClose={() => setActiveOverlay(null)} />
+      <ProtocolOverlay
+        isOpen={activeOverlay === "protocol"}
+        onClose={() => setActiveOverlay(null)}
+        onRequestSmsSignup={() => {
+          setActiveOverlay(null);
+          setSmsSource("protocol_cta");
+          setSmsOpen(true);
+        }}
+      />
+      <ContactOverlay isOpen={activeOverlay === "contact"} onClose={() => setActiveOverlay(null)} />
+      <VaultOverlay
+        isOpen={activeOverlay === "vault"}
+        onClose={() => setActiveOverlay(null)}
+        onProtocolGate={() => {
+          setActiveOverlay(null);
+          setProtocolGateOpen(true);
+        }}
+        onOpenLookbook={(ctx) => {
+          setActiveOverlay(null);
+          setLookbookDot(ctx);
+        }}
+      />
+
+      {/* SMS signup sheet */}
+      <SmsSignupSheet
+        isOpen={smsOpen}
+        onClose={() => setSmsOpen(false)}
+        source={smsSource}
+      />
+
+      {/* Protocol gate — blocked purchase attempt */}
+      <ProtocolGate
+        isOpen={protocolGateOpen}
+        onClose={() => setProtocolGateOpen(false)}
+        onViewProtocol={() => {
+          setProtocolGateOpen(false);
+          setActiveOverlay("protocol");
+        }}
+        onRequestSmsSignup={() => {
+          setProtocolGateOpen(false);
+          setSmsSource("blocked_purchase");
+          setSmsOpen(true);
+        }}
+      />
     </div>
   );
 }
