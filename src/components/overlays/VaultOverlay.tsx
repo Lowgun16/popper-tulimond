@@ -14,12 +14,16 @@ interface VaultOverlayProps {
   onOpenLookbook: (ctx: LookbookContext) => void;
 }
 
-// Flatten all outfit items across all models, deduplicated by item ID.
-// Each variant (Showstopper Short, Showstopper Long, Heartbreaker Short, Heartbreaker Long)
-// is a distinct purchasable item and should appear as its own card.
-function getAllVariants(): OutfitItem[] {
-  const all = MODEL_INVENTORY.flatMap((slot) => slot.outfit);
-  return all.filter((item, i, arr) => arr.findIndex((x) => x.id === item.id) === i);
+// ─── Sort/Group helpers ───────────────────────────────────────────────────────
+
+const COLORWAY_ORDER: Record<string, number> = { "Showstopper": 0, "Heartbreaker": 1 };
+
+function sleeveOrder(colorway: string): number {
+  return colorway.includes("Short") ? 0 : 1;
+}
+
+function colorwayOrder(name: string): number {
+  return COLORWAY_ORDER[name] ?? 99;
 }
 
 /** Extracts sleeve type from the colorway field, e.g. "Ivory (Short Sleeve)" → "Short Sleeve" */
@@ -28,30 +32,27 @@ function sleeveLabel(colorway: string): string {
   return match ? match[1] : "";
 }
 
-const eyebrowStyle: CSSProperties = {
-  fontFamily: "var(--font-title, serif)",
-  fontSize: "9px",
-  letterSpacing: "0.35em",
-  textTransform: "uppercase",
-  color: "rgba(196,164,86,0.6)",
-  marginBottom: "6px",
-};
+/** Group items by collection, sorted within each group by colorway → sleeve */
+function getGroupedItems(): Record<string, OutfitItem[]> {
+  const all = MODEL_INVENTORY.flatMap((slot) => slot.outfit);
+  // Dedupe by item id
+  const unique = all.filter((item, i, arr) => arr.findIndex((x) => x.id === item.id) === i);
+  // Sort: colorway priority first, then sleeve (short before long)
+  const sorted = [...unique].sort((a, b) => {
+    const colorDiff = colorwayOrder(a.name) - colorwayOrder(b.name);
+    if (colorDiff !== 0) return colorDiff;
+    return sleeveOrder(a.colorway) - sleeveOrder(b.colorway);
+  });
+  // Group by collection
+  return sorted.reduce<Record<string, OutfitItem[]>>((acc, item) => {
+    const key = item.collection;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
+    return acc;
+  }, {});
+}
 
-const nameStyle: CSSProperties = {
-  fontFamily: "var(--font-display, serif)",
-  fontSize: "22px",
-  fontWeight: 300,
-  color: "rgba(240,232,215,0.95)",
-  letterSpacing: "0.04em",
-  marginBottom: "4px",
-};
-
-const priceStyle: CSSProperties = {
-  fontFamily: "var(--font-body, sans-serif)",
-  fontSize: "14px",
-  color: "rgba(196,164,86,0.85)",
-  marginBottom: "20px",
-};
+// ─── Button styles ────────────────────────────────────────────────────────────
 
 const btnBaseStyle: CSSProperties = {
   fontFamily: "var(--font-title, serif)",
@@ -76,17 +77,28 @@ const sizeBtnStyle: CSSProperties = {
   color: "rgba(240,232,215,0.55)",
 };
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function VaultOverlay({
   isOpen,
   onClose,
   onProtocolGate,
   onOpenLookbook,
 }: VaultOverlayProps) {
-  const items = getAllVariants();
+  const grouped = getGroupedItems();
 
   return (
     <OverlayShell isOpen={isOpen} onClose={onClose} label="The Vault">
-      <p style={{ ...eyebrowStyle, marginBottom: "16px" }}>Popper Tulimond</p>
+      <p style={{
+        fontFamily: "var(--font-title, serif)",
+        fontSize: "9px",
+        letterSpacing: "0.35em",
+        textTransform: "uppercase",
+        color: "rgba(196,164,86,0.95)",
+        marginBottom: "16px",
+      }}>
+        Popper Tulimond
+      </p>
       <h1 style={{
         fontFamily: "var(--font-display, serif)",
         fontSize: "clamp(24px, 4vw, 36px)",
@@ -98,44 +110,88 @@ export default function VaultOverlay({
         The Vault
       </h1>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
-        {items.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              borderTop: "1px solid rgba(255,255,255,0.06)",
-              paddingTop: "32px",
-            }}
-          >
-            <p style={eyebrowStyle}>{item.collection}</p>
-            <p style={nameStyle}>{item.name}</p>
-            <p style={{
-              fontFamily: "var(--font-body, sans-serif)",
-              fontSize: "11px",
-              color: "rgba(240,232,215,0.35)",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              marginBottom: "12px",
+      <div style={{ display: "flex", flexDirection: "column", gap: "48px" }}>
+        {Object.entries(grouped).map(([collection, variants]) => (
+          <div key={collection}>
+            {/* Collection heading */}
+            <h2 style={{
+              fontFamily: "var(--font-display, serif)",
+              fontSize: "22px",
+              fontWeight: 300,
+              color: "rgba(240,232,215,0.95)",
+              letterSpacing: "0.06em",
+              marginBottom: "24px",
+              paddingBottom: "12px",
+              borderBottom: "1px solid rgba(196,164,86,0.3)",
             }}>
-              {sleeveLabel(item.colorway)}
-            </p>
-            <p style={priceStyle}>{item.price}</p>
+              {collection}
+            </h2>
 
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-              <button
-                type="button"
-                style={lookbookBtnStyle}
-                onClick={() => onOpenLookbook({ ...item, lookbook: item.lookbook ?? [] })}
-              >
-                Lookbook
-              </button>
-              <button
-                type="button"
-                style={sizeBtnStyle}
-                onClick={onProtocolGate}
-              >
-                Find Your Size
-              </button>
+            {/* Variants */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              {variants.map((item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "12px",
+                    padding: "16px 0",
+                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  }}
+                >
+                  {/* Left: colorway + sleeve + price */}
+                  <div>
+                    <p style={{
+                      fontFamily: "var(--font-display, serif)",
+                      fontSize: "17px",
+                      fontWeight: 300,
+                      color: "rgba(240,232,215,0.95)",
+                      letterSpacing: "0.04em",
+                      marginBottom: "4px",
+                    }}>
+                      {item.name}
+                    </p>
+                    <p style={{
+                      fontFamily: "var(--font-body, sans-serif)",
+                      fontSize: "11px",
+                      color: "rgba(240,232,215,0.65)",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      marginBottom: "4px",
+                    }}>
+                      {sleeveLabel(item.colorway)}
+                    </p>
+                    <p style={{
+                      fontFamily: "var(--font-body, sans-serif)",
+                      fontSize: "14px",
+                      color: "rgba(196,164,86,0.95)",
+                    }}>
+                      {item.price}
+                    </p>
+                  </div>
+
+                  {/* Right: buttons */}
+                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      style={lookbookBtnStyle}
+                      onClick={() => onOpenLookbook({ ...item, lookbook: item.lookbook ?? [] })}
+                    >
+                      Lookbook
+                    </button>
+                    <button
+                      type="button"
+                      style={sizeBtnStyle}
+                      onClick={onProtocolGate}
+                    >
+                      Find Your Size
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ))}
