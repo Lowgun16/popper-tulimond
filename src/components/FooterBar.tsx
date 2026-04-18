@@ -30,12 +30,12 @@ export default function FooterBar({ navOpacity, footerOpen, onToggle }: FooterBa
           fontSize: "8px",
           letterSpacing: "0.3em",
           textTransform: "uppercase",
-          color: "rgba(240,232,215,0.35)",
+          color: "rgba(240,232,215,0.75)",
           transition: "color 0.2s",
           padding: "4px 8px",
         }}
-        onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "rgba(240,232,215,0.65)")}
-        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "rgba(240,232,215,0.35)")}
+        onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "rgba(240,232,215,0.95)")}
+        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "rgba(240,232,215,0.75)")}
       >
         {footerOpen ? "Close Footer" : "View Footer"}
       </button>
