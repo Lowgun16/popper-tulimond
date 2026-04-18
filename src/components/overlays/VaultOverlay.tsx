@@ -14,12 +14,18 @@ interface VaultOverlayProps {
   onOpenLookbook: (ctx: LookbookContext) => void;
 }
 
-// Flatten all outfit items across all models, then deduplicate by name
-function getUniqueItems(): OutfitItem[] {
+// Flatten all outfit items across all models, deduplicated by item ID.
+// Each variant (Showstopper Short, Showstopper Long, Heartbreaker Short, Heartbreaker Long)
+// is a distinct purchasable item and should appear as its own card.
+function getAllVariants(): OutfitItem[] {
   const all = MODEL_INVENTORY.flatMap((slot) => slot.outfit);
-  return all.filter(
-    (item, i, arr) => arr.findIndex((x) => x.name === item.name) === i
-  );
+  return all.filter((item, i, arr) => arr.findIndex((x) => x.id === item.id) === i);
+}
+
+/** Extracts sleeve type from the colorway field, e.g. "Ivory (Short Sleeve)" → "Short Sleeve" */
+function sleeveLabel(colorway: string): string {
+  const match = colorway.match(/\(([^)]+)\)/);
+  return match ? match[1] : "";
 }
 
 const eyebrowStyle: CSSProperties = {
@@ -76,7 +82,7 @@ export default function VaultOverlay({
   onProtocolGate,
   onOpenLookbook,
 }: VaultOverlayProps) {
-  const items = getUniqueItems();
+  const items = getAllVariants();
 
   return (
     <OverlayShell isOpen={isOpen} onClose={onClose} label="The Vault">
@@ -103,6 +109,16 @@ export default function VaultOverlay({
           >
             <p style={eyebrowStyle}>{item.collection}</p>
             <p style={nameStyle}>{item.name}</p>
+            <p style={{
+              fontFamily: "var(--font-body, sans-serif)",
+              fontSize: "11px",
+              color: "rgba(240,232,215,0.35)",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              marginBottom: "12px",
+            }}>
+              {sleeveLabel(item.colorway)}
+            </p>
             <p style={priceStyle}>{item.price}</p>
 
             <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
