@@ -16,18 +16,14 @@ export default function ProtocolGate({ isOpen, onClose, onViewProtocol, onReques
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 z-[7000]"
-            style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)" }}
-          />
-
-          {/* Card */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="fixed inset-0 z-[7000] flex items-center justify-center p-5"
+          style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)" }}
+        >
           <motion.div
             role="dialog"
             aria-modal="true"
@@ -36,17 +32,17 @@ export default function ProtocolGate({ isOpen, onClose, onViewProtocol, onReques
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}
             transition={{ duration: 0.22 }}
-            className="fixed z-[7001]"
+            onClick={(e) => e.stopPropagation()}
+            className="w-full"
             style={{
-              top: "50%", left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "min(440px, 90vw)",
+              maxWidth: "440px",
               background: "rgba(10,10,10,0.98)",
               border: "1px solid rgba(255,255,255,0.08)",
-              borderTop: `1px solid rgba(196,164,86,0.4)`,
+              borderTop: "1px solid rgba(196,164,86,0.4)",
               padding: "36px 32px",
-              maxHeight: "90vh",
-              overflowY: "auto" as const,
+              maxHeight: "90dvh",
+              overflowY: "auto",
+              position: "relative",
             }}
           >
             <button
@@ -111,7 +107,7 @@ export default function ProtocolGate({ isOpen, onClose, onViewProtocol, onReques
               </button>
             </div>
           </motion.div>
-        </>
+        </motion.div>
       )}
     </AnimatePresence>
   );

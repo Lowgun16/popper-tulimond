@@ -65,35 +65,30 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={handleClose}
-            className="fixed inset-0 z-[7000]"
-            style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }}
-          />
-
-          {/* Sheet */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={handleClose}
+          className="fixed inset-0 z-[7000] flex items-center justify-center p-5"
+          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
             transition={{ duration: 0.25 }}
-            className="fixed z-[7001]"
+            onClick={(e) => e.stopPropagation()}
+            className="z-[7001] w-full"
             style={{
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "min(480px, 90vw)",
+              maxWidth: "480px",
               background: "rgba(10,10,10,0.98)",
               border: "1px solid rgba(255,255,255,0.1)",
               borderTop: `2px solid ${GOLD}`,
               padding: "36px 32px 28px",
-              maxHeight: "90vh",
-              overflowY: "auto" as const,
+              maxHeight: "90dvh",
+              overflowY: "auto",
+              position: "relative",
             }}
           >
             <button
@@ -207,7 +202,7 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
               </form>
             )}
           </motion.div>
-        </>
+        </motion.div>
       )}
     </AnimatePresence>
   );
