@@ -18,6 +18,11 @@ interface VaultOverlayProps {
 
 const COLORWAY_ORDER: Record<string, number> = { "Showstopper": 0, "Heartbreaker": 1 };
 
+const COLORWAY_COLOR: Record<string, string> = {
+  "Showstopper": "Ivory",
+  "Heartbreaker": "Guilt Grey",
+};
+
 function sleeveOrder(colorway: string): number {
   return colorway.includes("Short") ? 0 : 1;
 }
@@ -111,7 +116,9 @@ export default function VaultOverlay({
       </h1>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "48px" }}>
-        {Object.entries(grouped).map(([collection, variants]) => (
+        {Object.entries(grouped).map(([collection, variants]) => {
+          const seenColorways = new Set<string>();
+          return (
           <div key={collection}>
             {/* Collection heading */}
             <h2 style={{
@@ -129,7 +136,13 @@ export default function VaultOverlay({
 
             {/* Variants */}
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {variants.map((item) => (
+              {variants.map((item) => {
+                const isFirstOfColorway = !seenColorways.has(item.name);
+                if (isFirstOfColorway) seenColorways.add(item.name);
+                const displayName = isFirstOfColorway && COLORWAY_COLOR[item.name]
+                  ? `${item.name} (${COLORWAY_COLOR[item.name]})`
+                  : item.name;
+                return (
                 <div
                   key={item.id}
                   style={{
@@ -152,7 +165,7 @@ export default function VaultOverlay({
                       letterSpacing: "0.04em",
                       marginBottom: "4px",
                     }}>
-                      {item.name}
+                      {displayName}
                     </p>
                     <p style={{
                       fontFamily: "var(--font-body, sans-serif)",
@@ -191,10 +204,12 @@ export default function VaultOverlay({
                     </button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </OverlayShell>
   );
