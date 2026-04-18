@@ -3,11 +3,13 @@
 import { useState, useCallback } from "react";
 import Portal from "@/components/Portal";
 import CartDrawer, { type CartItem } from "@/components/CartDrawer";
+import ProtocolGate from "@/components/ProtocolGate";
 import type { LookbookContext } from "@/components/studio/studioTypes";
 
 export default function Home() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [protocolGateOpen, setProtocolGateOpen] = useState(false);
 
   const handleAddToCart = useCallback((item: LookbookContext, size: string) => {
     const newItem: CartItem = {
@@ -34,9 +36,15 @@ export default function Home() {
         items={cartItems}
         onClose={() => setIsCartOpen(false)}
         onRemoveItem={handleRemoveItem}
-        onApplePay={() => console.log("TODO: connect Stripe")}
-        onGooglePay={() => console.log("TODO: connect Stripe")}
-        onPayOtherWay={() => console.log("TODO: connect Stripe")}
+        onApplePay={() => { setIsCartOpen(false); setProtocolGateOpen(true); }}
+        onGooglePay={() => { setIsCartOpen(false); setProtocolGateOpen(true); }}
+        onPayOtherWay={() => { setIsCartOpen(false); setProtocolGateOpen(true); }}
+      />
+      <ProtocolGate
+        isOpen={protocolGateOpen}
+        onClose={() => setProtocolGateOpen(false)}
+        onViewProtocol={() => setProtocolGateOpen(false)}
+        onRequestSmsSignup={() => setProtocolGateOpen(false)}
       />
     </main>
   );
