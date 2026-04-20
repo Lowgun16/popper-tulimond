@@ -47,7 +47,7 @@ export default function PortalBackground({
               style={{ opacity: insideOpacity, filter: insideFilter }}
             >
               <Image
-                src="/assets/branding/inside-store-tall.png"
+                src="/assets/branding/tall-inside-no-chandelier.png"
                 alt="Inside Popper Tulimond"
                 fill
                 className="object-cover object-center"
