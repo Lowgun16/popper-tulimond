@@ -1,12 +1,13 @@
 import LegalPageLayout from "@/components/LegalPageLayout";
-import { REFUND_CONTENT } from "@/lib/staticContent";
+import { fetchLegalContent } from "@/lib/pageContent";
 
 export const metadata = { title: "Refund Policy — Popper Tulimond" };
 
-export default function RefundPage() {
+export default async function RefundPage() {
+  const content = await fetchLegalContent("refund");
   return (
-    <LegalPageLayout title={REFUND_CONTENT.title} lastUpdated={REFUND_CONTENT.lastUpdated}>
-      {REFUND_CONTENT.body}
+    <LegalPageLayout title={content.title} lastUpdated={content.lastUpdated}>
+      {content.body}
     </LegalPageLayout>
   );
 }

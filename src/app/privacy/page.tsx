@@ -1,12 +1,13 @@
 import LegalPageLayout from "@/components/LegalPageLayout";
-import { PRIVACY_CONTENT } from "@/lib/staticContent";
+import { fetchLegalContent } from "@/lib/pageContent";
 
 export const metadata = { title: "Privacy Policy — Popper Tulimond" };
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const content = await fetchLegalContent("privacy");
   return (
-    <LegalPageLayout title={PRIVACY_CONTENT.title} lastUpdated={PRIVACY_CONTENT.lastUpdated}>
-      {PRIVACY_CONTENT.body}
+    <LegalPageLayout title={content.title} lastUpdated={content.lastUpdated}>
+      {content.body}
     </LegalPageLayout>
   );
 }

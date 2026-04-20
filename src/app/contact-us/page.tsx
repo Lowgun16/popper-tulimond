@@ -1,25 +1,25 @@
 import LegalPageLayout from "@/components/LegalPageLayout";
-import { CONTACT_CONTENT } from "@/lib/staticContent";
+import { fetchContactUsContent } from "@/lib/pageContent";
 
 export const metadata = { title: "Contact Us — Popper Tulimond" };
 
-export default function ContactUsPage() {
-  const { address, phone, email, note } = CONTACT_CONTENT;
+export default async function ContactUsPage() {
+  const content = await fetchContactUsContent();
   const optionalLines = [
-    phone ? `Phone: ${phone}` : null,
-    email ? `Email: ${email}` : null,
+    content.phone ? `Phone: ${content.phone}` : null,
+    content.email ? `Email: ${content.email}` : null,
   ].filter((x): x is string => x !== null);
 
   const lines = [
-    address.line1,
-    address.line2,
+    content.address.line1,
+    content.address.line2,
     ...(optionalLines.length ? ["", ...optionalLines] : []),
     "",
-    note,
+    content.note,
   ].join("\n");
 
   return (
-    <LegalPageLayout title="Contact Us" lastUpdated="April 2026">
+    <LegalPageLayout title="Contact Us" lastUpdated="">
       {lines}
     </LegalPageLayout>
   );

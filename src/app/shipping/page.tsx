@@ -1,12 +1,13 @@
 import LegalPageLayout from "@/components/LegalPageLayout";
-import { SHIPPING_CONTENT } from "@/lib/staticContent";
+import { fetchLegalContent } from "@/lib/pageContent";
 
 export const metadata = { title: "Shipping & Fulfillment — Popper Tulimond" };
 
-export default function ShippingPage() {
+export default async function ShippingPage() {
+  const content = await fetchLegalContent("shipping");
   return (
-    <LegalPageLayout title={SHIPPING_CONTENT.title} lastUpdated={SHIPPING_CONTENT.lastUpdated}>
-      {SHIPPING_CONTENT.body}
+    <LegalPageLayout title={content.title} lastUpdated={content.lastUpdated}>
+      {content.body}
     </LegalPageLayout>
   );
 }
