@@ -3,11 +3,12 @@
 
 import type { CSSProperties } from "react";
 import OverlayShell from "./OverlayShell";
-import { ABOUT_CONTENT } from "@/lib/staticContent";
+import type { AboutContent } from "@/lib/contentTypes";
 
 interface AboutOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  content: AboutContent;
 }
 
 const eyebrow: CSSProperties = {
@@ -36,7 +37,7 @@ const bodyText: CSSProperties = {
   whiteSpace: "pre-line",
 };
 
-export default function AboutOverlay({ isOpen, onClose }: AboutOverlayProps) {
+export default function AboutOverlay({ isOpen, onClose, content }: AboutOverlayProps) {
   return (
     <OverlayShell isOpen={isOpen} onClose={onClose} label="About Popper Tulimond">
       {/* Header */}
@@ -50,17 +51,17 @@ export default function AboutOverlay({ isOpen, onClose }: AboutOverlayProps) {
         marginBottom: "6px",
         fontWeight: 300,
       }}>
-        {ABOUT_CONTENT.headline}
+        {content.headline}
       </h1>
       <p style={{ ...eyebrow, color: "rgba(240,232,215,0.35)", marginBottom: "40px" }}>
-        {ABOUT_CONTENT.subheadline}
+        {content.subheadline}
       </p>
 
       {/* Gold divider */}
       <div style={{ width: "48px", height: "1px", background: "rgba(196,164,86,0.5)", marginBottom: "40px" }} />
 
       {/* Sections */}
-      {ABOUT_CONTENT.sections.map((section) => (
+      {content.sections.map((section) => (
         <div key={section.id}>
           <h2 style={sectionTitle}>{section.title}</h2>
           <p style={bodyText}>{section.body}</p>
@@ -70,7 +71,7 @@ export default function AboutOverlay({ isOpen, onClose }: AboutOverlayProps) {
       {/* Closing */}
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: "48px", paddingTop: "32px" }}>
         <p style={{ ...bodyText, color: "rgba(196,164,86,0.5)", whiteSpace: "pre-line" }}>
-          {ABOUT_CONTENT.closing}
+          {content.closing}
         </p>
       </div>
     </OverlayShell>
