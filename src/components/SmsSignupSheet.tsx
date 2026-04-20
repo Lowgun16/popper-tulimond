@@ -41,10 +41,15 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
     setError(null);
 
     try {
-      // Phase B will wire this to the real API route.
-      const payload = { phone: phone.trim(), email: email.trim() || null, source };
-      console.log("[SmsSignup] Payload (Phase A stub):", payload);
-      await new Promise<void>((r) => setTimeout(r, 600));
+      const res = await fetch("/api/sms-signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phone.trim(), email: email.trim() || null, source }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error || "Submission failed");
+      }
       setSubmitted(true);
     } catch (err) {
       console.error("[SmsSignup] Submission error:", err);
