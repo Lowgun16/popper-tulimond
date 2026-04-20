@@ -3,13 +3,7 @@
 
 import type { CSSProperties } from "react";
 import OverlayShell from "./OverlayShell";
-import {
-  TERMS_CONTENT,
-  PRIVACY_CONTENT,
-  SHIPPING_CONTENT,
-  REFUND_CONTENT,
-  CONTACT_CONTENT,
-} from "@/lib/staticContent";
+import type { AllLegalContent, LegalContent, ContactUsContent } from "@/lib/contentTypes";
 
 export type LegalPage = "terms" | "privacy" | "shipping" | "refund" | "contact-us";
 
@@ -17,6 +11,7 @@ interface LegalContentOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   page: LegalPage | null;
+  allLegal: AllLegalContent;
 }
 
 const GOLD = "rgba(196,164,86,0.7)";
@@ -47,70 +42,52 @@ const body: CSSProperties = {
   whiteSpace: "pre-line",
 };
 
-function LegalContent({ page }: { page: LegalPage }) {
+function LegalTextContent({ content }: { content: LegalContent }) {
+  return (
+    <>
+      <p style={eyebrow}>Popper Tulimond — {content.lastUpdated}</p>
+      <h1 style={heading}>{content.title}</h1>
+      <p style={body}>{content.body}</p>
+    </>
+  );
+}
+
+function ContactUsPageContent({ content }: { content: ContactUsContent }) {
+  const optionalLines = [
+    content.phone ? `Phone: ${content.phone}` : null,
+    content.email ? `Email: ${content.email}` : null,
+  ].filter((x): x is string => x !== null);
+  const lines = [
+    content.address.line1,
+    content.address.line2,
+    ...(optionalLines.length ? ["", ...optionalLines] : []),
+    "",
+    content.note,
+  ].join("\n");
+  return (
+    <>
+      <p style={eyebrow}>Popper Tulimond</p>
+      <h1 style={heading}>Contact Us</h1>
+      <p style={body}>{lines}</p>
+    </>
+  );
+}
+
+function LegalPageContent({ page, allLegal }: { page: LegalPage; allLegal: AllLegalContent }) {
   switch (page) {
-    case "terms":
-      return (
-        <>
-          <p style={eyebrow}>Popper Tulimond — {TERMS_CONTENT.lastUpdated}</p>
-          <h1 style={heading}>{TERMS_CONTENT.title}</h1>
-          <p style={body}>{TERMS_CONTENT.body}</p>
-        </>
-      );
-    case "privacy":
-      return (
-        <>
-          <p style={eyebrow}>Popper Tulimond — {PRIVACY_CONTENT.lastUpdated}</p>
-          <h1 style={heading}>{PRIVACY_CONTENT.title}</h1>
-          <p style={body}>{PRIVACY_CONTENT.body}</p>
-        </>
-      );
-    case "shipping":
-      return (
-        <>
-          <p style={eyebrow}>Popper Tulimond — {SHIPPING_CONTENT.lastUpdated}</p>
-          <h1 style={heading}>{SHIPPING_CONTENT.title}</h1>
-          <p style={body}>{SHIPPING_CONTENT.body}</p>
-        </>
-      );
-    case "refund":
-      return (
-        <>
-          <p style={eyebrow}>Popper Tulimond — {REFUND_CONTENT.lastUpdated}</p>
-          <h1 style={heading}>{REFUND_CONTENT.title}</h1>
-          <p style={body}>{REFUND_CONTENT.body}</p>
-        </>
-      );
-    case "contact-us": {
-      const { address, phone, email, note } = CONTACT_CONTENT;
-      const optionalLines = [
-        phone ? `Phone: ${phone}` : null,
-        email ? `Email: ${email}` : null,
-      ].filter((x): x is string => x !== null);
-      const lines = [
-        address.line1,
-        address.line2,
-        ...(optionalLines.length ? ["", ...optionalLines] : []),
-        "",
-        note,
-      ].join("\n");
-      return (
-        <>
-          <p style={eyebrow}>Popper Tulimond — April 2026</p>
-          <h1 style={heading}>Contact Us</h1>
-          <p style={body}>{lines}</p>
-        </>
-      );
-    }
-    default:
-      return null;
+    case "terms":      return <LegalTextContent content={allLegal.terms} />;
+    case "privacy":    return <LegalTextContent content={allLegal.privacy} />;
+    case "shipping":   return <LegalTextContent content={allLegal.shipping} />;
+    case "refund":     return <LegalTextContent content={allLegal.refund} />;
+    case "contact-us": return <ContactUsPageContent content={allLegal.contactUs} />;
+    default:           return null;
   }
 }
 
-export default function LegalContentOverlay({ isOpen, onClose, page }: LegalContentOverlayProps) {
+export default function LegalContentOverlay({ isOpen, onClose, page, allLegal }: LegalContentOverlayProps) {
   return (
     <OverlayShell isOpen={isOpen} onClose={onClose} label={page ? `Legal — ${page}` : "Legal"}>
-      {page && <LegalContent page={page} />}
+      {page && <LegalPageContent page={page} allLegal={allLegal} />}
     </OverlayShell>
   );
 }
