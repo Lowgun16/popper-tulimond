@@ -28,6 +28,7 @@ import SmsSignupSheet from "./SmsSignupSheet";
 import ProtocolGate from "./ProtocolGate";
 import AtelierNav from "./AtelierNav";
 import type { NavPage } from "./AtelierNav";
+import type { AllPageContent } from "@/lib/contentTypes";
 
 const STUDIO_DRAFT_KEY = "tulimond-studio-draft";
 
@@ -533,9 +534,10 @@ function ModelStage({ slot, index, revealed, isStudioMode, studioSlot, isSelecte
 interface CollectionOverlayProps {
   opacity: MotionValue<number>;
   onAddToCart: (item: LookbookContext, size: string) => void;
+  allContent: AllPageContent;
 }
 
-export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOverlayProps) {
+export default function CollectionOverlay({ opacity, onAddToCart, allContent }: CollectionOverlayProps) {
   const router = useRouter();
   const [active, setActive] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -771,10 +773,11 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
         isOpen={activeLegalPage !== null}
         onClose={() => setActiveLegalPage(null)}
         page={activeLegalPage}
+        allLegal={{ terms: allContent.terms, privacy: allContent.privacy, shipping: allContent.shipping, refund: allContent.refund, contactUs: allContent.contactUs }}
       />
 
       {/* Brand page overlays */}
-      <AboutOverlay isOpen={activeOverlay === "about"} onClose={() => setActiveOverlay(null)} />
+      <AboutOverlay isOpen={activeOverlay === "about"} onClose={() => setActiveOverlay(null)} content={allContent.about} />
       <ProtocolOverlay
         isOpen={activeOverlay === "protocol"}
         onClose={() => setActiveOverlay(null)}
@@ -783,8 +786,9 @@ export default function CollectionOverlay({ opacity, onAddToCart }: CollectionOv
           setSmsSource("protocol_cta");
           setSmsOpen(true);
         }}
+        content={allContent.protocol}
       />
-      <ContactOverlay isOpen={activeOverlay === "contact"} onClose={() => setActiveOverlay(null)} />
+      <ContactOverlay isOpen={activeOverlay === "contact"} onClose={() => setActiveOverlay(null)} content={allContent.contact} />
       <VaultOverlay
         isOpen={activeOverlay === "vault"}
         onClose={() => setActiveOverlay(null)}

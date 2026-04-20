@@ -7,12 +7,14 @@ import { usePortalTransforms } from "@/hooks/usePortalTransforms";
 import PortalBackground from "@/components/PortalBackground";
 import CollectionOverlay from "@/components/CollectionOverlay";
 import type { LookbookContext } from "@/components/studio/studioTypes";
+import type { AllPageContent } from "@/lib/contentTypes";
 
 interface PortalProps {
   onAddToCart: (item: LookbookContext, size: string) => void;
+  allContent: AllPageContent;
 }
 
-export default function Portal({ onAddToCart }: PortalProps) {
+export default function Portal({ onAddToCart, allContent }: PortalProps) {
   const t = usePortalTransforms();
   const [scope, animate] = useAnimate();
   const shakeRanRef = useRef(false);
@@ -60,7 +62,7 @@ export default function Portal({ onAddToCart }: PortalProps) {
         />
 
         {/* Model Stage + all overlays/nav — owned by CollectionOverlay */}
-        <CollectionOverlay opacity={t.navOpacity} onAddToCart={onAddToCart} />
+        <CollectionOverlay opacity={t.navOpacity} onAddToCart={onAddToCart} allContent={allContent} />
 
       </div>
     </div>
