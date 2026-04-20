@@ -104,10 +104,10 @@ export function parseContactUs(rows: ContentRow[]): ContactUsContent {
 
 const fetchRows = cache(async (slug: string): Promise<ContentRow[]> => {
   try {
-    const rows = await sql<ContentRow[]>`
+    const rows = await sql`
       SELECT field_key, value FROM page_content WHERE page_slug = ${slug}
     `;
-    return rows;
+    return rows as ContentRow[];
   } catch {
     // If DB is unreachable, fall back gracefully to static content
     return [];
