@@ -14,3 +14,11 @@ class MockCanvas {
   }
 }
 (global as any).HTMLCanvasElement = MockCanvas;
+
+// Polyfill TextDecoder and TextEncoder for @neondatabase/serverless
+if (typeof global.TextDecoder === "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { TextDecoder, TextEncoder } = require("util");
+  (global as any).TextDecoder = TextDecoder;
+  (global as any).TextEncoder = TextEncoder;
+}
