@@ -3,11 +3,12 @@
 
 import type { CSSProperties } from "react";
 import OverlayShell from "./OverlayShell";
-import { CONTACT_CONTENT } from "@/lib/staticContent";
+import type { ContactContent } from "@/lib/contentTypes";
 
 interface ContactOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  content: ContactContent;
 }
 
 const eyebrowStyle: CSSProperties = {
@@ -35,7 +36,7 @@ const valueStyle: CSSProperties = {
   lineHeight: "1.6",
 };
 
-export default function ContactOverlay({ isOpen, onClose }: ContactOverlayProps) {
+export default function ContactOverlay({ isOpen, onClose, content }: ContactOverlayProps) {
   return (
     <OverlayShell isOpen={isOpen} onClose={onClose} label="Contact Popper Tulimond">
       <p style={{ ...eyebrowStyle, marginBottom: "16px" }}>Popper Tulimond</p>
@@ -47,7 +48,7 @@ export default function ContactOverlay({ isOpen, onClose }: ContactOverlayProps)
         marginBottom: "48px",
         fontWeight: 300,
       }}>
-        {CONTACT_CONTENT.headline}
+        {content.headline}
       </h1>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
@@ -55,27 +56,27 @@ export default function ContactOverlay({ isOpen, onClose }: ContactOverlayProps)
         <div>
           <p style={fieldLabelStyle}>Headquarters</p>
           <p style={valueStyle}>
-            {CONTACT_CONTENT.address.line1}<br />
-            {CONTACT_CONTENT.address.line2}
+            {content.address.line1}<br />
+            {content.address.line2}
           </p>
         </div>
 
         {/* Phone — only shown when populated */}
-        {CONTACT_CONTENT.phone && (
+        {content.phone && (
           <div>
             <p style={fieldLabelStyle}>Phone</p>
-            <a href={`tel:${CONTACT_CONTENT.phone}`} style={{ ...valueStyle, textDecoration: "none" }}>
-              {CONTACT_CONTENT.phone}
+            <a href={`tel:${content.phone}`} style={{ ...valueStyle, textDecoration: "none" }}>
+              {content.phone}
             </a>
           </div>
         )}
 
         {/* Email — only shown when populated */}
-        {CONTACT_CONTENT.email && (
+        {content.email && (
           <div>
             <p style={fieldLabelStyle}>Email</p>
-            <a href={`mailto:${CONTACT_CONTENT.email}`} style={{ ...valueStyle, textDecoration: "none" }}>
-              {CONTACT_CONTENT.email}
+            <a href={`mailto:${content.email}`} style={{ ...valueStyle, textDecoration: "none" }}>
+              {content.email}
             </a>
           </div>
         )}
@@ -93,7 +94,7 @@ export default function ContactOverlay({ isOpen, onClose }: ContactOverlayProps)
             lineHeight: "1.7",
             fontStyle: "italic",
           }}>
-            {CONTACT_CONTENT.note}
+            {content.note}
           </p>
         </div>
       </div>
