@@ -1,3 +1,7 @@
+// Ensure DATABASE_URL is set so db.ts doesn't throw during module import in tests
+process.env.DATABASE_URL =
+  process.env.DATABASE_URL ?? "postgresql://test:test@localhost/test";
+
 // Mock canvas for jsdom (jsdom doesn't implement canvas)
 class MockCanvas {
   getContext() {
@@ -14,3 +18,11 @@ class MockCanvas {
   }
 }
 (global as any).HTMLCanvasElement = MockCanvas;
+
+// Polyfill TextDecoder and TextEncoder for @neondatabase/serverless
+if (typeof global.TextDecoder === "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { TextDecoder, TextEncoder } = require("util");
+  (global as any).TextDecoder = TextDecoder;
+  (global as any).TextEncoder = TextEncoder;
+}

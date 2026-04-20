@@ -5,15 +5,16 @@ import { useEffect, useRef } from "react";
 import { useAnimate } from "framer-motion";
 import { usePortalTransforms } from "@/hooks/usePortalTransforms";
 import PortalBackground from "@/components/PortalBackground";
-import AtelierNav from "@/components/AtelierNav";
 import CollectionOverlay from "@/components/CollectionOverlay";
 import type { LookbookContext } from "@/components/studio/studioTypes";
+import type { AllPageContent } from "@/lib/contentTypes";
 
 interface PortalProps {
   onAddToCart: (item: LookbookContext, size: string) => void;
+  allContent: AllPageContent;
 }
 
-export default function Portal({ onAddToCart }: PortalProps) {
+export default function Portal({ onAddToCart, allContent }: PortalProps) {
   const t = usePortalTransforms();
   const [scope, animate] = useAnimate();
   const shakeRanRef = useRef(false);
@@ -60,11 +61,8 @@ export default function Portal({ onAddToCart }: PortalProps) {
           showInside={t.showInside}
         />
 
-        {/* Model Stage — staggered silhouettes with pulse dots, reveals after walk-in */}
-        <CollectionOverlay opacity={t.navOpacity} onAddToCart={onAddToCart} />
-
-        {/* Editorial nav — ghost overlay, reveals only once inside */}
-        <AtelierNav opacity={t.navOpacity} />
+        {/* Model Stage + all overlays/nav — owned by CollectionOverlay */}
+        <CollectionOverlay opacity={t.navOpacity} onAddToCart={onAddToCart} allContent={allContent} />
 
       </div>
     </div>
