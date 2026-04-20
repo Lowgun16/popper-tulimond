@@ -1,3 +1,7 @@
+// Ensure DATABASE_URL is set so db.ts doesn't throw during module import in tests
+process.env.DATABASE_URL =
+  process.env.DATABASE_URL ?? "postgresql://test:test@localhost/test";
+
 // Mock canvas for jsdom (jsdom doesn't implement canvas)
 class MockCanvas {
   getContext() {
