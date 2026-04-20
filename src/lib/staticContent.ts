@@ -33,7 +33,7 @@ export const PROTOCOL_CONTENT = {
   header: "Popper Tulimond /",
   title: "THE PROTOCOL",
   rules: [
-    { number: "01", text: "We open once a month. The 15th turns to the 16th at midnight EST." },
+    { number: "01", text: "We open once a month: When the 15th turns to the 16th at midnight EST." },
     { number: "02", text: "Slots are finite. Once we sell out, we close. No exceptions." },
     { number: "03", text: "The Constable is your only way in." },
   ],
