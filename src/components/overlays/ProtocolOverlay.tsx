@@ -3,13 +3,14 @@
 
 import type { CSSProperties } from "react";
 import OverlayShell from "./OverlayShell";
-import { PROTOCOL_CONTENT } from "@/lib/staticContent";
+import type { ProtocolContent } from "@/lib/contentTypes";
 
 interface ProtocolOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   /** Called when user clicks the SMS early access CTA */
   onRequestSmsSignup: () => void;
+  content: ProtocolContent;
 }
 
 /** Red gun SVG — outline only, vertical orientation, barrel up. Matches physical tag. */
@@ -32,7 +33,7 @@ function RedGunSvg() {
   );
 }
 
-export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup }: ProtocolOverlayProps) {
+export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup, content }: ProtocolOverlayProps) {
   return (
     <OverlayShell isOpen={isOpen} onClose={onClose} label="The Protocol">
       {/* Dark background fills the overlay shell; card is centered within */}
@@ -63,7 +64,7 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup }:
             fontSize: "8px", letterSpacing: "0.3em",
             color: "#4a3f2f", textTransform: "uppercase" as CSSProperties["textTransform"], marginBottom: "10px",
           }}>
-            {PROTOCOL_CONTENT.header}
+            {content.header}
           </p>
 
           <h2 style={{
@@ -71,14 +72,14 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup }:
             fontSize: "20px", color: "#1a140a",
             marginBottom: "18px", letterSpacing: "0.08em", fontWeight: 700,
           }}>
-            {PROTOCOL_CONTENT.title}
+            {content.title}
           </h2>
 
           <div style={{ width: "100%", height: "1px", background: "#9a8a6a", marginBottom: "22px" }} />
 
           {/* Rules */}
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "26px" }}>
-            {PROTOCOL_CONTENT.rules.map((rule) => (
+            {content.rules.map((rule) => (
               <div key={rule.number} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
                 <span style={{
                   fontFamily: "'Courier New', monospace",
@@ -113,10 +114,10 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup }:
                 textDecoration: "underline", textUnderlineOffset: "3px",
               }}
             >
-              {PROTOCOL_CONTENT.cta}
+              {content.cta}
             </button>
             <br />
-            <span style={{ color: "#4a3f2f" }}>{PROTOCOL_CONTENT.ctaSubtext}</span>
+            <span style={{ color: "#4a3f2f" }}>{content.ctaSubtext}</span>
           </div>
 
           {/* Bottom-right image slot — swappable via Edit Pages (Phase B) */}
