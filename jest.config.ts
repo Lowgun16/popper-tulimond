@@ -8,6 +8,12 @@ const config: Config = {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   testMatch: ["**/__tests__/**/*.test.ts", "**/?(*.)+(spec|test).ts"],
+  transformIgnorePatterns: ["node_modules/(?!(jose)/)"],
+  extensionsToTreatAsEsm: [".ts"],
+  transform: {
+    "^.+\\.tsx?$": ["ts-jest", { useESM: true }],
+    "^.+\\.js$": ["ts-jest", { useESM: true }],
+  },
 };
 
 export default config;
