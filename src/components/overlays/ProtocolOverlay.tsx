@@ -64,16 +64,22 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup, c
             fontSize: "8px", letterSpacing: "0.3em",
             color: "#4a3f2f", textTransform: "uppercase" as CSSProperties["textTransform"], marginBottom: "10px",
           }}>
-            {content.header}
-          </p>
+          <p style={{
+            fontFamily: "'Courier New', monospace",
+            fontSize: "8px", letterSpacing: "0.3em",
+            color: "#4a3f2f", textTransform: "uppercase" as CSSProperties["textTransform"], marginBottom: "10px",
+          }} dangerouslySetInnerHTML={{ __html: content.header }} />
 
           <h2 style={{
             fontFamily: "'Courier New', monospace",
             fontSize: "20px", color: "#1a140a",
             marginBottom: "18px", letterSpacing: "0.08em", fontWeight: 700,
           }}>
-            {content.title}
-          </h2>
+          <h2 style={{
+            fontFamily: "'Courier New', monospace",
+            fontSize: "20px", color: "#1a140a",
+            marginBottom: "18px", letterSpacing: "0.08em", fontWeight: 700,
+          }} dangerouslySetInnerHTML={{ __html: content.title }} />
 
           <div style={{ width: "100%", height: "1px", background: "#9a8a6a", marginBottom: "22px" }} />
 
@@ -92,8 +98,10 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup, c
                   fontFamily: "'Courier New', monospace",
                   fontSize: "11.5px", color: "#1a140a", lineHeight: 1.65,
                 }}>
-                  {rule.text}
-                </p>
+                <p style={{
+                  fontFamily: "'Courier New', monospace",
+                  fontSize: "11.5px", color: "#1a140a", lineHeight: 1.65,
+                }} dangerouslySetInnerHTML={{ __html: rule.text }} />
               </div>
             ))}
           </div>
@@ -114,10 +122,10 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup, c
                 textDecoration: "underline", textUnderlineOffset: "3px",
               }}
             >
-              {content.cta}
+              <span dangerouslySetInnerHTML={{ __html: content.cta }} />
             </button>
             <br />
-            <span style={{ color: "#4a3f2f" }}>{content.ctaSubtext}</span>
+            <span style={{ color: "#4a3f2f" }} dangerouslySetInnerHTML={{ __html: content.ctaSubtext }} />
           </div>
 
           {/* Bottom-right image slot — swappable via Edit Pages (Phase B) */}

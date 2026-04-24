@@ -51,11 +51,10 @@ export default function AboutOverlay({ isOpen, onClose, content }: AboutOverlayP
         marginBottom: "6px",
         fontWeight: 300,
       }}>
-        {content.headline}
+        <span dangerouslySetInnerHTML={{ __html: content.headline }} />
       </h1>
-      <p style={{ ...eyebrow, color: "rgba(240,232,215,0.35)", marginBottom: "40px" }}>
-        {content.subheadline}
-      </p>
+      <p style={{ ...eyebrow, color: "rgba(240,232,215,0.35)", marginBottom: "40px" }}
+        dangerouslySetInnerHTML={{ __html: content.subheadline }} />
 
       {/* Gold divider */}
       <div style={{ width: "48px", height: "1px", background: "rgba(196,164,86,0.5)", marginBottom: "40px" }} />
@@ -63,16 +62,15 @@ export default function AboutOverlay({ isOpen, onClose, content }: AboutOverlayP
       {/* Sections */}
       {content.sections.map((section) => (
         <div key={section.id}>
-          <h2 style={sectionTitle}>{section.title}</h2>
-          <p style={bodyText}>{section.body}</p>
+          <h2 style={sectionTitle} dangerouslySetInnerHTML={{ __html: section.title }} />
+          <p style={bodyText} dangerouslySetInnerHTML={{ __html: section.body }} />
         </div>
       ))}
 
       {/* Closing */}
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: "48px", paddingTop: "32px" }}>
-        <p style={{ ...bodyText, color: "rgba(196,164,86,0.5)", whiteSpace: "pre-line" }}>
-          {content.closing}
-        </p>
+        <p style={{ ...bodyText, color: "rgba(196,164,86,0.5)", whiteSpace: "pre-line" }}
+          dangerouslySetInnerHTML={{ __html: content.closing }} />
       </div>
     </OverlayShell>
   );

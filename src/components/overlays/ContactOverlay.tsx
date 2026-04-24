@@ -48,17 +48,15 @@ export default function ContactOverlay({ isOpen, onClose, content }: ContactOver
         marginBottom: "48px",
         fontWeight: 300,
       }}>
-        {content.headline}
+        <span dangerouslySetInnerHTML={{ __html: content.headline }} />
       </h1>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
         {/* Address */}
         <div>
           <p style={fieldLabelStyle}>Headquarters</p>
-          <p style={valueStyle}>
-            {content.address.line1}<br />
-            {content.address.line2}
-          </p>
+          <p style={valueStyle}
+            dangerouslySetInnerHTML={{ __html: `${content.address.line1}<br />${content.address.line2}` }} />
         </div>
 
         {/* Phone — only shown when populated */}
@@ -94,8 +92,13 @@ export default function ContactOverlay({ isOpen, onClose, content }: ContactOver
             lineHeight: "1.7",
             fontStyle: "italic",
           }}>
-            {content.note}
-          </p>
+          <p style={{
+            fontFamily: "var(--font-body, sans-serif)",
+            fontSize: "13px",
+            color: "rgba(240,232,215,0.4)",
+            lineHeight: "1.7",
+            fontStyle: "italic",
+          }} dangerouslySetInnerHTML={{ __html: content.note }} />
         </div>
       </div>
     </OverlayShell>
