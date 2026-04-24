@@ -30,6 +30,7 @@ import ProtocolGate from "./ProtocolGate";
 import AtelierNav from "./AtelierNav";
 import type { NavPage } from "./AtelierNav";
 import type { AllPageContent } from "@/lib/contentTypes";
+import type { ProductOverride } from "@/lib/productOverrides";
 
 const STUDIO_DRAFT_KEY = "tulimond-studio-draft";
 
@@ -536,9 +537,10 @@ interface CollectionOverlayProps {
   opacity: MotionValue<number>;
   onAddToCart: (item: LookbookContext, size: string) => void;
   allContent: AllPageContent;
+  productOverrides: ProductOverride[];
 }
 
-export default function CollectionOverlay({ opacity, onAddToCart, allContent }: CollectionOverlayProps) {
+export default function CollectionOverlay({ opacity, onAddToCart, allContent, productOverrides }: CollectionOverlayProps) {
   const router = useRouter();
   const [active, setActive] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -813,6 +815,7 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent }: 
           setActiveOverlay(null);
           setLookbookDot(ctx);
         }}
+        productOverrides={productOverrides}
       />
 
       {/* SMS signup sheet */}
