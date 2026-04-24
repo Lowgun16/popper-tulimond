@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { sql } from "@/lib/db";
 import AdminSetupClient from "./AdminSetupClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function SetupPage() {
   // If any admin exists, this route is gone
   const existing = await sql`SELECT id FROM admin_users LIMIT 1`;

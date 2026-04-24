@@ -15,6 +15,7 @@ import { MODEL_INVENTORY } from "@/data/inventory";
 import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import { DEFAULT_SHADOW } from "./studio/studioTypes";
 import { LookbookOverlay } from "./studio/LookbookOverlay";
+import { EditPagesPanel } from "./edit-pages/EditPagesPanel";
 import OverlayPortal from "@/components/OverlayPortal";
 import AboutOverlay from "./overlays/AboutOverlay";
 import VaultOverlay from "./overlays/VaultOverlay";
@@ -554,6 +555,7 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent }: 
   const [smsSource, setSmsSource] = useState<"protocol_cta" | "blocked_purchase">("protocol_cta");
   const [protocolGateOpen, setProtocolGateOpen] = useState(false);
   const [activeLegalPage, setActiveLegalPage] = useState<LegalPage | null>(null);
+  const [showEditPages, setShowEditPages] = useState(false);
 
   useMotionValueEvent(opacity, "change", (v) => {
     setActive(v > 0.05);
@@ -681,6 +683,17 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent }: 
             ⚠ Clear Session Draft
           </button>
         )}
+
+        {/* Edit Pages button */}
+        <button
+          className="px-6 py-3 bg-black/95 border border-white/30 text-[10px] uppercase tracking-widest text-white backdrop-blur-xl shadow-2xl hover:border-[#D4B896]/60 transition-colors"
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            setShowEditPages(true);
+          }}
+        >
+          ✎ Edit Pages
+        </button>
 
         <button
           className="px-6 py-3 bg-black/95 border border-white/30 text-[10px] uppercase tracking-widest text-white backdrop-blur-xl shadow-2xl"
@@ -823,6 +836,9 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent }: 
           setSmsOpen(true);
         }}
       />
+      {showEditPages && (
+        <EditPagesPanel onClose={() => setShowEditPages(false)} />
+      )}
     </div>
   );
 }

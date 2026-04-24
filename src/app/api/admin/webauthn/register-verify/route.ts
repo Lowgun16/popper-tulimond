@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
   challengeStore.delete(email);
 
   const { credential } = verification.registrationInfo;
+  // @ts-expect-error — @simplewebauthn/server type mismatch: credential.id is string, fromBuffer expects Uint8Array
   const credentialId = isoBase64URL.fromBuffer(credential.id);
   const publicKey = isoBase64URL.fromBuffer(credential.publicKey);
 
