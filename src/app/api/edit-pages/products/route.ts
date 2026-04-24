@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireSession } from "@/lib/adminAuth";
+import { requireOwner } from "@/lib/adminAuth";
 import { sql } from "@/lib/db";
 
 type ProductOverride = {
@@ -14,7 +14,7 @@ type ProductOverride = {
 
 /** GET /api/edit-pages/products — returns all product_overrides rows */
 export async function GET(req: NextRequest) {
-  const sessionOrResponse = await requireSession(req);
+  const sessionOrResponse = await requireOwner(req);
   if (sessionOrResponse instanceof NextResponse) return sessionOrResponse;
 
   const rows: ProductOverride[] = await sql`
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
 /** POST /api/edit-pages/products — upserts a draft override for an item */
 export async function POST(req: NextRequest) {
-  const sessionOrResponse = await requireSession(req);
+  const sessionOrResponse = await requireOwner(req);
   if (sessionOrResponse instanceof NextResponse) return sessionOrResponse;
 
   const { itemId, price, displayName, productImage, status } = await req.json() as {

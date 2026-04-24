@@ -85,17 +85,25 @@ export function ProductEditor({ onBack: _onBack }: Props) {
     setSaving(true);
     try {
       const entries = Object.entries(overrides);
-      await Promise.all(
-        entries.map(([item_id, override]) =>
+      const results = await Promise.all(
+        entries.map(([itemId, override]) =>
           fetch("/api/edit-pages/products", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ item_id, ...override }),
+            body: JSON.stringify({
+              itemId,
+              price: override.price,
+              displayName: override.display_name,
+              productImage: override.product_image,
+              status: override.status,
+            }),
           })
         )
       );
-      setLastSaved(new Date());
+      if (results.every((r) => r.ok)) {
+        setLastSaved(new Date());
+      }
     } finally {
       setSaving(false);
     }
@@ -105,10 +113,14 @@ export function ProductEditor({ onBack: _onBack }: Props) {
     if (!window.confirm("Publish product changes to the live site?")) return;
     setPublishing(true);
     try {
-      await fetch("/api/edit-pages/products/publish", {
+      const res = await fetch("/api/edit-pages/products/publish", {
         method: "POST",
         credentials: "include",
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(`Publish failed: ${data.error ?? res.status}`);
+      }
     } finally {
       setPublishing(false);
     }

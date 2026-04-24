@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireSession } from "@/lib/adminAuth";
+import { requireOwner } from "@/lib/adminAuth";
 import { sql } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
 /** POST /api/edit-pages/products/publish — promotes all draft overrides to published */
 export async function POST(req: NextRequest) {
-  const sessionOrResponse = await requireSession(req);
+  const sessionOrResponse = await requireOwner(req);
   if (sessionOrResponse instanceof NextResponse) return sessionOrResponse;
 
   await sql`
