@@ -15,7 +15,8 @@ export async function middleware(request: NextRequest) {
   if (
     (pathname.startsWith("/api/admin/") &&
       !pathname.startsWith("/api/admin/webauthn/") &&
-      !pathname.startsWith("/api/admin/recover/")) ||
+      !pathname.startsWith("/api/admin/recover/") &&
+      !pathname.startsWith("/api/admin/invite/")) ||
     (pathname.startsWith("/admin/") &&
       !pathname.startsWith("/admin/setup") &&
       !pathname.startsWith("/admin/recover") &&
