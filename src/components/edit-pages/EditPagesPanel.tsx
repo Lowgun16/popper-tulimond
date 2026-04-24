@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAdminSession } from "@/hooks/useAdminSession";
 import { EditPagesSidebar } from "./EditPagesSidebar";
-import { PageEditor } from "./PageEditor";
+import { PageEditor, type PageEditorHandle } from "./PageEditor";
 import { AdminPanel } from "./AdminPanel";
 
 type Props = {
@@ -61,6 +61,7 @@ export function EditPagesPanel({ onClose }: Props) {
   }
 
   const isOwner = session.status === "authenticated" && session.role === "owner";
+  const pageEditorRef = useRef<PageEditorHandle>(null);
 
   return (
     <AnimatePresence>
@@ -106,24 +107,14 @@ export function EditPagesPanel({ onClose }: Props) {
           </div>
         ) : (
           /* Authenticated — main UI */
-          <div className="flex flex-1 overflow-hidden">
+          <div className="flex flex-col flex-1 overflow-hidden">
 
-            {/* Sidebar — hidden on narrow screens */}
-            <div className="hidden md:flex border-r border-white/10 h-full">
-              <EditPagesSidebar
-                activePage={activePage}
-                onSelectPage={(slug) => { setActivePage(slug); setShowAdmin(false); }}
-                isOwner={isOwner}
-                onAdminClick={() => setShowAdmin(true)}
-              />
-            </div>
-
-            {/* Mobile: page selector dropdown */}
-            <div className="md:hidden px-4 py-3 border-b border-white/10 shrink-0">
+            {/* Mobile: combined sticky top bar — page selector + actions */}
+            <div className="md:hidden flex items-center gap-2 px-3 py-2.5 border-b border-white/10 shrink-0">
               <select
                 value={activePage}
                 onChange={(e) => { setActivePage(e.target.value); setShowAdmin(false); }}
-                className="bg-transparent border border-white/20 text-white text-xs px-3 py-1.5 w-full outline-none"
+                className="flex-1 bg-transparent border border-white/20 text-white text-[10px] px-2 py-1.5 outline-none min-w-0"
               >
                 <optgroup label="Brand Pages">
                   {["about","protocol","contact","vault"].map((s) => (
@@ -140,24 +131,53 @@ export function EditPagesPanel({ onClose }: Props) {
                   ))}
                 </optgroup>
               </select>
+              <button
+                onClick={() => pageEditorRef.current?.save()}
+                disabled={pageEditorRef.current?.saving}
+                className="shrink-0 px-3 py-1.5 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest disabled:opacity-40"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => pageEditorRef.current?.triggerPublish()}
+                disabled={pageEditorRef.current?.publishing}
+                className="shrink-0 px-3 py-1.5 bg-[#D4B896] text-black text-[9px] uppercase tracking-widest disabled:opacity-40"
+              >
+                Publish
+              </button>
             </div>
 
-            {/* Main area */}
-            <div className="flex-1 overflow-hidden h-full">
-              {showAdmin ? (
-                <AdminPanel
-                  currentUserId={session.userId}
-                  onBack={() => setShowAdmin(false)}
+            {/* Desktop sidebar + editor row */}
+            <div className="flex flex-1 overflow-hidden">
+
+              {/* Sidebar — desktop only */}
+              <div className="hidden md:flex border-r border-white/10 h-full">
+                <EditPagesSidebar
+                  activePage={activePage}
+                  onSelectPage={(slug) => { setActivePage(slug); setShowAdmin(false); }}
+                  isOwner={isOwner}
+                  onAdminClick={() => setShowAdmin(true)}
                 />
-              ) : (
-                <PageEditor
-                  key={activePage}
-                  pageSlug={activePage}
-                  liveContent={liveContent}
-                  customColors={palette}
-                  onAddCustomColor={handleAddCustomColor}
-                />
-              )}
+              </div>
+
+              {/* Main area */}
+              <div className="flex-1 overflow-hidden h-full">
+                {showAdmin ? (
+                  <AdminPanel
+                    currentUserId={session.userId}
+                    onBack={() => setShowAdmin(false)}
+                  />
+                ) : (
+                  <PageEditor
+                    ref={pageEditorRef}
+                    key={activePage}
+                    pageSlug={activePage}
+                    liveContent={liveContent}
+                    customColors={palette}
+                    onAddCustomColor={handleAddCustomColor}
+                  />
+                )}
+              </div>
             </div>
           </div>
         )}

@@ -1,8 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import { useEditPages } from "@/hooks/useEditPages";
 import { FieldEditor } from "./FieldEditor";
 import { PublishModal } from "./PublishModal";
+
+export type PageEditorHandle = {
+  save: () => Promise<void>;
+  triggerPublish: () => void;
+  saving: boolean;
+  publishing: boolean;
+};
 
 const PAGE_FIELDS: Record<string, Array<{ key: string; label: string }>> = {
   about: [
@@ -86,7 +93,10 @@ type Props = {
   onAddCustomColor: (hex: string) => void;
 };
 
-export function PageEditor({ pageSlug, liveContent, customColors, onAddCustomColor }: Props) {
+export const PageEditor = forwardRef<PageEditorHandle, Props>(function PageEditor(
+  { pageSlug, liveContent, customColors, onAddCustomColor }: Props,
+  ref
+) {
   const { drafts, saving, publishing, loadDrafts, updateField, saveDraft, publish } = useEditPages(pageSlug);
   const [localDrafts, setLocalDrafts] = useState<Record<string, string>>({});
   const [showPublishModal, setShowPublishModal] = useState(false);
@@ -111,29 +121,35 @@ export function PageEditor({ pageSlug, liveContent, customColors, onAddCustomCol
   }
 
   async function handlePublishConfirm() {
-    // Save latest local state first, then publish
     await saveDraft(localDrafts);
     await publish();
     setShowPublishModal(false);
   }
 
+  useImperativeHandle(ref, () => ({
+    save: handleSaveDraft,
+    triggerPublish: () => setShowPublishModal(true),
+    saving,
+    publishing,
+  }), [handleSaveDraft, saving, publishing]);
+
   return (
     <div className="flex flex-col h-full">
-      {/* Top bar */}
-      <div className="flex flex-col gap-3 px-6 py-4 border-b border-white/10 shrink-0 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+      {/* Top bar — desktop only; mobile bar lives in EditPagesPanel */}
+      <div className="hidden md:flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
         <h2 className="text-sm uppercase tracking-widest text-white">{PAGE_LABELS[pageSlug] ?? pageSlug}</h2>
         <div className="flex gap-3">
           <button
             onClick={handleSaveDraft}
             disabled={saving}
-            className="flex-1 sm:flex-none px-5 py-2.5 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest hover:border-white/40 disabled:opacity-40"
+            className="px-5 py-2 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest hover:border-white/40 disabled:opacity-40"
           >
             {saving ? "Saving..." : "Save Draft"}
           </button>
           <button
             onClick={() => setShowPublishModal(true)}
             disabled={publishing}
-            className="flex-1 sm:flex-none px-5 py-2.5 bg-[#D4B896] text-black text-[9px] uppercase tracking-widest disabled:opacity-40"
+            className="px-5 py-2 bg-[#D4B896] text-black text-[9px] uppercase tracking-widest disabled:opacity-40"
           >
             {publishing ? "Publishing..." : "Publish"}
           </button>
@@ -164,4 +180,4 @@ export function PageEditor({ pageSlug, liveContent, customColors, onAddCustomCol
       )}
     </div>
   );
-}
+});
