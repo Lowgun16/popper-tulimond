@@ -63,18 +63,8 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup, c
             fontFamily: "'Courier New', monospace",
             fontSize: "8px", letterSpacing: "0.3em",
             color: "#4a3f2f", textTransform: "uppercase" as CSSProperties["textTransform"], marginBottom: "10px",
-          }}>
-          <p style={{
-            fontFamily: "'Courier New', monospace",
-            fontSize: "8px", letterSpacing: "0.3em",
-            color: "#4a3f2f", textTransform: "uppercase" as CSSProperties["textTransform"], marginBottom: "10px",
           }} dangerouslySetInnerHTML={{ __html: content.header }} />
 
-          <h2 style={{
-            fontFamily: "'Courier New', monospace",
-            fontSize: "20px", color: "#1a140a",
-            marginBottom: "18px", letterSpacing: "0.08em", fontWeight: 700,
-          }}>
           <h2 style={{
             fontFamily: "'Courier New', monospace",
             fontSize: "20px", color: "#1a140a",
@@ -94,10 +84,6 @@ export default function ProtocolOverlay({ isOpen, onClose, onRequestSmsSignup, c
                 }}>
                   {rule.number} —
                 </span>
-                <p style={{
-                  fontFamily: "'Courier New', monospace",
-                  fontSize: "11.5px", color: "#1a140a", lineHeight: 1.65,
-                }}>
                 <p style={{
                   fontFamily: "'Courier New', monospace",
                   fontSize: "11.5px", color: "#1a140a", lineHeight: 1.65,
