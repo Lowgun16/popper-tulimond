@@ -120,20 +120,20 @@ export function PageEditor({ pageSlug, liveContent, customColors, onAddCustomCol
   return (
     <div className="flex flex-col h-full">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+      <div className="flex flex-col gap-3 px-6 py-4 border-b border-white/10 shrink-0 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <h2 className="text-sm uppercase tracking-widest text-white">{PAGE_LABELS[pageSlug] ?? pageSlug}</h2>
         <div className="flex gap-3">
           <button
             onClick={handleSaveDraft}
             disabled={saving}
-            className="px-5 py-2 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest hover:border-white/40 disabled:opacity-40"
+            className="flex-1 sm:flex-none px-5 py-2.5 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest hover:border-white/40 disabled:opacity-40"
           >
             {saving ? "Saving..." : "Save Draft"}
           </button>
           <button
             onClick={() => setShowPublishModal(true)}
             disabled={publishing}
-            className="px-5 py-2 bg-[#D4B896] text-black text-[9px] uppercase tracking-widest disabled:opacity-40"
+            className="flex-1 sm:flex-none px-5 py-2.5 bg-[#D4B896] text-black text-[9px] uppercase tracking-widest disabled:opacity-40"
           >
             {publishing ? "Publishing..." : "Publish"}
           </button>

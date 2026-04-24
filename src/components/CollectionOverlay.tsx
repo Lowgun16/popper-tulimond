@@ -837,7 +837,9 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent }: 
         }}
       />
       {showEditPages && (
-        <EditPagesPanel onClose={() => setShowEditPages(false)} />
+        <OverlayPortal>
+          <EditPagesPanel onClose={() => setShowEditPages(false)} />
+        </OverlayPortal>
       )}
     </div>
   );
