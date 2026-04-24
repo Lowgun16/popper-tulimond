@@ -11,12 +11,15 @@ export async function middleware(request: NextRequest) {
     return new NextResponse(null, { status: 404 });
   }
 
-  // Protect /admin/* API routes (not /admin/setup or /admin/recover — those are public)
+  // Protect /admin/* API routes — webauthn + recover routes are public (no session yet)
   if (
-    pathname.startsWith("/api/admin/") ||
+    (pathname.startsWith("/api/admin/") &&
+      !pathname.startsWith("/api/admin/webauthn/") &&
+      !pathname.startsWith("/api/admin/recover/")) ||
     (pathname.startsWith("/admin/") &&
       !pathname.startsWith("/admin/setup") &&
-      !pathname.startsWith("/admin/recover"))
+      !pathname.startsWith("/admin/recover") &&
+      !pathname.startsWith("/admin/invite"))
   ) {
     const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
     if (!token) {
