@@ -20,6 +20,8 @@ export interface OutfitItem {
   materials?: string;
   story?: string;
   sizeGuide?: string;
+  /** Product thumbnail shown in the Vault listing. Path relative to /public. */
+  productImage?: string;
 }
 
 export interface ModelSlot {
@@ -59,6 +61,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         story: "Built for the man who doesn't need to announce himself. The Constable's ivory Showstopper is the uniform of quiet authority.",
         materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
         sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
+        productImage: "/assets/models/Angel/Angel-Heart-Long.png",
       },
     ],
     shadow: { offsetX: 0, offsetY: -8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
@@ -87,6 +90,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         story: "Built for the man who doesn't need to announce himself. The Constable's ivory Showstopper is the uniform of quiet authority.",
         materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
         sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
+        productImage: "/assets/models/Jerome/Jerome-Show-Short.png",
       },
     ],
     shadow: { offsetX: 0, offsetY: -8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
@@ -115,6 +119,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         story: "Built for the man who doesn't need to announce himself. The Constable's ivory Showstopper is the uniform of quiet authority.",
         materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
         sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
+        productImage: "/assets/models/Jack/Show.Long.Mid.Brick.jpeg",
       },
     ],
     shadow: { offsetX: -28, offsetY: -2, scaleX: 0.90, scaleY: 0.080, opacity: 0.35, blur: 14 },
@@ -143,6 +148,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         story: "Built for the man who doesn't need to announce himself. The Constable's ivory Showstopper is the uniform of quiet authority.",
         materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
         sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
+        productImage: "/assets/models/Jerome/Heart.Short.Mid.Studio.jpeg",
       },
     ],
     shadow: { offsetX: 0, offsetY: 0, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },

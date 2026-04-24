@@ -1,6 +1,7 @@
 // src/components/overlays/VaultOverlay.tsx
 "use client";
 
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import OverlayShell from "./OverlayShell";
 import { MODEL_INVENTORY } from "@/data/inventory";
@@ -148,60 +149,80 @@ export default function VaultOverlay({
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between",
-                    flexWrap: "wrap",
-                    gap: "12px",
+                    gap: "16px",
                     padding: "16px 0",
                     borderBottom: "1px solid rgba(255,255,255,0.05)",
                   }}
                 >
-                  {/* Left: colorway + sleeve + price */}
-                  <div>
-                    <p style={{
-                      fontFamily: "var(--font-display, serif)",
-                      fontSize: "17px",
-                      fontWeight: 300,
-                      color: "rgba(240,232,215,0.95)",
-                      letterSpacing: "0.04em",
-                      marginBottom: "4px",
+                  {/* Product thumbnail */}
+                  {item.productImage && (
+                    <div style={{
+                      flexShrink: 0,
+                      width: "64px",
+                      height: "84px",
+                      overflow: "hidden",
+                      borderRadius: "2px",
+                      border: "1px solid rgba(196,164,86,0.15)",
+                      background: "rgba(255,255,255,0.03)",
                     }}>
-                      {displayName}
-                    </p>
-                    <p style={{
-                      fontFamily: "var(--font-body, sans-serif)",
-                      fontSize: "11px",
-                      color: "rgba(240,232,215,0.65)",
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      marginBottom: "4px",
-                    }}>
-                      {sleeveLabel(item.colorway)}
-                    </p>
-                    <p style={{
-                      fontFamily: "var(--font-body, sans-serif)",
-                      fontSize: "14px",
-                      color: "rgba(196,164,86,0.95)",
-                    }}>
-                      {item.price}
-                    </p>
-                  </div>
+                      <Image
+                        src={item.productImage}
+                        alt={`${displayName} ${sleeveLabel(item.colorway)}`}
+                        width={64}
+                        height={84}
+                        style={{ objectFit: "cover", objectPosition: "top center", width: "100%", height: "100%" }}
+                      />
+                    </div>
+                  )}
 
-                  {/* Right: buttons */}
-                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                    <button
-                      type="button"
-                      style={lookbookBtnStyle}
-                      onClick={() => onOpenLookbook({ ...item, lookbook: item.lookbook ?? [] })}
-                    >
-                      Lookbook
-                    </button>
-                    <button
-                      type="button"
-                      style={sizeBtnStyle}
-                      onClick={onProtocolGate}
-                    >
-                      Find Your Size
-                    </button>
+                  {/* Name + sleeve + price + buttons */}
+                  <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                    <div>
+                      <p style={{
+                        fontFamily: "var(--font-display, serif)",
+                        fontSize: "17px",
+                        fontWeight: 300,
+                        color: "rgba(240,232,215,0.95)",
+                        letterSpacing: "0.04em",
+                        marginBottom: "4px",
+                      }}>
+                        {displayName}
+                      </p>
+                      <p style={{
+                        fontFamily: "var(--font-body, sans-serif)",
+                        fontSize: "11px",
+                        color: "rgba(240,232,215,0.65)",
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                        marginBottom: "4px",
+                      }}>
+                        {sleeveLabel(item.colorway)}
+                      </p>
+                      <p style={{
+                        fontFamily: "var(--font-body, sans-serif)",
+                        fontSize: "14px",
+                        color: "rgba(196,164,86,0.95)",
+                      }}>
+                        {item.price}
+                      </p>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        style={lookbookBtnStyle}
+                        onClick={() => onOpenLookbook({ ...item, lookbook: item.lookbook ?? [] })}
+                      >
+                        Lookbook
+                      </button>
+                      <button
+                        type="button"
+                        style={sizeBtnStyle}
+                        onClick={onProtocolGate}
+                      >
+                        Find Your Size
+                      </button>
+                    </div>
                   </div>
                 </div>
                 );
