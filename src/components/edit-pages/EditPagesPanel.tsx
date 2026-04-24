@@ -6,6 +6,7 @@ import { EditPagesSidebar } from "./EditPagesSidebar";
 import { PageEditor, type PageEditorHandle } from "./PageEditor";
 import { AdminPanel } from "./AdminPanel";
 import { ProductEditor } from "./ProductEditor";
+import { PreviewPane } from "./PreviewPane";
 
 type Props = {
   onClose: () => void;
@@ -61,6 +62,7 @@ export function EditPagesPanel({ onClose }: Props) {
     }
   }
 
+  const [showPreview, setShowPreview] = useState(false);
   const isOwner = session.status === "authenticated" && session.role === "owner";
   const pageEditorRef = useRef<PageEditorHandle>(null);
 
@@ -77,12 +79,22 @@ export function EditPagesPanel({ onClose }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
           <p className="text-[9px] uppercase tracking-widest text-white/30">Edit Pages</p>
-          <button
-            onClick={onClose}
-            className="text-white/30 hover:text-white text-xs uppercase tracking-widest"
-          >
-            ✕ Close
-          </button>
+          <div className="flex items-center gap-4">
+            {session.status === "authenticated" && !showAdmin && activePage !== "products" && (
+              <button
+                onClick={() => setShowPreview(true)}
+                className="text-white/30 hover:text-white text-xs uppercase tracking-widest"
+              >
+                Preview
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="text-white/30 hover:text-white text-xs uppercase tracking-widest"
+            >
+              ✕ Close
+            </button>
+          </div>
         </div>
 
         {/* Auth states */}
@@ -191,6 +203,15 @@ export function EditPagesPanel({ onClose }: Props) {
               </div>
             </div>
           </div>
+        )}
+
+        {showPreview && (
+          <PreviewPane
+            pageSlug={activePage}
+            drafts={pageEditorRef.current?.getDrafts() ?? {}}
+            liveContent={liveContent}
+            onClose={() => setShowPreview(false)}
+          />
         )}
       </motion.div>
     </AnimatePresence>
