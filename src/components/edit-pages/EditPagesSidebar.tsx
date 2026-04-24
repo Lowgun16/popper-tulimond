@@ -25,9 +25,10 @@ type Props = {
   onSelectPage: (slug: string) => void;
   isOwner: boolean;
   onAdminClick: () => void;
+  onProductsClick: () => void;
 };
 
-export function EditPagesSidebar({ activePage, onSelectPage, isOwner, onAdminClick }: Props) {
+export function EditPagesSidebar({ activePage, onSelectPage, isOwner, onAdminClick, onProductsClick }: Props) {
   function PageBtn({ page }: { page: PageItem }) {
     const isActive = activePage === page.slug;
     return (
@@ -49,6 +50,18 @@ export function EditPagesSidebar({ activePage, onSelectPage, isOwner, onAdminCli
       <div className="flex-1 overflow-y-auto py-4">
         <p className="px-4 text-[8px] uppercase tracking-widest text-white/20 mb-2">Brand Pages</p>
         {BRAND_PAGES.map((p) => <PageBtn key={p.slug} page={p} />)}
+        {isOwner && (
+          <button
+            onClick={onProductsClick}
+            className={`w-full text-left px-4 py-2.5 text-[9px] uppercase tracking-widest transition-colors ${
+              activePage === "products"
+                ? "text-[#D4B896] border-l-2 border-[#D4B896] bg-white/[0.03]"
+                : "text-white/40 border-l-2 border-transparent hover:text-white/70"
+            }`}
+          >
+            Products
+          </button>
+        )}
         <p className="px-4 text-[8px] uppercase tracking-widest text-white/20 mt-4 mb-2">Legal</p>
         {LEGAL_PAGES.map((p) => <PageBtn key={p.slug} page={p} />)}
       </div>

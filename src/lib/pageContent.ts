@@ -11,6 +11,7 @@ import type {
   ContactUsContent,
   AllPageContent,
 } from "./contentTypes";
+import type { ProductOverride } from "./productOverrides";
 import {
   ABOUT_CONTENT,
   PROTOCOL_CONTENT,
@@ -102,6 +103,15 @@ export function parseContactUs(rows: ContentRow[]): ContactUsContent {
 
 // ── Cached DB fetcher ─────────────────────────────────────────────────────────
 
+const fetchPublishedOverrides = cache(async (): Promise<ProductOverride[]> => {
+  try {
+    const rows = await sql`SELECT * FROM product_overrides WHERE is_draft = false`;
+    return rows as ProductOverride[];
+  } catch {
+    return [];
+  }
+});
+
 const fetchRows = cache(async (slug: string): Promise<ContentRow[]> => {
   try {
     const rows = await sql`
@@ -126,6 +136,7 @@ export async function fetchAllPageContent(): Promise<AllPageContent> {
     shippingRows,
     refundRows,
     contactUsRows,
+    productOverrides,
   ] = await Promise.all([
     fetchRows("about"),
     fetchRows("protocol"),
@@ -135,6 +146,7 @@ export async function fetchAllPageContent(): Promise<AllPageContent> {
     fetchRows("shipping"),
     fetchRows("refund"),
     fetchRows("contact-us"),
+    fetchPublishedOverrides(),
   ]);
 
   return {
@@ -146,6 +158,7 @@ export async function fetchAllPageContent(): Promise<AllPageContent> {
     shipping: parseLegal(shippingRows, SHIPPING_CONTENT),
     refund: parseLegal(refundRows, REFUND_CONTENT),
     contactUs: parseContactUs(contactUsRows),
+    productOverrides,
   };
 }
 

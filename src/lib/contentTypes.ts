@@ -1,5 +1,7 @@
 // src/lib/contentTypes.ts
 
+import type { ProductOverride } from "./productOverrides";
+
 export type AboutContent = {
   headline: string;
   subheadline: string;
@@ -53,4 +55,5 @@ export type AllPageContent = {
   shipping: LegalContent;
   refund: LegalContent;
   contactUs: ContactUsContent;
+  productOverrides: ProductOverride[];
 };

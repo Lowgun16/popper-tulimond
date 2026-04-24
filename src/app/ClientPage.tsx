@@ -6,12 +6,14 @@ import CartDrawer, { type CartItem } from "@/components/CartDrawer";
 import ProtocolGate from "@/components/ProtocolGate";
 import type { LookbookContext } from "@/components/studio/studioTypes";
 import type { AllPageContent } from "@/lib/contentTypes";
+import type { ProductOverride } from "@/lib/productOverrides";
 
 interface ClientPageProps {
   allContent: AllPageContent;
+  productOverrides: ProductOverride[];
 }
 
-export default function ClientPage({ allContent }: ClientPageProps) {
+export default function ClientPage({ allContent, productOverrides }: ClientPageProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [protocolGateOpen, setProtocolGateOpen] = useState(false);
@@ -35,7 +37,7 @@ export default function ClientPage({ allContent }: ClientPageProps) {
 
   return (
     <main>
-      <Portal onAddToCart={handleAddToCart} allContent={allContent} />
+      <Portal onAddToCart={handleAddToCart} allContent={allContent} productOverrides={productOverrides} />
       <CartDrawer
         isOpen={isCartOpen}
         items={cartItems}

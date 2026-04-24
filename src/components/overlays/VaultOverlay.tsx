@@ -5,14 +5,16 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import OverlayShell from "./OverlayShell";
 import { MODEL_INVENTORY } from "@/data/inventory";
+import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import type { LookbookContext } from "@/components/studio/studioTypes";
-import type { OutfitItem } from "@/data/inventory";
+import { mergeInventoryWithOverrides, type ProductOverride } from "@/lib/productOverrides";
 
 interface VaultOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   onProtocolGate: () => void;
   onOpenLookbook: (ctx: LookbookContext) => void;
+  productOverrides?: ProductOverride[];
 }
 
 // ─── Sort/Group helpers ───────────────────────────────────────────────────────
@@ -39,8 +41,8 @@ function sleeveLabel(colorway: string): string {
 }
 
 /** Group items by collection, sorted within each group by colorway → sleeve */
-function getGroupedItems(): Record<string, OutfitItem[]> {
-  const all = MODEL_INVENTORY.flatMap((slot) => slot.outfit);
+function getGroupedItems(inventory: ModelSlot[]): Record<string, OutfitItem[]> {
+  const all = inventory.flatMap((slot) => slot.outfit);
   // Dedupe by item id
   const unique = all.filter((item, i, arr) => arr.findIndex((x) => x.id === item.id) === i);
   // Sort: colorway priority first, then sleeve (short before long)
@@ -90,8 +92,13 @@ export default function VaultOverlay({
   onClose,
   onProtocolGate,
   onOpenLookbook,
+  productOverrides,
 }: VaultOverlayProps) {
-  const grouped = getGroupedItems();
+  const effectiveInventory =
+    productOverrides && productOverrides.length > 0
+      ? mergeInventoryWithOverrides(MODEL_INVENTORY, productOverrides)
+      : MODEL_INVENTORY;
+  const grouped = getGroupedItems(effectiveInventory);
 
   return (
     <OverlayShell isOpen={isOpen} onClose={onClose} label="The Vault">
@@ -143,6 +150,8 @@ export default function VaultOverlay({
                 const displayName = isFirstOfColorway && COLORWAY_COLOR[item.name]
                   ? `${item.name} (${COLORWAY_COLOR[item.name]})`
                   : item.name;
+                const isSoldOut =
+                  (item as OutfitItem & { _vaultStatus?: string })._vaultStatus === "sold_out";
                 return (
                 <div
                   key={item.id}
@@ -207,17 +216,34 @@ export default function VaultOverlay({
                       </p>
                     </div>
 
+                    {/* Sold Out badge */}
+                    {isSoldOut && (
+                      <span style={{
+                        fontFamily: "var(--font-title, serif)",
+                        fontSize: "9px",
+                        letterSpacing: "0.25em",
+                        textTransform: "uppercase" as const,
+                        color: "rgba(196,164,86,0.7)",
+                        border: "1px solid rgba(196,164,86,0.3)",
+                        padding: "4px 10px",
+                      }}>
+                        Sold Out
+                      </span>
+                    )}
+
                     <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
                       <button
                         type="button"
-                        style={lookbookBtnStyle}
+                        style={isSoldOut ? { ...lookbookBtnStyle, opacity: 0.4, pointerEvents: "none" as const } : lookbookBtnStyle}
+                        disabled={isSoldOut}
                         onClick={() => onOpenLookbook({ ...item, lookbook: item.lookbook ?? [] })}
                       >
                         Lookbook
                       </button>
                       <button
                         type="button"
-                        style={sizeBtnStyle}
+                        style={isSoldOut ? { ...sizeBtnStyle, opacity: 0.4, pointerEvents: "none" as const } : sizeBtnStyle}
+                        disabled={isSoldOut}
                         onClick={onProtocolGate}
                       >
                         Find Your Size

@@ -4,5 +4,5 @@ import ClientPage from "./ClientPage";
 
 export default async function Page() {
   const allContent = await fetchAllPageContent();
-  return <ClientPage allContent={allContent} />;
+  return <ClientPage allContent={allContent} productOverrides={allContent.productOverrides} />;
 }
