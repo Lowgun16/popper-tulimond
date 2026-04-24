@@ -5,6 +5,7 @@ import { useAdminSession } from "@/hooks/useAdminSession";
 import { EditPagesSidebar } from "./EditPagesSidebar";
 import { PageEditor, type PageEditorHandle } from "./PageEditor";
 import { AdminPanel } from "./AdminPanel";
+import { ProductEditor } from "./ProductEditor";
 
 type Props = {
   onClose: () => void;
@@ -122,6 +123,9 @@ export function EditPagesPanel({ onClose }: Props) {
                       {s === "about" ? "About" : s === "protocol" ? "The Protocol" : s === "contact" ? "Contact" : "Vault"}
                     </option>
                   ))}
+                  {isOwner && (
+                    <option value="products" className="bg-black">Products</option>
+                  )}
                 </optgroup>
                 <optgroup label="Legal">
                   {["terms","privacy","shipping","refund","contact-us"].map((s) => (
@@ -131,20 +135,24 @@ export function EditPagesPanel({ onClose }: Props) {
                   ))}
                 </optgroup>
               </select>
-              <button
-                onClick={() => pageEditorRef.current?.save()}
-                disabled={pageEditorRef.current?.saving}
-                className="shrink-0 px-3 py-1.5 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest disabled:opacity-40"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => pageEditorRef.current?.triggerPublish()}
-                disabled={pageEditorRef.current?.publishing}
-                className="shrink-0 px-3 py-1.5 bg-[#D4B896] text-black text-[9px] uppercase tracking-widest disabled:opacity-40"
-              >
-                Publish
-              </button>
+              {activePage !== "products" && (
+                <>
+                  <button
+                    onClick={() => pageEditorRef.current?.save()}
+                    disabled={pageEditorRef.current?.saving}
+                    className="shrink-0 px-3 py-1.5 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest disabled:opacity-40"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => pageEditorRef.current?.triggerPublish()}
+                    disabled={pageEditorRef.current?.publishing}
+                    className="shrink-0 px-3 py-1.5 bg-[#D4B896] text-black text-[9px] uppercase tracking-widest disabled:opacity-40"
+                  >
+                    Publish
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Desktop sidebar + editor row */}
@@ -157,6 +165,7 @@ export function EditPagesPanel({ onClose }: Props) {
                   onSelectPage={(slug) => { setActivePage(slug); setShowAdmin(false); }}
                   isOwner={isOwner}
                   onAdminClick={() => setShowAdmin(true)}
+                  onProductsClick={() => { setActivePage("products"); setShowAdmin(false); }}
                 />
               </div>
 
@@ -167,6 +176,8 @@ export function EditPagesPanel({ onClose }: Props) {
                     currentUserId={session.userId}
                     onBack={() => setShowAdmin(false)}
                   />
+                ) : activePage === "products" ? (
+                  <ProductEditor />
                 ) : (
                   <PageEditor
                     ref={pageEditorRef}
