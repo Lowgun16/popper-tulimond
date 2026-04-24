@@ -9,6 +9,7 @@ export type PageEditorHandle = {
   triggerPublish: () => void;
   saving: boolean;
   publishing: boolean;
+  getDrafts: () => Record<string, string>;
 };
 
 const PAGE_FIELDS: Record<string, Array<{ key: string; label: string }>> = {
@@ -131,7 +132,8 @@ export const PageEditor = forwardRef<PageEditorHandle, Props>(function PageEdito
     triggerPublish: () => setShowPublishModal(true),
     saving,
     publishing,
-  }), [handleSaveDraft, saving, publishing]);
+    getDrafts: () => localDrafts,
+  }), [handleSaveDraft, saving, publishing, localDrafts]);
 
   return (
     <div className="flex flex-col h-full">
