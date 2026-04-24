@@ -38,6 +38,8 @@ export async function POST(req: NextRequest) {
     status?: "active" | "sold_out" | "hidden";
   };
 
+  if (!itemId) return NextResponse.json({ error: "itemId is required" }, { status: 400 });
+
   await sql`
     INSERT INTO product_overrides (item_id, price, display_name, product_image, status, is_draft, updated_at)
     VALUES (
@@ -50,10 +52,10 @@ export async function POST(req: NextRequest) {
       now()
     )
     ON CONFLICT (item_id) DO UPDATE SET
-      price         = COALESCE(EXCLUDED.price,         product_overrides.price),
-      display_name  = COALESCE(EXCLUDED.display_name,  product_overrides.display_name),
-      product_image = COALESCE(EXCLUDED.product_image, product_overrides.product_image),
-      status        = EXCLUDED.status,
+      price         = ${price ?? null},
+      display_name  = ${displayName ?? null},
+      product_image = ${productImage ?? null},
+      status        = ${status ?? 'active'},
       is_draft      = true,
       updated_at    = now()
   `;
