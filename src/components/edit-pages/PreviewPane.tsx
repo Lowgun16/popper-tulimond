@@ -99,7 +99,7 @@ function PreviewContent({ pageSlug, drafts, liveContent, onClose }: Props) {
       <VaultOverlay
         isOpen={true}
         onClose={onClose}
-        onProtocolGate={() => {}}
+        onAddToCart={() => {}}
         onOpenLookbook={() => {}}
         productOverrides={vaultOverrides}
       />

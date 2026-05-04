@@ -2,26 +2,13 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import OverlayPortal from "@/components/OverlayPortal";
+import { useCart } from "@/contexts/CartContext";
+import { formatPrice } from "@/lib/formatPrice";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface CartItem {
-  id: string;
-  name: string;
-  collection: string;
-  colorway: string;
-  size: string;
-  price: string;
-}
-
 export interface CartDrawerProps {
-  isOpen: boolean;
-  items: CartItem[];
-  onClose: () => void;
-  onRemoveItem: (id: string) => void;
-  onApplePay: () => void;
-  onGooglePay: () => void;
-  onPayOtherWay: () => void;
+  onCheckout?: () => void;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -32,22 +19,12 @@ const GOLD_SOLID = "#C4A456";
 
 // ─── CartDrawer ───────────────────────────────────────────────────────────────
 
-export default function CartDrawer({
-  isOpen,
-  items,
-  onClose,
-  onRemoveItem,
-  onApplePay,
-  onGooglePay,
-  onPayOtherWay,
-}: CartDrawerProps) {
-  // Compute order total by summing numeric price values
-  const total = items.reduce((acc, item) => {
-    const numeric = parseFloat(item.price.replace(/[^0-9.]/g, ""));
-    return acc + (isNaN(numeric) ? 0 : numeric);
-  }, 0);
+export default function CartDrawer({ onCheckout }: CartDrawerProps) {
+  const { items, isOpen, closeCart, removeItem } = useCart();
 
-  const formattedTotal = `$${total.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  // Compute order total from cents
+  const total = items.reduce((acc, item) => acc + item.initiationPriceCents, 0);
+  const formattedTotal = formatPrice(total);
 
   return (
     <OverlayPortal>
@@ -61,7 +38,7 @@ export default function CartDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            onClick={onClose}
+            onClick={closeCart}
             style={{
               position: "fixed",
               inset: 0,
@@ -107,7 +84,7 @@ export default function CartDrawer({
                 YOUR CART
               </h2>
               <button
-                onClick={onClose}
+                onClick={closeCart}
                 aria-label="Close cart"
                 style={{
                   width: 44,
@@ -170,7 +147,7 @@ export default function CartDrawer({
                           {item.name}
                         </h3>
                         <button
-                          onClick={() => onRemoveItem(item.id)}
+                          onClick={() => removeItem(item.id)}
                           style={{
                             background: "none",
                             border: "none",
@@ -199,7 +176,7 @@ export default function CartDrawer({
                           Size {item.size}
                         </span>
                         <span style={{ color: "var(--color-parchment, #EDE6D6)", fontSize: "0.9rem", fontFamily: "var(--font-display, Georgia, serif)" }}>
-                          {item.price}
+                          {formatPrice(item.initiationPriceCents)}
                         </span>
                       </div>
                     </li>
@@ -249,7 +226,7 @@ export default function CartDrawer({
 
                 {/* Apple Pay */}
                 <button
-                  onClick={onApplePay}
+                  onClick={() => onCheckout?.()}
                   style={{
                     background: "#000",
                     color: "#fff",
@@ -272,7 +249,7 @@ export default function CartDrawer({
 
                 {/* Google Pay */}
                 <button
-                  onClick={onGooglePay}
+                  onClick={() => onCheckout?.()}
                   style={{
                     background: "#fff",
                     color: "#000",
@@ -292,7 +269,7 @@ export default function CartDrawer({
                 {/* Pay another way */}
                 <div style={{ textAlign: "center" }}>
                   <button
-                    onClick={onPayOtherWay}
+                    onClick={() => onCheckout?.()}
                     style={{
                       background: "none",
                       border: "none",

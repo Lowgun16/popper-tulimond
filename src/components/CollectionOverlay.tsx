@@ -808,9 +808,9 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
       <VaultOverlay
         isOpen={activeOverlay === "vault"}
         onClose={() => setActiveOverlay(null)}
-        onProtocolGate={() => {
+        onAddToCart={(item, size) => {
+          onAddToCart(item as LookbookContext, size);
           setActiveOverlay(null);
-          setProtocolGateOpen(true);
         }}
         onOpenLookbook={(ctx) => {
           setActiveOverlay(null);

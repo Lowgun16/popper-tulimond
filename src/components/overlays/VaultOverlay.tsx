@@ -9,11 +9,12 @@ import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import type { LookbookContext } from "@/components/studio/studioTypes";
 import { mergeInventoryWithOverrides, type ProductOverride } from "@/lib/productOverrides";
 import { formatPrice } from "@/lib/formatPrice";
+import SizeSelector from "@/components/vault/SizeSelector";
 
 interface VaultOverlayProps {
   isOpen: boolean;
   onClose: () => void;
-  onProtocolGate: () => void;
+  onAddToCart: (item: OutfitItem, size: string) => void;
   onOpenLookbook: (ctx: LookbookContext) => void;
   productOverrides?: ProductOverride[];
 }
@@ -80,18 +81,13 @@ const lookbookBtnStyle: CSSProperties = {
   color: "rgba(196,164,86,0.85)",
 };
 
-const sizeBtnStyle: CSSProperties = {
-  ...btnBaseStyle,
-  border: "1px solid rgba(255,255,255,0.12)",
-  color: "rgba(240,232,215,0.55)",
-};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function VaultOverlay({
   isOpen,
   onClose,
-  onProtocolGate,
+  onAddToCart,
   onOpenLookbook,
   productOverrides,
 }: VaultOverlayProps) {
@@ -232,7 +228,7 @@ export default function VaultOverlay({
                       </span>
                     )}
 
-                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                       <button
                         type="button"
                         style={isSoldOut ? { ...lookbookBtnStyle, opacity: 0.4, pointerEvents: "none" as const } : lookbookBtnStyle}
@@ -241,14 +237,12 @@ export default function VaultOverlay({
                       >
                         Lookbook
                       </button>
-                      <button
-                        type="button"
-                        style={isSoldOut ? { ...sizeBtnStyle, opacity: 0.4, pointerEvents: "none" as const } : sizeBtnStyle}
-                        disabled={isSoldOut}
-                        onClick={onProtocolGate}
-                      >
-                        Find Your Size
-                      </button>
+                      {!isSoldOut && (
+                        <SizeSelector
+                          sizes={item.sizes}
+                          onAddToCart={(size) => onAddToCart(item, size)}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>

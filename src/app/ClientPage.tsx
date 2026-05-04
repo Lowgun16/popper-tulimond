@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import Portal from "@/components/Portal";
-import CartDrawer, { type CartItem } from "@/components/CartDrawer";
+import CartDrawer from "@/components/CartDrawer";
 import ProtocolGate from "@/components/ProtocolGate";
+import { useCart } from "@/contexts/CartContext";
 import type { LookbookContext } from "@/components/studio/studioTypes";
 import type { AllPageContent } from "@/lib/contentTypes";
 import type { ProductOverride } from "@/lib/productOverrides";
-import { formatPrice } from "@/lib/formatPrice";
 
 interface ClientPageProps {
   allContent: AllPageContent;
@@ -15,44 +15,32 @@ interface ClientPageProps {
 }
 
 export default function ClientPage({ allContent, productOverrides }: ClientPageProps) {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [protocolGateOpen, setProtocolGateOpen] = useState(false);
+  const { addItem } = useCart();
 
-  const handleAddToCart = useCallback((item: LookbookContext, size: string) => {
-    const newItem: CartItem = {
-      id: `${item.name}-${Math.random().toString(36).slice(2, 9)}`,
+  const handleAddToCart = useCallback((item: LookbookContext & { id?: string; productImage?: string }, size: string) => {
+    addItem({
+      itemId: item.id ?? `item-${Math.random().toString(36).slice(2, 9)}`,
       name: item.name,
       collection: item.collection,
       colorway: item.colorway,
       size,
-      price: formatPrice(item.initiationPriceCents),
-    };
-    setCartItems((prev) => [...prev, newItem]);
-    setIsCartOpen(true);
-  }, []);
-
-  const handleRemoveItem = useCallback((id: string) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  }, []);
+      initiationPriceCents: item.initiationPriceCents,
+      memberPriceCents: item.memberPriceCents,
+      productImage: item.productImage,
+    });
+  }, [addItem]);
 
   return (
     <main>
       <Portal onAddToCart={handleAddToCart} allContent={allContent} productOverrides={productOverrides} />
       <CartDrawer
-        isOpen={isCartOpen}
-        items={cartItems}
-        onClose={() => setIsCartOpen(false)}
-        onRemoveItem={handleRemoveItem}
-        onApplePay={() => { setIsCartOpen(false); setProtocolGateOpen(true); }}
-        onGooglePay={() => { setIsCartOpen(false); setProtocolGateOpen(true); }}
-        onPayOtherWay={() => { setIsCartOpen(false); setProtocolGateOpen(true); }}
+        onCheckout={() => { /* Stripe wired in Tasks 15-16 */ }}
       />
       <ProtocolGate
-        isOpen={protocolGateOpen}
-        onClose={() => setProtocolGateOpen(false)}
-        onViewProtocol={() => setProtocolGateOpen(false)}
-        onRequestSmsSignup={() => setProtocolGateOpen(false)}
+        isOpen={false}
+        onClose={() => {}}
+        onViewProtocol={() => {}}
+        onRequestSmsSignup={() => {}}
       />
     </main>
   );
