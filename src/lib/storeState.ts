@@ -1,4 +1,4 @@
-import { fromZonedTime } from "date-fns-tz";
+import { toDate } from "date-fns-tz";
 import { parseISO } from "date-fns";
 
 export type StorePhase =
@@ -20,10 +20,7 @@ export interface DropRow {
 }
 
 function wallClockToDate(dateStr: string, timeStr: string, tz: string): Date {
-  const [h, m] = timeStr.split(":").map(Number);
-  const base = parseISO(dateStr);
-  base.setHours(h, m, 0, 0);
-  return fromZonedTime(base, tz);
+  return toDate(`${dateStr}T${timeStr}:00`, { timeZone: tz });
 }
 
 export function getStorePhase(drop: DropRow, now: Date): StorePhase {

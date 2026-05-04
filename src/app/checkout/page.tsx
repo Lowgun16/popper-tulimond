@@ -93,23 +93,47 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const totalCents = items.reduce((sum, i) => sum + i.initiationPriceCents, 0);
+  const [lineItems, setLineItems] = useState<(typeof items[number] & { priceCents: number })[]>([]);
+  const [totalCents, setTotalCents] = useState(0);
 
   useEffect(() => {
     if (items.length === 0) {
       router.push("/");
       return;
     }
-    fetch("/api/checkout/payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items }),
-    })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.clientSecret) setClientSecret(d.clientSecret);
-        else setError(d.error ?? "Unable to start checkout");
+
+    // Fetch member session and payment intent in parallel
+    Promise.all([
+      fetch("/api/member/session").then((r) => r.json()).catch(() => null),
+      fetch("/api/checkout/payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      }).then((r) => r.json()),
+    ])
+      .then(([memberSession, paymentData]) => {
+        if (!paymentData.clientSecret) {
+          setError(paymentData.error ?? "Unable to start checkout");
+          return;
+        }
+
+        const isMember = !!memberSession?.member;
+        let constableCount = 0;
+        const computed = items.map((item) => {
+          if (!isMember) {
+            constableCount++;
+            return {
+              ...item,
+              priceCents: constableCount === 1 ? item.initiationPriceCents : item.memberPriceCents,
+            };
+          }
+          return { ...item, priceCents: item.memberPriceCents };
+        });
+        const total = computed.reduce((sum, i) => sum + i.priceCents, 0);
+
+        setLineItems(computed);
+        setTotalCents(total);
+        setClientSecret(paymentData.clientSecret);
       })
       .catch(() => setError("Network error. Please try again."));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -206,7 +230,7 @@ export default function CheckoutPage() {
             paddingBottom: 20,
           }}
         >
-          {items.map((item) => (
+          {lineItems.map((item) => (
             <div
               key={item.id}
               style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}
@@ -227,7 +251,7 @@ export default function CheckoutPage() {
                   fontSize: "14px",
                 }}
               >
-                {formatPrice(item.initiationPriceCents)}
+                {formatPrice(item.priceCents)}
               </span>
             </div>
           ))}
