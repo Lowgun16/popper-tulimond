@@ -40,8 +40,7 @@ export async function POST(req: NextRequest) {
       expectedOrigin: process.env.WEBAUTHN_ORIGIN!,
       expectedRPID: process.env.WEBAUTHN_RP_ID!,
       credential: {
-        // @ts-expect-error — simplewebauthn type mismatch: toBuffer returns Uint8Array, field expects string
-        id: isoBase64URL.toBuffer(cred.credential_id),
+        id: cred.credential_id,
         publicKey: isoBase64URL.toBuffer(cred.public_key),
         counter: cred.counter,
       },
