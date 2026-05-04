@@ -47,6 +47,35 @@ export async function POST(req: NextRequest) {
       INSERT INTO orders (stripe_payment_intent_id, name, phone, email, shipping_address, items, total_cents)
       VALUES (${paymentIntentId}, ${name}, ${phone}, ${email}, ${JSON.stringify(shipping)}, ${JSON.stringify(items)}, ${totalCents})
     `;
+
+    // Send order confirmation email (non-blocking)
+    if (email) {
+      try {
+        const { Resend } = await import("resend");
+        const { render } = await import("@react-email/components");
+        const OrderConfirmationEmail = (await import("@/emails/OrderConfirmation")).default;
+
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const html = await render(
+          OrderConfirmationEmail({
+            name,
+            orderId: paymentIntentId,
+            items: items.map((i: { name: string; size: string; priceCents: number }) => i),
+            totalCents,
+            shippingAddress: shipping,
+          })
+        );
+
+        await resend.emails.send({
+          from: process.env.FROM_EMAIL ?? "orders@poppertulimond.com",
+          to: email,
+          subject: "Your order is confirmed — Popper Tulimond",
+          html,
+        });
+      } catch (err) {
+        console.error("[orders/confirm] Resend error:", err);
+      }
+    }
   }
 
   // Get or create member
