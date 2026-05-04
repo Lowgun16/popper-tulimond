@@ -40,7 +40,8 @@ export function useAdminSession() {
         body: JSON.stringify({ authenticationResponse: authResponse }),
       });
       if (!verifyRes.ok) {
-        setSession({ status: "error", message: "Authentication failed" });
+        const errData = await verifyRes.json().catch(() => ({}));
+        setSession({ status: "error", message: errData.error ?? "Authentication failed" });
         return false;
       }
       await checkSession();

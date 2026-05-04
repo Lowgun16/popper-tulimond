@@ -40,8 +40,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { credential } = verification.registrationInfo;
-  // @ts-expect-error — simplewebauthn type mismatch: fromBuffer expects Uint8Array, credential.id is string
-  const credentialId = isoBase64URL.fromBuffer(credential.id);
+  const credentialId = credential.id; // already a Base64URLString
   const publicKey = isoBase64URL.fromBuffer(credential.publicKey);
 
   const existingAdmins = await sql`SELECT id FROM admin_users LIMIT 1`;
