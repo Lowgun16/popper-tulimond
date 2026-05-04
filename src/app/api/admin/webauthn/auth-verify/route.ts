@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       expectedOrigin: process.env.WEBAUTHN_ORIGIN!,
       expectedRPID: process.env.WEBAUTHN_RP_ID!,
       credential: {
-        // @ts-expect-error — @simplewebauthn/server type mismatch: toBuffer returns Uint8Array, library expects string
+        // @ts-expect-error — simplewebauthn type mismatch: toBuffer returns Uint8Array, field expects string
         id: isoBase64URL.toBuffer(cred.credential_id),
         publicKey: isoBase64URL.toBuffer(cred.public_key),
         counter: cred.counter,
@@ -62,7 +62,6 @@ export async function POST(req: NextRequest) {
 
   const token = await signSession({ userId: cred.user_id, role: cred.role });
   const response = NextResponse.json({ ok: true });
-  // Set session cookie + clear challenge cookie
   response.headers.append("Set-Cookie", buildSessionCookieHeader(token));
   response.headers.append(
     "Set-Cookie",
