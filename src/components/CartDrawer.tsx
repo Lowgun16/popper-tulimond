@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import OverlayPortal from "@/components/OverlayPortal";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/lib/formatPrice";
@@ -21,6 +22,7 @@ const GOLD_SOLID = "#C4A456";
 
 export default function CartDrawer({ onCheckout }: CartDrawerProps) {
   const { items, isOpen, closeCart, removeItem } = useCart();
+  const router = useRouter();
 
   // Compute order total from cents
   const total = items.reduce((acc, item) => acc + item.initiationPriceCents, 0);
@@ -269,7 +271,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
                 {/* Pay another way */}
                 <div style={{ textAlign: "center" }}>
                   <button
-                    onClick={() => onCheckout?.()}
+                    onClick={() => { closeCart(); router.push("/checkout"); }}
                     style={{
                       background: "none",
                       border: "none",
