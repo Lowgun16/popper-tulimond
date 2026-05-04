@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { loadStripe, type Stripe, type PaymentRequest } from "@stripe/stripe-js";
 import OverlayPortal from "@/components/OverlayPortal";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/lib/formatPrice";
@@ -18,11 +20,96 @@ const DRAWER_BG = "#0e0e0e";
 const GOLD = "rgba(196, 164, 86, 0.3)";
 const GOLD_SOLID = "#C4A456";
 
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
 // ─── CartDrawer ───────────────────────────────────────────────────────────────
 
 export default function CartDrawer({ onCheckout }: CartDrawerProps) {
-  const { items, isOpen, closeCart, removeItem } = useCart();
+  const { items, isOpen, closeCart, removeItem, clearCart } = useCart();
   const router = useRouter();
+
+  // Payment Request (Apple Pay / Google Pay)
+  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
+  const [canPayApple, setCanPayApple] = useState(false);
+  const [canPayGoogle, setCanPayGoogle] = useState(false);
+  const stripeRef = useRef<Stripe | null>(null);
+
+  useEffect(() => {
+    if (items.length === 0) return;
+    const totalCents = items.reduce((sum, i) => sum + i.initiationPriceCents, 0);
+
+    stripePromise.then((stripe) => {
+      if (!stripe) return;
+      stripeRef.current = stripe;
+
+      const pr = stripe.paymentRequest({
+        country: "US",
+        currency: "usd",
+        total: { label: "Popper Tulimond", amount: totalCents },
+        requestPayerName: true,
+        requestPayerEmail: true,
+        requestPayerPhone: true,
+        requestShipping: true,
+        shippingOptions: [
+          { id: "standard", label: "Standard Shipping", detail: "", amount: 0 },
+        ],
+      });
+
+      pr.canMakePayment().then((result) => {
+        if (!result) return;
+        setPaymentRequest(pr);
+        setCanPayApple(!!result.applePay);
+        setCanPayGoogle(!!result.googlePay);
+      });
+
+      pr.on("paymentmethod", async (ev) => {
+        // Create payment intent
+        const piRes = await fetch("/api/checkout/payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items }),
+        });
+        const { clientSecret, error: piError } = await piRes.json();
+        if (piError) {
+          ev.complete("fail");
+          return;
+        }
+
+        const { error } = await stripe.confirmCardPayment(
+          clientSecret,
+          { payment_method: ev.paymentMethod.id },
+          { handleActions: false }
+        );
+
+        if (error) {
+          ev.complete("fail");
+          return;
+        }
+        ev.complete("success");
+
+        // Confirm order server-side
+        const confirmRes = await fetch("/api/orders/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            paymentIntentId: clientSecret.split("_secret_")[0],
+            shippingAddress: ev.shippingAddress,
+            payerEmail: ev.payerEmail,
+            payerName: ev.payerName,
+            payerPhone: ev.payerPhone,
+          }),
+        });
+        const data = await confirmRes.json();
+        clearCart();
+        closeCart();
+        if (data.setupToken) {
+          router.push(`/membership-setup?token=${data.setupToken}`);
+        } else {
+          router.push("/");
+        }
+      });
+    });
+  }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Compute order total from cents
   const total = items.reduce((acc, item) => acc + item.initiationPriceCents, 0);
@@ -228,7 +315,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
 
                 {/* Apple Pay */}
                 <button
-                  onClick={() => onCheckout?.()}
+                  onClick={() => paymentRequest?.show()}
                   style={{
                     background: "#000",
                     color: "#fff",
@@ -238,7 +325,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
                     fontSize: "1.1rem",
                     fontFamily: "inherit",
                     cursor: "pointer",
-                    display: "flex",
+                    display: canPayApple ? "flex" : "none",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: 8,
@@ -251,7 +338,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
 
                 {/* Google Pay */}
                 <button
-                  onClick={() => onCheckout?.()}
+                  onClick={() => paymentRequest?.show()}
                   style={{
                     background: "#fff",
                     color: "#000",
@@ -263,6 +350,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
                     cursor: "pointer",
                     border: "1px solid #e0e0e0",
                     marginBottom: 16,
+                    display: canPayGoogle ? "block" : "none",
                   }}
                 >
                   G Pay
