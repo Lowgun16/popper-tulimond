@@ -1,19 +1,21 @@
 import { NextResponse } from "next/server";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
 
-// Shared challenge store for auth flow
-export const authChallengeStore = new Map<string, string>();
+export const CHALLENGE_COOKIE = "webauthn_auth_challenge";
 
 export async function GET() {
-  // Allow any registered credential (passkey-style: user selects their device)
   const options = await generateAuthenticationOptions({
     rpID: process.env.WEBAUTHN_RP_ID!,
     userVerification: "preferred",
     allowCredentials: [],
   });
 
-  // Store challenge keyed by challenge string itself (resolved in verify)
-  authChallengeStore.set(options.challenge, options.challenge);
-
-  return NextResponse.json(options);
+  const response = NextResponse.json(options);
+  response.headers.set(
+    "Set-Cookie",
+    `${CHALLENGE_COOKIE}=${options.challenge}; HttpOnly; SameSite=Lax; Path=/; Max-Age=300${
+      process.env.NODE_ENV === "production" ? "; Secure" : ""
+    }`
+  );
+  return response;
 }

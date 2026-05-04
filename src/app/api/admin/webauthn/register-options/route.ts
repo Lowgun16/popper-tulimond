@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import { sql } from "@/lib/db";
 
-// In-memory challenge store (sufficient for single-server; Vercel Fluid Compute reuses instances)
-const challengeStore = new Map<string, string>();
+export const REG_CHALLENGE_COOKIE = "webauthn_reg_challenge";
 
 export async function GET(req: NextRequest) {
   const email = req.nextUrl.searchParams.get("email");
@@ -12,7 +11,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "email and name are required" }, { status: 400 });
   }
 
-  // Fetch existing credentials for this user (if any) to exclude them
   const existingRows = await sql`
     SELECT wc.credential_id
     FROM webauthn_credentials wc
@@ -37,9 +35,12 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  challengeStore.set(email, options.challenge);
-
-  return NextResponse.json(options);
+  const response = NextResponse.json(options);
+  response.headers.set(
+    "Set-Cookie",
+    `${REG_CHALLENGE_COOKIE}=${options.challenge}; HttpOnly; SameSite=Lax; Path=/; Max-Age=300${
+      process.env.NODE_ENV === "production" ? "; Secure" : ""
+    }`
+  );
+  return response;
 }
-
-export { challengeStore };

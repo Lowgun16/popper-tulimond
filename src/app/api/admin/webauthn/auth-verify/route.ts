@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAuthenticationResponse } from "@simplewebauthn/server";
 import { isoBase64URL } from "@simplewebauthn/server/helpers";
 import { sql } from "@/lib/db";
-import { authChallengeStore } from "../auth-options/route";
+import { CHALLENGE_COOKIE } from "../auth-options/route";
 import { signSession } from "@/lib/session";
 import { buildSessionCookieHeader } from "@/lib/adminAuth";
 
@@ -10,19 +10,13 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { authenticationResponse } = body as { authenticationResponse: { id: string; response: { clientDataJSON: string } } };
 
-  // Decode challenge from clientDataJSON
-  const clientData = JSON.parse(
-    Buffer.from(authenticationResponse.response.clientDataJSON, "base64url").toString()
-  );
-  const challenge = clientData.challenge;
-  const expectedChallenge = authChallengeStore.get(challenge);
+  const expectedChallenge = req.cookies.get(CHALLENGE_COOKIE)?.value;
   if (!expectedChallenge) {
-    return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
+    return NextResponse.json({ error: "Challenge not found — try again" }, { status: 400 });
   }
 
   const credentialId = authenticationResponse.id;
 
-  // Look up the credential
   const credRows = await sql`
     SELECT wc.id, wc.credential_id, wc.public_key, wc.counter,
            au.id as user_id, au.role
@@ -46,7 +40,7 @@ export async function POST(req: NextRequest) {
       expectedOrigin: process.env.WEBAUTHN_ORIGIN!,
       expectedRPID: process.env.WEBAUTHN_RP_ID!,
       credential: {
-        // @ts-expect-error — @simplewebauthn/server type mismatch: toBuffer returns Uint8Array, library expects string
+        // @ts-expect-error — simplewebauthn type mismatch: toBuffer returns Uint8Array, field expects string
         id: isoBase64URL.toBuffer(cred.credential_id),
         publicKey: isoBase64URL.toBuffer(cred.public_key),
         counter: cred.counter,
@@ -60,9 +54,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Authentication failed" }, { status: 401 });
   }
 
-  authChallengeStore.delete(challenge);
-
-  // Update counter
   await sql`
     UPDATE webauthn_credentials
     SET counter = ${verification.authenticationInfo.newCounter}
@@ -71,6 +62,10 @@ export async function POST(req: NextRequest) {
 
   const token = await signSession({ userId: cred.user_id, role: cred.role });
   const response = NextResponse.json({ ok: true });
-  response.headers.set("Set-Cookie", buildSessionCookieHeader(token));
+  response.headers.append("Set-Cookie", buildSessionCookieHeader(token));
+  response.headers.append(
+    "Set-Cookie",
+    `${CHALLENGE_COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0`
+  );
   return response;
 }

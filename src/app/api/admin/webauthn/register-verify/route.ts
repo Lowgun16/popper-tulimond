@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyRegistrationResponse } from "@simplewebauthn/server";
 import { isoBase64URL } from "@simplewebauthn/server/helpers";
 import { sql } from "@/lib/db";
-import { challengeStore } from "../register-options/route";
+import { REG_CHALLENGE_COOKIE } from "../register-options/route";
 import { signSession } from "@/lib/session";
 import { buildSessionCookieHeader } from "@/lib/adminAuth";
 import bcrypt from "bcryptjs";
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     inviteToken?: string;
   };
 
-  const expectedChallenge = challengeStore.get(email);
+  const expectedChallenge = req.cookies.get(REG_CHALLENGE_COOKIE)?.value;
   if (!expectedChallenge) {
     return NextResponse.json({ error: "No challenge found — start registration again" }, { status: 400 });
   }
@@ -39,18 +39,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Verification failed" }, { status: 400 });
   }
 
-  challengeStore.delete(email);
-
   const { credential } = verification.registrationInfo;
-  // @ts-expect-error — @simplewebauthn/server type mismatch: credential.id is string, fromBuffer expects Uint8Array
+  // @ts-expect-error — simplewebauthn type mismatch: fromBuffer expects Uint8Array, credential.id is string
   const credentialId = isoBase64URL.fromBuffer(credential.id);
   const publicKey = isoBase64URL.fromBuffer(credential.publicKey);
 
-  // Check if this is the very first admin (setup flow) or an invite flow
   const existingAdmins = await sql`SELECT id FROM admin_users LIMIT 1`;
   const isFirstAdmin = existingAdmins.length === 0;
 
-  // Validate invite token if not first admin
   if (!isFirstAdmin && inviteToken) {
     const invite = await sql`
       SELECT id FROM admin_invites
@@ -66,7 +62,6 @@ export async function POST(req: NextRequest) {
 
   const assignedRole = isFirstAdmin ? "owner" : (role ?? "editor");
 
-  // Upsert user
   const userResult = await sql`
     INSERT INTO admin_users (name, email, role)
     VALUES (${name}, ${email}, ${assignedRole})
@@ -75,14 +70,12 @@ export async function POST(req: NextRequest) {
   `;
   const userId = userResult[0].id;
 
-  // Save credential
   await sql`
     INSERT INTO webauthn_credentials (user_id, credential_id, public_key, counter)
     VALUES (${userId}, ${credentialId}, ${publicKey}, ${credential.counter})
     ON CONFLICT (credential_id) DO NOTHING
   `;
 
-  // Generate recovery code for first admin (owner)
   let recoveryCode: string | null = null;
   if (isFirstAdmin) {
     recoveryCode = crypto.randomBytes(16).toString("hex");
@@ -93,9 +86,12 @@ export async function POST(req: NextRequest) {
     `;
   }
 
-  // Issue session
   const token = await signSession({ userId, role: assignedRole });
   const response = NextResponse.json({ ok: true, recoveryCode });
-  response.headers.set("Set-Cookie", buildSessionCookieHeader(token));
+  response.headers.append("Set-Cookie", buildSessionCookieHeader(token));
+  response.headers.append(
+    "Set-Cookie",
+    `${REG_CHALLENGE_COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0`
+  );
   return response;
 }
