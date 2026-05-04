@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import type { OutfitItem } from "@/data/inventory";
 import type { LookbookContext } from "@/components/studio/studioTypes";
+import { formatPrice } from "@/lib/formatPrice";
 
 export const CARD_W = 184; 
 const CARD_GAP = 40;
@@ -81,7 +82,7 @@ export function SpatialCard({ item, placement, onClose, onLookbook }: SpatialCar
           {item.collection}
         </p>
         <h3 style={{ fontSize: "16px", color: "white", marginBottom: "4px" }}>{item.name}</h3>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "16px" }}>{item.price}</p>
+        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "16px" }}>{formatPrice(item.initiationPriceCents)}</p>
 
         <button 
           onClick={(e) => { e.stopPropagation(); onLookbook(item as any); }} 

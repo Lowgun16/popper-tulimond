@@ -53,7 +53,8 @@ interface RawOutfitItem {
   name: string;
   collection: string;
   colorway: string;
-  price: string;
+  initiationPriceCents: number;
+  memberPriceCents: number;
   type: AccessType;
   dotPosition: string;
   lookbook?: LookbookItem[];
@@ -93,7 +94,8 @@ export function modelSlotToStudio(slot: RawModelSlot): StudioSlot {
       name: item.name,
       collection: item.collection,
       colorway: item.colorway,
-      price: item.price,
+      initiationPriceCents: item.initiationPriceCents,
+      memberPriceCents: item.memberPriceCents,
       type: item.type,
       topPct,
       leftPct: dLeft,
@@ -153,7 +155,8 @@ export function exportInventoryCode(slots: StudioSlot[]): string {
       lines.push(`        name: "${dot.name}",`);
       lines.push(`        collection: "${dot.collection}",`);
       lines.push(`        colorway: "${dot.colorway}",`);
-      lines.push(`        price: "${dot.price}",`);
+      lines.push(`        initiationPriceCents: ${dot.initiationPriceCents},`);
+      lines.push(`        memberPriceCents: ${dot.memberPriceCents},`);
       lines.push(`        type: ${JSON.stringify(dot.type)},`);
       lines.push(`        dotPosition: "top-[${dot.topPct.toFixed(1)}%] left-[${dot.leftPct.toFixed(1)}%]",`);
 

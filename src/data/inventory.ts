@@ -9,8 +9,10 @@ export interface OutfitItem {
   name: string;
   collection: string;
   colorway: string;
-  /** Price as a display string, e.g. "$179" */
-  price: string;
+  /** Initiation Night price in cents, e.g. 12900 for $129 */
+  initiationPriceCents: number;
+  /** Member price in cents, e.g. 22900 for $229 */
+  memberPriceCents: number;
   type: AccessType;
   dotPosition: string;
   lookbook?: LookbookItem[];
@@ -51,7 +53,8 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         name: "Heartbreaker",
         collection: "The Constable",
         colorway: "Guilt Grey (Long Sleeve)",
-        price: "$159",
+        initiationPriceCents: 15900,
+        memberPriceCents: 25900,
         type: "public",
         dotPosition: "top-[33.3%] left-[60.5%]",
         filterDimensions: [],
@@ -80,7 +83,8 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         name: "Showstopper",
         collection: "The Constable",
         colorway: "Ivory (Short Sleeve)",
-        price: "$129",
+        initiationPriceCents: 12900,
+        memberPriceCents: 22900,
         type: "public",
         dotPosition: "top-[34.5%] left-[40.1%]",
         filterDimensions: [],
@@ -109,7 +113,8 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         name: "Showstopper",
         collection: "The Constable",
         colorway: "Ivory (Long Sleeve)",
-        price: "$159",
+        initiationPriceCents: 15900,
+        memberPriceCents: 25900,
         type: "public",
         dotPosition: "top-[34.8%] left-[44.8%]",
         filterDimensions: [],
@@ -138,7 +143,8 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         name: "Heartbreaker",
         collection: "The Constable",
         colorway: "Guilt Grey (Short Sleeve)",
-        price: "$129",
+        initiationPriceCents: 12900,
+        memberPriceCents: 22900,
         type: "public",
         dotPosition: "top-[33.6%] left-[56.6%]",
         filterDimensions: [],

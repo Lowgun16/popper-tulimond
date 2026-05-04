@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { MODEL_INVENTORY } from "@/data/inventory";
 import type { ProductOverride } from "@/lib/productOverrides";
+import { formatPrice } from "@/lib/formatPrice";
 
 type Props = {
   onBack?: () => void;
@@ -229,10 +230,10 @@ export function ProductEditor({ onBack: _onBack }: Props) {
                       </p>
                       <ImagePathInput
                         value={
-                          getField(item.id, "price", item.price) as string
+                          getField(item.id, "price", formatPrice(item.initiationPriceCents)) as string
                         }
                         onChange={(v) => handleChange(item.id, "price", v)}
-                        placeholder={item.price}
+                        placeholder={formatPrice(item.initiationPriceCents)}
                       />
                     </div>
 

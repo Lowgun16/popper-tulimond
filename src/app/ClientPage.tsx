@@ -7,6 +7,7 @@ import ProtocolGate from "@/components/ProtocolGate";
 import type { LookbookContext } from "@/components/studio/studioTypes";
 import type { AllPageContent } from "@/lib/contentTypes";
 import type { ProductOverride } from "@/lib/productOverrides";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface ClientPageProps {
   allContent: AllPageContent;
@@ -25,7 +26,7 @@ export default function ClientPage({ allContent, productOverrides }: ClientPageP
       collection: item.collection,
       colorway: item.colorway,
       size,
-      price: item.price,
+      price: formatPrice(item.initiationPriceCents),
     };
     setCartItems((prev) => [...prev, newItem]);
     setIsCartOpen(true);

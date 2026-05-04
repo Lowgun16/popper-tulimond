@@ -10,6 +10,7 @@ import {
 } from "framer-motion";
 import { StudioInspector } from "./studio/StudioInspector";
 import { modelSlotToStudio, exportInventoryCode } from "./studio/studioUtils";
+import { formatPrice } from "@/lib/formatPrice";
 import type { StudioSlot, StudioDot, ShadowConfig, LookbookContext } from "./studio/studioTypes";
 import { MODEL_INVENTORY } from "@/data/inventory";
 import type { ModelSlot, OutfitItem } from "@/data/inventory";
@@ -226,7 +227,7 @@ function ObsidianCard({ id, item, layout, onClose, onAction }: ObsidianCardProps
           {item.collection}
         </p>
         <h3 style={{ fontSize: "16px", color: "white", marginBottom: "4px" }}>{item.name}</h3>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "16px" }}>{item.price}</p>
+        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "16px" }}>{formatPrice(item.initiationPriceCents)}</p>
         <button
           onClick={(e) => { e.stopPropagation(); onAction(); }}
           style={{
@@ -633,7 +634,7 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
           }}
           copyConfirm={copyConfirm}
           onAddDot={(slotId) => {
-            const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "The Constable", colorway: "", price: "", type: "public", topPct: 50, leftPct: 50, lookbook: [], filterDimensions: [], sizes: ["S", "M", "L", "XL", "XXL"], sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } }, story: "", materials: "", sizeGuide: "" };
+            const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "The Constable", colorway: "", initiationPriceCents: 12900, memberPriceCents: 22900, type: "public", topPct: 50, leftPct: 50, lookbook: [], filterDimensions: [], sizes: ["S", "M", "L", "XL", "XXL"], sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } }, story: "", materials: "", sizeGuide: "" };
             setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s));
           }}
           onRemoveDot={(slotId, dotId) => {

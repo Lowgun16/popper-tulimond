@@ -42,7 +42,6 @@ export function mergeInventoryWithOverrides(
 
         return {
           ...item,
-          price: override.price ?? item.price,
           name: override.display_name ?? item.name,
           productImage: override.product_image ?? item.productImage,
           _vaultStatus: override.status,

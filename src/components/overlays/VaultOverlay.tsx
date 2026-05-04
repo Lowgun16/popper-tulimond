@@ -8,6 +8,7 @@ import { MODEL_INVENTORY } from "@/data/inventory";
 import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import type { LookbookContext } from "@/components/studio/studioTypes";
 import { mergeInventoryWithOverrides, type ProductOverride } from "@/lib/productOverrides";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface VaultOverlayProps {
   isOpen: boolean;
@@ -212,7 +213,7 @@ export default function VaultOverlay({
                         fontSize: "14px",
                         color: "rgba(196,164,86,0.95)",
                       }}>
-                        {item.price}
+                        {formatPrice(item.initiationPriceCents)}
                       </p>
                     </div>
 
