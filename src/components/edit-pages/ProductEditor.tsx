@@ -94,7 +94,8 @@ export function ProductEditor({ onBack: _onBack }: Props) {
             credentials: "include",
             body: JSON.stringify({
               itemId,
-              price: override.price,
+              initiationPriceCents: override.initiation_price_cents,
+              memberPriceCents: override.member_price_cents,
               displayName: override.display_name,
               productImage: override.product_image,
               status: override.status,
@@ -226,13 +227,19 @@ export function ProductEditor({ onBack: _onBack }: Props) {
                     {/* Price */}
                     <div className="mb-3">
                       <p className="text-[8px] uppercase tracking-widest text-white/30 mb-1">
-                        Price
+                        Initiation Price (cents)
                       </p>
                       <ImagePathInput
-                        value={
-                          getField(item.id, "price", formatPrice(item.initiationPriceCents)) as string
+                        value={String(
+                          getField(item.id, "initiation_price_cents", item.initiationPriceCents) ?? item.initiationPriceCents
+                        )}
+                        onChange={(v) =>
+                          handleChange(
+                            item.id,
+                            "initiation_price_cents",
+                            v === "" ? null : Number(v)
+                          )
                         }
-                        onChange={(v) => handleChange(item.id, "price", v)}
                         placeholder={formatPrice(item.initiationPriceCents)}
                       />
                     </div>
