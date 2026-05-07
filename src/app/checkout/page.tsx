@@ -12,6 +12,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/lib/formatPrice";
+import SmsSignupSheet from "@/components/SmsSignupSheet";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -93,6 +94,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [storeClosed, setStoreClosed] = useState(false);
   const [lineItems, setLineItems] = useState<(typeof items[number] & { priceCents: number })[]>([]);
   const [totalCents, setTotalCents] = useState(0);
 
@@ -113,7 +115,12 @@ export default function CheckoutPage() {
     ])
       .then(([memberSession, paymentData]) => {
         if (!paymentData.clientSecret) {
-          setError(paymentData.error ?? "Unable to start checkout");
+          const msg = paymentData.error ?? "";
+          if (msg === "Store is not open" || msg === "Store is closed" || msg === "Early access required") {
+            setStoreClosed(true);
+          } else {
+            setError(msg || "Unable to start checkout");
+          }
           return;
         }
 
@@ -137,6 +144,52 @@ export default function CheckoutPage() {
       })
       .catch(() => setError("Network error. Please try again."));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (storeClosed) {
+    return (
+      <>
+        <div
+          style={{
+            minHeight: "100dvh",
+            background: DARK,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div style={{ maxWidth: 440, width: "100%", textAlign: "center" }}>
+            <p style={{ fontFamily: "var(--font-title, serif)", fontSize: "9px", letterSpacing: "0.35em", textTransform: "uppercase", color: GOLD, marginBottom: 24 }}>
+              Popper Tulimond
+            </p>
+            <h1 style={{ fontFamily: "var(--font-display, serif)", fontSize: "26px", fontWeight: 300, color: "rgba(240,232,215,0.95)", marginBottom: 16, lineHeight: 1.3 }}>
+              The store opens on the 16th.
+            </h1>
+            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.55)", lineHeight: 1.7, marginBottom: 32 }}>
+              New members are accepted once a month. Sign up for texts and we&apos;ll send you early access — 15 minutes before the doors open.
+            </p>
+            <button
+              onClick={() => router.push("/")}
+              style={{
+                background: "rgba(196,164,86,0.1)",
+                border: `1px solid ${GOLD}`,
+                color: GOLD,
+                padding: "14px 32px",
+                cursor: "pointer",
+                fontFamily: "var(--font-title, serif)",
+                fontSize: "10px",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+              }}
+            >
+              Get Early Access
+            </button>
+          </div>
+        </div>
+        <SmsSignupSheet isOpen={true} onClose={() => router.push("/")} source="blocked_purchase" />
+      </>
+    );
+  }
 
   if (error) {
     return (
