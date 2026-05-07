@@ -30,8 +30,8 @@ export interface LookbookContext {
   name: string;
   collection: string;
   colorway: string;
-  /** Price as a display string, e.g. "$179" */
-  price: string;
+  initiationPriceCents: number;
+  memberPriceCents: number;
   type: AccessType;
   lookbook: LookbookItem[];
   filterDimensions?: FilterDimension[];

@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { LookbookContext, LookbookItem, FilterDimension } from "./studioTypes";
+import { formatPrice } from "@/lib/formatPrice";
 import OverlayPortal from "@/components/OverlayPortal";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -363,7 +364,7 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
                     fontFamily: "var(--font-display, Georgia, serif)", fontSize: "2rem",
                     color: "#C4A456", marginTop: 12, marginBottom: 24, lineHeight: 1.2,
                   }}>
-                    {item.price}
+                    {formatPrice(item.initiationPriceCents)}
                   </p>
 
                   <div className="divider-gold" style={{ marginBottom: 24 }} />

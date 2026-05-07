@@ -4,14 +4,18 @@ import { sql } from "@/lib/db";
 import twilio from "twilio";
 
 export async function POST(req: NextRequest) {
-  let body: { phone?: unknown; email?: unknown; source?: unknown };
+  let body: { firstName?: unknown; phone?: unknown; email?: unknown; source?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { phone, email, source } = body;
+  const { firstName, phone, email, source } = body;
+
+  if (typeof firstName !== "string" || firstName.trim().length === 0) {
+    return NextResponse.json({ ok: false, error: "First name required" }, { status: 400 });
+  }
 
   // Validate phone
   if (typeof phone !== "string" || phone.trim().length < 7) {
@@ -37,8 +41,8 @@ export async function POST(req: NextRequest) {
   // Save to DB
   try {
     await sql`
-      INSERT INTO sms_signups (phone, email, source)
-      VALUES (${cleanPhone}, ${cleanEmail}, ${source})
+      INSERT INTO sms_signups (phone, email, name, source)
+      VALUES (${cleanPhone}, ${cleanEmail}, ${firstName.trim()}, ${source})
     `;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
