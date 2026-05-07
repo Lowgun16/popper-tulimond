@@ -111,7 +111,11 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items }),
-      }).then((r) => r.json()),
+      }).then(async (r) => {
+        const text = await r.text();
+        try { return JSON.parse(text); }
+        catch { return { error: `Server error (${r.status})` }; }
+      }),
     ])
       .then(([memberSession, paymentData]) => {
         if (!paymentData.clientSecret) {
@@ -142,7 +146,7 @@ export default function CheckoutPage() {
         setTotalCents(total);
         setClientSecret(paymentData.clientSecret);
       })
-      .catch(() => setError("Network error. Please try again."));
+      .catch((err) => setError(`Network error: ${err?.message ?? "unknown"}. Please try again.`));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (storeClosed) {
