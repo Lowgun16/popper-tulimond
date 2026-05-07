@@ -7,6 +7,7 @@ import { loadStripe, type Stripe, type PaymentRequest } from "@stripe/stripe-js"
 import OverlayPortal from "@/components/OverlayPortal";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/lib/formatPrice";
+import ReservationSheet from "@/components/ReservationSheet";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -28,11 +29,40 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
   const { items, isOpen, closeCart, removeItem, clearCart } = useCart();
   const router = useRouter();
 
+  const [reservationOpen, setReservationOpen] = useState(false);
+
   // Payment Request (Apple Pay / Google Pay)
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
   const [canPayApple, setCanPayApple] = useState(false);
   const [canPayGoogle, setCanPayGoogle] = useState(false);
   const stripeRef = useRef<Stripe | null>(null);
+
+  const checkStoreOpen = async (): Promise<boolean> => {
+    try {
+      const res = await fetch("/api/checkout/payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: items.slice(0, 1) }),
+      });
+      if (res.status === 403) return false;
+      return true;
+    } catch {
+      return true; // optimistic — let Stripe catch it
+    }
+  };
+
+  const handleAppleGooglePay = async () => {
+    const open = await checkStoreOpen();
+    if (!open) { setReservationOpen(true); return; }
+    paymentRequest?.show();
+  };
+
+  const handlePayAnotherWay = async () => {
+    const open = await checkStoreOpen();
+    if (!open) { setReservationOpen(true); return; }
+    closeCart();
+    router.push("/checkout");
+  };
 
   useEffect(() => {
     if (items.length === 0) return;
@@ -116,6 +146,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
   const formattedTotal = formatPrice(total);
 
   return (
+    <>
     <OverlayPortal>
     <AnimatePresence>
       {isOpen && (
@@ -315,7 +346,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
 
                 {/* Apple Pay */}
                 <button
-                  onClick={() => paymentRequest?.show()}
+                  onClick={handleAppleGooglePay}
                   style={{
                     background: "#000",
                     color: "#fff",
@@ -338,7 +369,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
 
                 {/* Google Pay */}
                 <button
-                  onClick={() => paymentRequest?.show()}
+                  onClick={handleAppleGooglePay}
                   style={{
                     background: "#fff",
                     color: "#000",
@@ -359,7 +390,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
                 {/* Pay another way */}
                 <div style={{ textAlign: "center" }}>
                   <button
-                    onClick={() => { closeCart(); router.push("/checkout"); }}
+                    onClick={handlePayAnotherWay}
                     style={{
                       background: "none",
                       border: "none",
@@ -382,5 +413,11 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
       )}
     </AnimatePresence>
     </OverlayPortal>
+    <ReservationSheet
+      isOpen={reservationOpen}
+      onClose={() => setReservationOpen(false)}
+      cartItems={items.map((i) => ({ name: i.name, size: i.size, colorway: i.colorway }))}
+    />
+    </>
   );
 }
