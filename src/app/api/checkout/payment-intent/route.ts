@@ -4,7 +4,7 @@ import { sql } from "@/lib/db";
 import { getStorePhase, type DropRow } from "@/lib/storeState";
 import { getMemberSession } from "@/lib/memberAuth";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
   const { items, phone } = (await req.json()) as {
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
 
   const totalCents = lineItems.reduce((sum, i) => sum + i.priceCents, 0);
 
-  const paymentIntent = await stripe.paymentIntents.create({
+  const paymentIntent = await getStripe().paymentIntents.create({
     amount: totalCents,
     currency: "usd",
     automatic_payment_methods: { enabled: true },

@@ -4,12 +4,12 @@ import { sql } from "@/lib/db";
 import { getMemberSession } from "@/lib/memberAuth";
 import { v4 as uuidv4 } from "uuid";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
   const { paymentIntentId, shippingAddress, payerEmail, payerName, payerPhone } = await req.json();
 
-  const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+  const pi = await getStripe().paymentIntents.retrieve(paymentIntentId);
   if (pi.status !== "succeeded") {
     return NextResponse.json({ error: "Payment not confirmed" }, { status: 400 });
   }
