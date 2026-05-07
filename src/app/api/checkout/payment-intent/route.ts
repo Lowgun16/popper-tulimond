@@ -7,6 +7,7 @@ import { getMemberSession } from "@/lib/memberAuth";
 const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
+  try {
   const { items, phone } = (await req.json()) as {
     items: Array<{
       itemId: string;
@@ -89,4 +90,11 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    console.error("[payment-intent] Unhandled error:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
