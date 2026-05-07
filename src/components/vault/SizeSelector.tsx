@@ -18,7 +18,8 @@ export default function SizeSelector({ sizes, onAddToCart, disabled }: SizeSelec
     if (!selected) return;
     onAddToCart(selected);
     setAdded(true);
-    setTimeout(() => { setAdded(false); setSelected(null); }, 1500);
+    if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(40);
+    setTimeout(() => { setAdded(false); setSelected(null); }, 1800);
   };
 
   return (
@@ -49,17 +50,18 @@ export default function SizeSelector({ sizes, onAddToCart, disabled }: SizeSelec
           onClick={handleAdd}
           style={{
             padding: "10px 20px",
-            background: added ? "rgba(196,164,86,0.2)" : "rgba(196,164,86,0.1)",
-            border: `1px solid ${GOLD}`,
-            color: GOLD,
+            background: added ? "rgba(56,161,105,0.15)" : "rgba(196,164,86,0.1)",
+            border: `1px solid ${added ? "#38A169" : GOLD}`,
+            color: added ? "#68D391" : GOLD,
             fontFamily: "var(--font-title, serif)",
             fontSize: "10px",
             letterSpacing: "0.2em",
             textTransform: "uppercase",
             cursor: "pointer",
+            transition: "background 0.2s, border-color 0.2s, color 0.2s",
           }}
         >
-          {added ? "Added" : `Add to Cart — ${selected}`}
+          {added ? "Added!" : `Add to Cart — ${selected}`}
         </button>
       )}
     </div>

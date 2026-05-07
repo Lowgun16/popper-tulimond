@@ -5,7 +5,6 @@ import { motion, type MotionValue, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
 import { useMemberSession } from "@/hooks/useMemberSession";
-import { useCart } from "@/contexts/CartContext";
 import { createPortal } from "react-dom";
 
 export type NavPage = "vault" | "about" | "protocol" | "contact";
@@ -35,7 +34,6 @@ export default function AtelierNav({ opacity, onNavClick, footerOpen, onLegalCli
   useMotionValueEvent(opacity, "change", (v) => setActive(v > 0.05));
 
   const { session: memberSession, refresh: refreshMember } = useMemberSession();
-  const { items, openCart } = useCart();
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginStatus, setLoginStatus] = useState<"idle" | "loading" | "error">("idle");
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -138,31 +136,6 @@ export default function AtelierNav({ opacity, onNavClick, footerOpen, onLegalCli
               {footerOpen ? "Close Footer" : "Legal"}
             </button>
           </div>
-
-          {items.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span aria-hidden="true" style={{ color: "rgba(240,232,215,0.15)", fontSize: "12px" }}>|</span>
-              <button
-                type="button"
-                onClick={openCart}
-                className="type-eyebrow py-3 px-1 bg-transparent border-none cursor-pointer transition-colors duration-300 inline-flex items-center gap-1.5"
-                style={{ color: "var(--color-parchment)", opacity: 0.75, fontSize: "9px", letterSpacing: "0.2em" }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "1")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.75")}
-                aria-label={`Open cart — ${items.length} item${items.length !== 1 ? "s" : ""}`}
-              >
-                Cart
-                <span style={{
-                  display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  width: "16px", height: "16px", borderRadius: "50%",
-                  background: "#C4A456", color: "#0e0e0e",
-                  fontSize: "8px", fontFamily: "var(--font-title, serif)", fontWeight: 600,
-                }}>
-                  {items.length}
-                </span>
-              </button>
-            </div>
-          )}
 
           <div className="hidden md:flex items-center gap-2">
             <span aria-hidden="true" style={{ color: "rgba(240,232,215,0.15)", fontSize: "12px" }}>|</span>

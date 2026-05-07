@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import Portal from "@/components/Portal";
 import CartDrawer from "@/components/CartDrawer";
+import CartIcon from "@/components/CartIcon";
 import ProtocolGate from "@/components/ProtocolGate";
 import { useCart } from "@/contexts/CartContext";
 import type { LookbookContext } from "@/components/studio/studioTypes";
@@ -33,6 +34,7 @@ export default function ClientPage({ allContent, productOverrides }: ClientPageP
   return (
     <main>
       <Portal onAddToCart={handleAddToCart} allContent={allContent} productOverrides={productOverrides} />
+      <CartIcon />
       <CartDrawer
         onCheckout={() => { /* Stripe wired in Tasks 15-16 */ }}
       />

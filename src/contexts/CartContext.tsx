@@ -46,6 +46,7 @@ interface CartContextValue extends CartState {
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
+  justAdded: boolean;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -53,6 +54,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false });
   const [hydrated, setHydrated] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
 
   // Hydrate from localStorage on mount
   useEffect(() => {
@@ -71,6 +73,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = useCallback((item: Omit<CartItem, "id">) => {
     dispatch({ type: "ADD", item: { ...item, id: `${item.itemId}-${item.size}-${Math.random().toString(36).slice(2, 7)}` } });
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 1500);
   }, []);
 
   const removeItem = useCallback((id: string) => dispatch({ type: "REMOVE", id }), []);
@@ -79,7 +83,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const closeCart  = useCallback(() => dispatch({ type: "CLOSE" }), []);
 
   return (
-    <CartContext.Provider value={{ ...state, addItem, removeItem, clearCart, openCart, closeCart }}>
+    <CartContext.Provider value={{ ...state, addItem, removeItem, clearCart, openCart, closeCart, justAdded }}>
       {children}
     </CartContext.Provider>
   );

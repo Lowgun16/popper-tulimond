@@ -27,7 +27,13 @@ export function getStorePhase(drop: DropRow, now: Date): StorePhase {
   if (!drop.is_open) return "sold_out";
   if (drop.sold_count >= drop.available_count) return "sold_out";
 
-  const dropDate = drop.drop_month; // e.g. "2026-05-16"
+  // Neon returns DATE columns as JS Date objects — normalize to "YYYY-MM-DD" string
+  const rawMonth = drop.drop_month as unknown;
+  const dropDate =
+    rawMonth instanceof Date
+      ? `${rawMonth.getUTCFullYear()}-${String(rawMonth.getUTCMonth() + 1).padStart(2, "0")}-${String(rawMonth.getUTCDate()).padStart(2, "0")}`
+      : String(rawMonth).slice(0, 10);
+
   const prevDate = parseISO(dropDate);
   prevDate.setDate(prevDate.getDate() - 1);
   const prevDateStr = prevDate.toISOString().slice(0, 10); // "2026-05-15"
