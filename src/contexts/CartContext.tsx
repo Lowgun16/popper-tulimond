@@ -32,7 +32,7 @@ type CartAction =
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case "HYDRATE": return { ...state, items: action.items };
-    case "ADD":     return { ...state, items: [...state.items, action.item], isOpen: true };
+    case "ADD":     return { ...state, items: [...state.items, action.item] };
     case "REMOVE":  return { ...state, items: state.items.filter((i) => i.id !== action.id) };
     case "CLEAR":   return { ...state, items: [] };
     case "OPEN":    return { ...state, isOpen: true };
