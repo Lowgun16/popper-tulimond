@@ -96,13 +96,29 @@ function MembershipCelebration({
 
   useEffect(() => {
     if (containerRef.current) containerRef.current.scrollTop = 0;
-    // Fire stamp sound when the seal makes contact (~450ms into the spring animation)
-    const soundTimer = setTimeout(() => playSealStampSound(), 450);
+
     // Haptic pattern for Android
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       setTimeout(() => navigator.vibrate([80, 40, 80, 40, 120]), 450);
     }
-    return () => clearTimeout(soundTimer);
+
+    // Sound: try immediately at ~450ms (works after gesture or permissive browsers).
+    // On iOS / strict Chrome without a recent gesture the AudioContext will be
+    // suspended — the pointerdown fallback catches that case and plays on first tap.
+    let played = false;
+    const playOnce = () => {
+      if (played) return;
+      played = true;
+      document.removeEventListener("pointerdown", playOnce);
+      playSealStampSound();
+    };
+    const soundTimer = setTimeout(playOnce, 450);
+    document.addEventListener("pointerdown", playOnce, { once: true });
+
+    return () => {
+      clearTimeout(soundTimer);
+      document.removeEventListener("pointerdown", playOnce);
+    };
   }, []);
 
   return (

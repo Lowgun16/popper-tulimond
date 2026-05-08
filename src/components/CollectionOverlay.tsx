@@ -734,7 +734,6 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
           onClose={() => setLookbookDot(null)}
           onAddToCart={(item, size) => {
             onAddToCart(item, size);
-            setLookbookDot(null);
           }}
         />
       )}
@@ -810,7 +809,6 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
         onClose={() => setActiveOverlay(null)}
         onAddToCart={(item, size) => {
           onAddToCart(item as LookbookContext, size);
-          setActiveOverlay(null);
         }}
         onOpenLookbook={(ctx) => {
           setActiveOverlay(null);

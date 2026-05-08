@@ -72,7 +72,8 @@ export function playSealStampSound(): void {
   const ctx = getCtx();
   if (!ctx) return;
 
-  try {
+  const schedule = () => {
+    try {
     const master = ctx.createGain();
     master.gain.setValueAtTime(0.7, ctx.currentTime);
     master.connect(ctx.destination);
@@ -162,7 +163,14 @@ export function playSealStampSound(): void {
     }
 
     setTimeout(() => { try { ctx.close(); } catch { /* ignore */ } }, 1800);
-  } catch {
-    // Silently skip
+    } catch {
+      // Silently skip
+    }
+  };
+
+  if (ctx.state === "suspended") {
+    ctx.resume().then(schedule).catch(() => { try { ctx.close(); } catch { /* ignore */ } });
+  } else {
+    schedule();
   }
 }

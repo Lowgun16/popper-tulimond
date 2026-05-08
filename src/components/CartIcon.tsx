@@ -31,7 +31,7 @@ export default function CartIcon() {
       aria-label={`Open cart — ${items.length} item${items.length !== 1 ? "s" : ""}`}
       style={{
         position: "fixed",
-        top: 20,
+        top: 72,
         right: 20,
         zIndex: 60,
         background: "none",
