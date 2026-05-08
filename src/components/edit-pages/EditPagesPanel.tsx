@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAdminSession } from "@/hooks/useAdminSession";
-import { EditPagesSidebar } from "./EditPagesSidebar";
+import { EditPagesSidebar, BRAND_PAGES, LEGAL_PAGES } from "./EditPagesSidebar";
 import { PageEditor, type PageEditorHandle } from "./PageEditor";
 import { AdminPanel } from "./AdminPanel";
 import { ProductEditor } from "./ProductEditor";
@@ -130,20 +130,16 @@ export function EditPagesPanel({ onClose }: Props) {
                 className="flex-1 bg-transparent border border-white/20 text-white text-[10px] px-2 py-1.5 outline-none min-w-0"
               >
                 <optgroup label="Brand Pages">
-                  {["about","protocol","contact","vault"].map((s) => (
-                    <option key={s} value={s} className="bg-black">
-                      {s === "about" ? "About" : s === "protocol" ? "The Protocol" : s === "contact" ? "Contact" : "Vault"}
-                    </option>
+                  {BRAND_PAGES.map((p) => (
+                    <option key={p.slug} value={p.slug} className="bg-black">{p.label}</option>
                   ))}
                   {isOwner && (
                     <option value="products" className="bg-black">Products</option>
                   )}
                 </optgroup>
                 <optgroup label="Legal">
-                  {["terms","privacy","shipping","refund","contact-us"].map((s) => (
-                    <option key={s} value={s} className="bg-black">
-                      {s === "terms" ? "Terms of Use" : s === "privacy" ? "Privacy Policy" : s === "shipping" ? "Shipping & Fulfillment" : s === "refund" ? "Refund Policy" : "Contact Us"}
-                    </option>
+                  {LEGAL_PAGES.map((p) => (
+                    <option key={p.slug} value={p.slug} className="bg-black">{p.label}</option>
                   ))}
                 </optgroup>
               </select>
