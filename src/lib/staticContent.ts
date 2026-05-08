@@ -76,6 +76,16 @@ export const SHIPPING_CONTENT = {
   body: `Standard Shipping (In-Stock Items)\nFor items currently in stock, orders are processed within 2–3 business days.\n\nPre-Orders\nAt Popper Tulimond, we prioritize quality over mass production. To ensure each shirt meets our standards, many of our items are sold on a Pre-Order basis.\n\nEstimated Ship Dates: Any item designated as a "Pre-Order" will have an estimated shipping date clearly listed on the product page. Please note that this date is an estimate based on our current manufacturing capacity.\n\nDelayed Fulfillment: Because we produce in limited runs to maintain exclusivity and quality, high sales volume may occasionally extend our standard lead times.\n\nTransparency: If your order is delayed more than 7 business days beyond the original estimate, we will notify you via email with an updated timeline and the option to maintain or cancel your order.`,
 } as const;
 
+export const RESERVATION_CONTENT = {
+  headline: "You have good taste.",
+  body_1: "New members join once a month. Since you've already chosen your piece, that tells us what we need to know.",
+  body_2: "Leave your email and we'll send you early access — fifteen minutes before the window opens — so you don't miss your chance on the limited spots available.",
+  cta_text: "Reserve My Place",
+  fine_print: "No spam. One email to confirm, one when your window opens.",
+  success_headline: "Your place is reserved.",
+  success_body: "We sent a confirmation to your email.",
+} as const;
+
 export const MEMBERSHIP_CELEBRATION_CONTENT = {
   congratulations_headline: "Congratulations.",
   subtitle: "You are now a full member of the Vault.",

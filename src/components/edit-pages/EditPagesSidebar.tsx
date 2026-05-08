@@ -11,6 +11,7 @@ const BRAND_PAGES: PageItem[] = [
   { slug: "contact", label: "Contact" },
   { slug: "vault", label: "Vault" },
   { slug: "membership-celebration", label: "Welcome — New Member" },
+  { slug: "reservation", label: "Reserve My Place Popup" },
 ];
 
 const LEGAL_PAGES: PageItem[] = [

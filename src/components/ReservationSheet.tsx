@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { RESERVATION_CONTENT } from "@/lib/staticContent";
+import type { ReservationContent } from "@/lib/contentTypes";
 
 const GOLD = "#C4A456";
 const DARK = "rgba(10,10,10,0.98)";
@@ -24,6 +26,18 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [] }: Pr
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [dropDate, setDropDate] = useState<string | null>(null);
+  const [content, setContent] = useState<ReservationContent>(RESERVATION_CONTENT);
+
+  useEffect(() => {
+    fetch("/api/content/reservation")
+      .then((r) => r.json())
+      .then(({ content: overrides }) => {
+        if (overrides && Object.keys(overrides).length > 0) {
+          setContent((prev) => ({ ...prev, ...overrides }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,10 +108,10 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [] }: Pr
               Popper Tulimond
             </p>
             <h2 style={{ fontFamily: "var(--font-display, serif)", fontSize: "24px", fontWeight: 300, color: "rgba(240,232,215,0.95)", marginBottom: 20, lineHeight: 1.35 }}>
-              Your place is reserved.
+              {content.success_headline}
             </h2>
             <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.6)", lineHeight: 1.75, marginBottom: 12 }}>
-              We sent a confirmation to your email.
+              {content.success_body}
             </p>
             <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.6)", lineHeight: 1.75, marginBottom: 32 }}>
               {dropDate
@@ -137,14 +151,14 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [] }: Pr
             </p>
 
             <h2 style={{ fontFamily: "var(--font-display, serif)", fontSize: "22px", fontWeight: 300, color: "rgba(240,232,215,0.95)", marginBottom: 16, lineHeight: 1.4 }}>
-              You have good taste.
+              {content.headline}
             </h2>
 
             <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "14px", color: "rgba(240,232,215,0.6)", lineHeight: 1.75, marginBottom: 10 }}>
-              New members join once a month. Since you've already chosen your piece, that tells us what we need to know.
+              {content.body_1}
             </p>
             <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "14px", color: "rgba(240,232,215,0.6)", lineHeight: 1.75, marginBottom: 28 }}>
-              Leave your email and we'll send you early access — fifteen minutes before the window opens — so you don't miss your chance on the limited spots available.
+              {content.body_2}
             </p>
 
             {cartItems.length > 0 && (
@@ -210,11 +224,11 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [] }: Pr
                   opacity: !email.trim() || status === "loading" ? 0.5 : 1,
                 }}
               >
-                {status === "loading" ? "Reserving..." : "Reserve My Place"}
+                {status === "loading" ? "Reserving..." : content.cta_text}
               </button>
 
               <p style={{ textAlign: "center", margin: "4px 0 0", fontFamily: "var(--font-body, sans-serif)", fontSize: "11px", color: "rgba(240,232,215,0.25)", lineHeight: 1.6 }}>
-                No spam. One email to confirm, one when your window opens.
+                {content.fine_print}
               </p>
             </form>
           </>

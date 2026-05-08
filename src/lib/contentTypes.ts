@@ -46,6 +46,16 @@ export type AllLegalContent = {
   contactUs: ContactUsContent;
 };
 
+export type ReservationContent = {
+  headline: string;
+  body_1: string;
+  body_2: string;
+  cta_text: string;
+  fine_print: string;
+  success_headline: string;
+  success_body: string;
+};
+
 export type MembershipCelebrationContent = {
   congratulations_headline: string;
   subtitle: string;

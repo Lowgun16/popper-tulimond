@@ -55,6 +55,15 @@ const PAGE_FIELDS: Record<string, Array<{ key: string; label: string }>> = {
     { key: "closing_line", label: "Closing Line (italic)" },
     { key: "cta_text", label: "Button Text" },
   ],
+  reservation: [
+    { key: "headline", label: "Headline (e.g. You have good taste.)" },
+    { key: "body_1", label: "Body — Paragraph 1" },
+    { key: "body_2", label: "Body — Paragraph 2" },
+    { key: "cta_text", label: "Button Text (e.g. Reserve My Place)" },
+    { key: "fine_print", label: "Fine Print (below the button)" },
+    { key: "success_headline", label: "Success — Headline" },
+    { key: "success_body", label: "Success — Body" },
+  ],
   terms: [
     { key: "title", label: "Title" },
     { key: "last_updated", label: "Last Updated" },
@@ -93,6 +102,7 @@ const PAGE_LABELS: Record<string, string> = {
   shipping: "Shipping & Fulfillment",
   refund: "Refund Policy",
   "contact-us": "Contact Us",
+  reservation: "Reserve My Place Popup",
 };
 
 type Props = {
