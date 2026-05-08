@@ -24,6 +24,8 @@ export interface OutfitItem {
   sizeGuide?: string;
   /** Product thumbnail shown in the Vault listing. Path relative to /public. */
   productImage?: string;
+  /** Cart thumbnail — overrides productImage in the cart drawer when set. */
+  cartImage?: string;
 }
 
 export interface ModelSlot {

@@ -7,6 +7,7 @@ type ProductOverride = {
   price: string | null;
   display_name: string | null;
   product_image: string | null;
+  cart_image: string | null;
   status: "active" | "sold_out" | "hidden";
   is_draft: boolean;
   updated_at: string;
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
   if (sessionOrResponse instanceof NextResponse) return sessionOrResponse;
 
   const rows: ProductOverride[] = await sql`
-    SELECT item_id, price, display_name, product_image, status, is_draft, updated_at
+    SELECT item_id, price, display_name, product_image, cart_image, status, is_draft, updated_at
     FROM product_overrides
   `;
 
@@ -30,23 +31,25 @@ export async function POST(req: NextRequest) {
   const sessionOrResponse = await requireOwner(req);
   if (sessionOrResponse instanceof NextResponse) return sessionOrResponse;
 
-  const { itemId, price, displayName, productImage, status } = await req.json() as {
+  const { itemId, price, displayName, productImage, cartImage, status } = await req.json() as {
     itemId: string;
     price?: string;
     displayName?: string;
     productImage?: string;
+    cartImage?: string | null;
     status?: "active" | "sold_out" | "hidden";
   };
 
   if (!itemId) return NextResponse.json({ error: "itemId is required" }, { status: 400 });
 
   await sql`
-    INSERT INTO product_overrides (item_id, price, display_name, product_image, status, is_draft, updated_at)
+    INSERT INTO product_overrides (item_id, price, display_name, product_image, cart_image, status, is_draft, updated_at)
     VALUES (
       ${itemId},
       ${price ?? null},
       ${displayName ?? null},
       ${productImage ?? null},
+      ${cartImage ?? null},
       ${status ?? "active"},
       true,
       now()
@@ -55,6 +58,7 @@ export async function POST(req: NextRequest) {
       price         = ${price ?? null},
       display_name  = ${displayName ?? null},
       product_image = ${productImage ?? null},
+      cart_image    = ${cartImage ?? null},
       status        = ${status ?? 'active'},
       is_draft      = true,
       updated_at    = now()

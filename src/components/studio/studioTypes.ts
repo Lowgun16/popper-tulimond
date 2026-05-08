@@ -40,6 +40,7 @@ export interface LookbookContext {
   sizeGuide?: string;
   sizes: string[];
   sizeChart?: Record<string, { chest: string; length: string }>;
+  cartImage?: string;
 }
 
 // ── StudioDot ─────────────────────────────────────────────────────────────────

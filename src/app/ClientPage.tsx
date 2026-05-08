@@ -27,7 +27,7 @@ export default function ClientPage({ allContent, productOverrides }: ClientPageP
       size,
       initiationPriceCents: item.initiationPriceCents,
       memberPriceCents: item.memberPriceCents,
-      productImage: item.productImage,
+      productImage: item.cartImage ?? item.productImage,
     });
   }, [addItem]);
 

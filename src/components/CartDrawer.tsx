@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { loadStripe, type Stripe, type PaymentRequest } from "@stripe/stripe-js";
+import Image from "next/image";
 import OverlayPortal from "@/components/OverlayPortal";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/lib/formatPrice";
@@ -251,53 +252,82 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
                     <li
                       key={item.id}
                       style={{
-                        padding: "20px 24px",
+                        padding: "16px 20px",
                         borderBottom: `1px solid rgba(196,164,86,0.12)`,
                         display: "flex",
-                        flexDirection: "column",
-                        gap: 4,
+                        gap: 14,
+                        alignItems: "flex-start",
                       }}
                     >
-                      {/* Name row with remove button */}
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                        <h3
-                          className="type-heading"
-                          style={{ color: "var(--color-parchment, #EDE6D6)", margin: 0, fontSize: "0.9rem" }}
-                        >
-                          {item.name}
-                        </h3>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            color: GOLD_SOLID,
-                            cursor: "pointer",
-                            fontSize: "1rem",
-                            opacity: 0.7,
-                            flexShrink: 0,
-                            padding: "0 4px",
-                            lineHeight: 1,
-                          }}
-                          aria-label={`Remove ${item.name}`}
-                        >
-                          ×
-                        </button>
+                      {/* Thumbnail */}
+                      <div
+                        style={{
+                          flexShrink: 0,
+                          width: 64,
+                          height: 84,
+                          background: "rgba(255,255,255,0.04)",
+                          border: "1px solid rgba(196,164,86,0.15)",
+                          overflow: "hidden",
+                          position: "relative",
+                        }}
+                      >
+                        {item.productImage ? (
+                          <Image
+                            src={item.productImage}
+                            alt={item.name}
+                            fill
+                            style={{ objectFit: "cover", objectPosition: "top center" }}
+                          />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <span style={{ color: "rgba(196,164,86,0.3)", fontSize: 20 }}>✦</span>
+                          </div>
+                        )}
                       </div>
 
-                      {/* Collection + colorway */}
-                      <p className="type-eyebrow" style={{ color: GOLD_SOLID, fontSize: "0.65rem", margin: 0 }}>
-                        {item.collection} — {item.colorway}
-                      </p>
+                      {/* Text content */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        {/* Name row with remove button */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                          <h3
+                            className="type-heading"
+                            style={{ color: "var(--color-parchment, #EDE6D6)", margin: 0, fontSize: "0.85rem" }}
+                          >
+                            {item.name}
+                          </h3>
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: GOLD_SOLID,
+                              cursor: "pointer",
+                              fontSize: "1rem",
+                              opacity: 0.7,
+                              flexShrink: 0,
+                              padding: "0 4px",
+                              lineHeight: 1,
+                            }}
+                            aria-label={`Remove ${item.name}`}
+                          >
+                            ×
+                          </button>
+                        </div>
 
-                      {/* Size + price row */}
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>
-                        <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", fontFamily: "var(--font-title, Georgia, serif)", letterSpacing: "0.08em" }}>
-                          Size {item.size}
-                        </span>
-                        <span style={{ color: "var(--color-parchment, #EDE6D6)", fontSize: "0.9rem", fontFamily: "var(--font-display, Georgia, serif)" }}>
-                          {formatPrice(item.initiationPriceCents)}
-                        </span>
+                        {/* Collection + colorway */}
+                        <p className="type-eyebrow" style={{ color: GOLD_SOLID, fontSize: "0.6rem", margin: "4px 0 0" }}>
+                          {item.collection} — {item.colorway}
+                        </p>
+
+                        {/* Size + price row */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72rem", fontFamily: "var(--font-title, Georgia, serif)", letterSpacing: "0.08em" }}>
+                            Size {item.size}
+                          </span>
+                          <span style={{ color: "var(--color-parchment, #EDE6D6)", fontSize: "0.9rem", fontFamily: "var(--font-display, Georgia, serif)" }}>
+                            {formatPrice(item.initiationPriceCents)}
+                          </span>
+                        </div>
                       </div>
                     </li>
                   ))}

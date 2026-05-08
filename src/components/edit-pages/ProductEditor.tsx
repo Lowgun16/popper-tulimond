@@ -32,6 +32,44 @@ function ImagePathInput({
   );
 }
 
+type SyncPrompt = {
+  itemId: string;
+  direction: "vault-to-cart" | "cart-to-vault";
+  newValue: string;
+};
+
+function ImageSyncPrompt({
+  prompt,
+  onConfirm,
+  onDismiss,
+}: {
+  prompt: SyncPrompt;
+  onConfirm: () => void;
+  onDismiss: () => void;
+}) {
+  return (
+    <div className="mt-1 flex items-center gap-2 text-[9px] text-white/40">
+      <span>
+        {prompt.direction === "vault-to-cart"
+          ? "Update cart image too?"
+          : "Also update vault image?"}
+      </span>
+      <button
+        onClick={onConfirm}
+        className="text-[#D4B896] underline underline-offset-2 hover:text-[#D4B896]/80"
+      >
+        Yes
+      </button>
+      <button
+        onClick={onDismiss}
+        className="text-white/30 hover:text-white/50"
+      >
+        No
+      </button>
+    </div>
+  );
+}
+
 function sleeveLabel(colorway: string): string {
   const match = colorway.match(/\(([^)]+)\)/);
   return match ? match[1] : colorway;
@@ -44,6 +82,7 @@ export function ProductEditor({ onBack: _onBack }: Props) {
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [syncPrompt, setSyncPrompt] = useState<SyncPrompt | null>(null);
 
   useEffect(() => {
     fetch("/api/edit-pages/products", { credentials: "include" })
@@ -98,6 +137,7 @@ export function ProductEditor({ onBack: _onBack }: Props) {
               memberPriceCents: override.member_price_cents,
               displayName: override.display_name,
               productImage: override.product_image,
+              cartImage: override.cart_image,
               status: override.status,
             }),
           })
@@ -244,24 +284,62 @@ export function ProductEditor({ onBack: _onBack }: Props) {
                       />
                     </div>
 
-                    {/* Product image path */}
+                    {/* Vault image */}
                     <div className="mb-3">
                       <p className="text-[8px] uppercase tracking-widest text-white/30 mb-1">
-                        Product Image Path
+                        Vault Image
                       </p>
                       <ImagePathInput
                         value={
-                          (getField(
-                            item.id,
-                            "product_image",
-                            item.productImage ?? ""
-                          ) as string | null) ?? ""
+                          ((getField(item.id, "product_image", item.productImage ?? "") as string | null) ?? "")
                         }
-                        onChange={(v) =>
-                          handleChange(item.id, "product_image", v)
-                        }
+                        onChange={(v) => {
+                          handleChange(item.id, "product_image", v);
+                          setSyncPrompt({ itemId: item.id, direction: "vault-to-cart", newValue: v });
+                        }}
                         placeholder={item.productImage ?? ""}
                       />
+                      {syncPrompt?.itemId === item.id && syncPrompt.direction === "vault-to-cart" && (
+                        <ImageSyncPrompt
+                          prompt={syncPrompt}
+                          onConfirm={() => {
+                            handleChange(item.id, "cart_image", syncPrompt.newValue);
+                            setSyncPrompt(null);
+                          }}
+                          onDismiss={() => setSyncPrompt(null)}
+                        />
+                      )}
+                    </div>
+
+                    {/* Cart image */}
+                    <div className="mb-3">
+                      <p className="text-[8px] uppercase tracking-widest text-white/30 mb-1">
+                        Cart Image
+                        <span className="ml-1 normal-case text-white/20">(defaults to Vault image)</span>
+                      </p>
+                      <ImagePathInput
+                        value={
+                          ((getField(item.id, "cart_image", null) as string | null) ?? "")
+                        }
+                        onChange={(v) => {
+                          handleChange(item.id, "cart_image", v || null);
+                          if (v) setSyncPrompt({ itemId: item.id, direction: "cart-to-vault", newValue: v });
+                          else setSyncPrompt(null);
+                        }}
+                        placeholder={
+                          ((getField(item.id, "product_image", item.productImage ?? "") as string | null) ?? item.productImage ?? "same as vault")
+                        }
+                      />
+                      {syncPrompt?.itemId === item.id && syncPrompt.direction === "cart-to-vault" && (
+                        <ImageSyncPrompt
+                          prompt={syncPrompt}
+                          onConfirm={() => {
+                            handleChange(item.id, "product_image", syncPrompt.newValue);
+                            setSyncPrompt(null);
+                          }}
+                          onDismiss={() => setSyncPrompt(null)}
+                        />
+                      )}
                     </div>
 
                     {/* Status toggle */}

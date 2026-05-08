@@ -9,6 +9,7 @@ export type ProductOverride = {
   member_price_cents: number | null;
   display_name: string | null;
   product_image: string | null;
+  cart_image: string | null;
   status: "active" | "sold_out" | "hidden";
   is_draft: boolean;
 };
@@ -43,6 +44,7 @@ export function mergeInventoryWithOverrides(
           memberPriceCents: override.member_price_cents ?? item.memberPriceCents,
           name: override.display_name ?? item.name,
           productImage: override.product_image ?? item.productImage,
+          cartImage: override.cart_image ?? override.product_image ?? item.productImage,
           _vaultStatus: override.status,
         };
       });
