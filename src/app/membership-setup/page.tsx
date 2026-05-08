@@ -313,9 +313,10 @@ function MembershipCelebration({ onEnterVault }: { onEnterVault: () => void }) {
 function MembershipSetupContent() {
   const params = useSearchParams();
   const token = params.get("token") ?? "";
+  const preview = params.get("preview") === "1";
   const router = useRouter();
 
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(preview ? "success" : "idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleActivate = async () => {
@@ -353,7 +354,7 @@ function MembershipSetupContent() {
     }
   };
 
-  if (!token) {
+  if (!token && !preview) {
     return (
       <div style={{ minHeight: "100dvh", background: DARK, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
         <p style={{ color: "rgba(240,232,215,0.4)", fontFamily: "var(--font-body, sans-serif)" }}>
