@@ -242,7 +242,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
                     THE CART IS EMPTY
                   </p>
                   <p className="type-body" style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.875rem" }}>
-                    Your first night starts with a Constable.
+                    Your story begins with a Constable.
                   </p>
                 </div>
               ) : (
