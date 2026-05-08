@@ -18,17 +18,22 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   cartItems?: CartItemSummary[];
+  contentOverride?: ReservationContent;
 }
 
-export default function ReservationSheet({ isOpen, onClose, cartItems = [] }: Props) {
+export default function ReservationSheet({ isOpen, onClose, cartItems = [], contentOverride }: Props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [dropDate, setDropDate] = useState<string | null>(null);
-  const [content, setContent] = useState<ReservationContent>(RESERVATION_CONTENT);
+  const [content, setContent] = useState<ReservationContent>(contentOverride ?? RESERVATION_CONTENT);
 
   useEffect(() => {
+    if (contentOverride) {
+      setContent(contentOverride);
+      return;
+    }
     fetch("/api/content/reservation")
       .then((r) => r.json())
       .then(({ content: overrides }) => {
@@ -37,7 +42,7 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [] }: Pr
         }
       })
       .catch(() => {});
-  }, []);
+  }, [contentOverride]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
