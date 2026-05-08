@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { LookbookContext, LookbookItem, FilterDimension } from "./studioTypes";
 import { formatPrice } from "@/lib/formatPrice";
 import OverlayPortal from "@/components/OverlayPortal";
+import { playCartAddSound } from "@/lib/sounds";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -244,6 +245,7 @@ function FilterRows({ dimensions, activeFilters, onToggle }: FilterRowsProps) {
 export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
+  const [added, setAdded] = useState(false);
 
   useEffect(() => { setSelectedSize(null); }, [item]);
   useEffect(() => { setActiveFilters({}); }, [item]);
@@ -280,6 +282,10 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
   const handleAddToCart = useCallback(() => {
     if (!item || !selectedSize) return;
     onAddToCart(item, selectedSize);
+    playCartAddSound();
+    if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(40);
+    setAdded(true);
+    setTimeout(() => { setAdded(false); setSelectedSize(null); }, 1800);
   }, [item, selectedSize, onAddToCart]);
 
   if (!item) return null;
@@ -441,15 +447,16 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
                     disabled={!selectedSize}
                     style={{
                       width: "100%", height: 52,
-                      background: selectedSize ? "#C4A456" : "rgba(196,164,86,0.2)",
-                      color: selectedSize ? "#121212" : "rgba(196,164,86,0.4)",
-                      border: "none", cursor: selectedSize ? "pointer" : "default",
+                      background: added ? "rgba(56,161,105,0.15)" : (selectedSize ? "#C4A456" : "rgba(196,164,86,0.2)"),
+                      color: added ? "#68D391" : (selectedSize ? "#121212" : "rgba(196,164,86,0.4)"),
+                      border: added ? "1px solid #38A169" : "none",
+                      cursor: selectedSize ? "pointer" : "default",
                       fontFamily: "var(--font-title, Georgia, serif)",
                       fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase",
-                      fontWeight: 400, transition: "background 0.2s, color 0.2s",
+                      fontWeight: 400, transition: "background 0.2s, color 0.2s, border-color 0.2s",
                     }}
                   >
-                    {selectedSize ? "Add to Cart" : "Select a Size"}
+                    {added ? "Added!" : (selectedSize ? "Add to Cart" : "Select a Size")}
                   </button>
 
                 </div>

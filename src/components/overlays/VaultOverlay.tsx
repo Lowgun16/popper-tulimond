@@ -235,7 +235,7 @@ export default function VaultOverlay({
                         disabled={isSoldOut}
                         onClick={() => onOpenLookbook({ ...item, lookbook: item.lookbook ?? [] })}
                       >
-                        Lookbook
+                        More Details
                       </button>
                       {!isSoldOut && (
                         <SizeSelector

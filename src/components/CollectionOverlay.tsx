@@ -236,7 +236,7 @@ function ObsidianCard({ id, item, layout, onClose, onAction }: ObsidianCardProps
             border: `1px solid ${GOLD}`, color: GOLD, cursor: "pointer",
           }}
         >
-          Find Your Size
+          More Details
         </button>
       </div>
     </motion.div>
@@ -751,9 +751,9 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
       {/* Nav — moved here from Portal to share overlay state */}
       <AtelierNav
         opacity={opacity}
-        onNavClick={(page) => setActiveOverlay(page)}
+        onNavClick={(page) => { setActiveDotId(null); setActiveOverlay(page); }}
         footerOpen={footerOpen}
-        onLegalClick={() => setFooterOpen((v) => !v)}
+        onLegalClick={() => { setActiveDotId(null); setFooterOpen((v) => !v); }}
       />
 
       {/* Bottom scrim — gradient from transparent to dark so "View Footer" is legible over the floor */}

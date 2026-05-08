@@ -33,7 +33,7 @@ export default function CartIcon() {
         position: "fixed",
         top: 72,
         right: 20,
-        zIndex: 60,
+        zIndex: 700,
         background: "none",
         border: "none",
         cursor: "pointer",
