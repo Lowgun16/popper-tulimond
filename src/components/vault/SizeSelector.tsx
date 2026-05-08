@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { playCartAddSound } from "@/lib/sounds";
 
 interface SizeSelectorProps {
   sizes: string[];
@@ -18,6 +19,7 @@ export default function SizeSelector({ sizes, onAddToCart, disabled }: SizeSelec
     if (!selected) return;
     onAddToCart(selected);
     setAdded(true);
+    playCartAddSound();
     if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(40);
     setTimeout(() => { setAdded(false); setSelected(null); }, 1800);
   };

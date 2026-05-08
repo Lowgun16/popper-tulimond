@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { MEMBERSHIP_CELEBRATION_CONTENT } from "@/lib/staticContent";
 import type { MembershipCelebrationContent } from "@/lib/contentTypes";
+import { playSealStampSound } from "@/lib/sounds";
 
 const GOLD = "#C4A456";
 const DARK = "#0e0e0e";
@@ -95,9 +96,13 @@ function MembershipCelebration({
 
   useEffect(() => {
     if (containerRef.current) containerRef.current.scrollTop = 0;
+    // Fire stamp sound when the seal makes contact (~450ms into the spring animation)
+    const soundTimer = setTimeout(() => playSealStampSound(), 450);
+    // Haptic pattern for Android
     if (typeof navigator !== "undefined" && navigator.vibrate) {
-      navigator.vibrate([80, 40, 80, 40, 120]);
+      setTimeout(() => navigator.vibrate([80, 40, 80, 40, 120]), 450);
     }
+    return () => clearTimeout(soundTimer);
   }, []);
 
   return (
