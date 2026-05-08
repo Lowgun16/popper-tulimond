@@ -46,6 +46,15 @@ export type AllLegalContent = {
   contactUs: ContactUsContent;
 };
 
+export type MembershipCelebrationContent = {
+  congratulations_headline: string;
+  subtitle: string;
+  body_1: string;
+  body_2: string;
+  closing_line: string;
+  cta_text: string;
+};
+
 export type AllPageContent = {
   about: AboutContent;
   protocol: ProtocolContent;

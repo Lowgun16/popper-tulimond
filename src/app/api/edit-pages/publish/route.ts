@@ -13,6 +13,7 @@ const PAGE_PATHS: Record<string, string[]> = {
   shipping: ["/shipping"],
   refund: ["/refund"],
   "contact-us": ["/contact-us"],
+  "membership-celebration": ["/membership-setup"],
 };
 
 /** POST /api/edit-pages/publish — body: { pageSlug } */

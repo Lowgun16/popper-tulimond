@@ -10,6 +10,7 @@ const BRAND_PAGES: PageItem[] = [
   { slug: "protocol", label: "The Protocol" },
   { slug: "contact", label: "Contact" },
   { slug: "vault", label: "Vault" },
+  { slug: "membership-celebration", label: "Welcome — New Member" },
 ];
 
 const LEGAL_PAGES: PageItem[] = [

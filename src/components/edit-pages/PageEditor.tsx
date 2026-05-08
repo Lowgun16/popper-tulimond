@@ -47,6 +47,14 @@ const PAGE_FIELDS: Record<string, Array<{ key: string; label: string }>> = {
     { key: "headline", label: "Headline" },
     { key: "subheadline", label: "Subheadline" },
   ],
+  "membership-celebration": [
+    { key: "congratulations_headline", label: "Headline (e.g. Congratulations.)" },
+    { key: "subtitle", label: "Subtitle (small gold caps under headline)" },
+    { key: "body_1", label: "Body — Paragraph 1" },
+    { key: "body_2", label: "Body — Paragraph 2" },
+    { key: "closing_line", label: "Closing Line (italic)" },
+    { key: "cta_text", label: "Button Text" },
+  ],
   terms: [
     { key: "title", label: "Title" },
     { key: "last_updated", label: "Last Updated" },
