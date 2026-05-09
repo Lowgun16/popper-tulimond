@@ -63,6 +63,7 @@ export function EditPagesPanel({ onClose }: Props) {
   }
 
   const [showPreview, setShowPreview] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
   const isOwner = session.status === "authenticated" && session.role === "owner";
   const pageEditorRef = useRef<PageEditorHandle>(null);
 
@@ -146,15 +147,17 @@ export function EditPagesPanel({ onClose }: Props) {
               {activePage !== "products" && (
                 <>
                   <button
-                    onClick={() => pageEditorRef.current?.save()}
+                    onClick={async () => {
+                      await pageEditorRef.current?.save();
+                      setSavedFlash(true);
+                      setTimeout(() => setSavedFlash(false), 1800);
+                    }}
                     disabled={pageEditorRef.current?.saving}
                     className={`shrink-0 px-3 py-1.5 border text-[9px] uppercase tracking-widest disabled:opacity-40 transition-colors ${
-                      pageEditorRef.current?.savedFlash
-                        ? "border-green-500/50 text-green-400"
-                        : "border-white/20 text-white/60"
+                      savedFlash ? "border-green-500/50 text-green-400" : "border-white/20 text-white/60"
                     }`}
                   >
-                    {pageEditorRef.current?.saving ? "Saving..." : pageEditorRef.current?.savedFlash ? "Saved ✓" : "Save"}
+                    {savedFlash ? "Saved ✓" : "Save"}
                   </button>
                   <button
                     onClick={() => pageEditorRef.current?.triggerPublish()}
