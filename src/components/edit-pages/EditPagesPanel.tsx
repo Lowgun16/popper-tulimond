@@ -104,15 +104,20 @@ export function EditPagesPanel({ onClose }: Props) {
             <p className="text-white/30 text-xs uppercase tracking-widest">Authenticating…</p>
           </div>
         ) : session.status === "unauthenticated" || session.status === "error" ? (
-          <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <div className="flex-1 flex flex-col items-center justify-center gap-4 px-8 max-w-sm mx-auto text-center">
             <p className="text-white/50 text-xs">
               {authError || "Authentication required to access Edit Pages."}
             </p>
+            {authError && authError.includes("failed") && (
+              <p className="text-white/25 text-[10px] leading-relaxed">
+                If this device has never been registered, log in from your phone and add this device under Admin → Register New Device.
+              </p>
+            )}
             <button
               onClick={async () => {
                 setAuthError("");
                 const ok = await authenticate();
-                if (!ok) setAuthError("Authentication failed. Try again.");
+                if (!ok) setAuthError("Authentication failed. If this device isn't registered, use your phone to add it via Admin → Register New Device.");
               }}
               className="px-6 py-2 bg-[#D4B896] text-black text-[9px] uppercase tracking-widest"
             >

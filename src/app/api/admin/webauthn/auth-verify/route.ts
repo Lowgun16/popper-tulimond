@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
   `;
 
   if (credRows.length === 0) {
-    return NextResponse.json({ error: "Credential not found" }, { status: 401 });
+    return NextResponse.json(
+      { error: "This device isn't registered. Log in from a registered device and add this one via Admin → Register New Device." },
+      { status: 401 }
+    );
   }
 
   const cred = credRows[0];
