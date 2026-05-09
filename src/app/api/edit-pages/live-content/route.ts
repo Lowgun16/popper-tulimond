@@ -29,14 +29,15 @@ const STATIC_DEFAULTS: Record<string, Record<string, string>> = {
   about: {
     headline: ABOUT_CONTENT.headline,
     subheadline: ABOUT_CONTENT.subheadline,
-    section_billboard_title: ABOUT_CONTENT.sections[0].title,
-    section_billboard_body: toHtml(ABOUT_CONTENT.sections[0].body),
-    section_foundation_title: ABOUT_CONTENT.sections[1].title,
-    section_foundation_body: toHtml(ABOUT_CONTENT.sections[1].body),
-    section_meal_title: ABOUT_CONTENT.sections[2].title,
-    section_meal_body: toHtml(ABOUT_CONTENT.sections[2].body),
-    section_silent_contract_title: ABOUT_CONTENT.sections[3].title,
-    section_silent_contract_body: toHtml(ABOUT_CONTENT.sections[3].body),
+    section_count: "4",
+    section_0_title: ABOUT_CONTENT.sections[0].title,
+    section_0_body: toHtml(ABOUT_CONTENT.sections[0].body),
+    section_1_title: ABOUT_CONTENT.sections[1].title,
+    section_1_body: toHtml(ABOUT_CONTENT.sections[1].body),
+    section_2_title: ABOUT_CONTENT.sections[2].title,
+    section_2_body: toHtml(ABOUT_CONTENT.sections[2].body),
+    section_3_title: ABOUT_CONTENT.sections[3].title,
+    section_3_body: toHtml(ABOUT_CONTENT.sections[3].body),
     closing: toHtml(ABOUT_CONTENT.closing),
   },
   protocol: {
@@ -117,6 +118,20 @@ export async function GET(req: NextRequest) {
   const defaults = STATIC_DEFAULTS[pageSlug] ?? {};
   const content: Record<string, string> = { ...defaults };
   for (const row of rows) content[row.field_key] = row.value;
+
+  // Translate legacy about section keys (section_billboard_*) to numbered format
+  if (pageSlug === "about") {
+    const legacyIds = ["billboard", "foundation", "meal", "silent-contract"];
+    legacyIds.forEach((id, i) => {
+      if (!content[`section_${i}_title`] && content[`section_${id}_title`]) {
+        content[`section_${i}_title`] = content[`section_${id}_title`];
+      }
+      if (!content[`section_${i}_body`] && content[`section_${id}_body`]) {
+        content[`section_${i}_body`] = content[`section_${id}_body`];
+      }
+    });
+    if (!content["section_count"]) content["section_count"] = "4";
+  }
 
   return NextResponse.json(content);
 }

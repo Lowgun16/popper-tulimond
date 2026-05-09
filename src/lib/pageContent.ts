@@ -30,21 +30,42 @@ export function rowsToMap(rows: ContentRow[]): Record<string, string> {
   return Object.fromEntries(rows.map((r) => [r.field_key, r.value]));
 }
 
+function toHtml(text: string): string {
+  if (/<[a-z][\s\S]*>/i.test(text)) return text;
+  return text
+    .split(/\n\n+/)
+    .map((para) => `<p>${para.replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
 // ── Page-specific parsers ─────────────────────────────────────────────────────
 
-const SECTION_IDS = ["billboard", "foundation", "meal", "silent-contract"] as const;
+const LEGACY_SECTION_IDS = ["billboard", "foundation", "meal", "silent-contract"] as const;
 
 export function parseAbout(rows: ContentRow[]): AboutContent {
   const m = rowsToMap(rows);
+  const sectionCount = parseInt(m["section_count"] ?? "4", 10);
+
+  const sections = Array.from({ length: sectionCount }, (_, i) => {
+    const legacyId = LEGACY_SECTION_IDS[i];
+    const title =
+      m[`section_${i}_title`] ??
+      (legacyId ? m[`section_${legacyId}_title`] : undefined) ??
+      ABOUT_CONTENT.sections[i]?.title ??
+      "";
+    const rawBody =
+      m[`section_${i}_body`] ??
+      (legacyId ? m[`section_${legacyId}_body`] : undefined) ??
+      ABOUT_CONTENT.sections[i]?.body ??
+      "";
+    return { id: `section-${i}`, title, body: toHtml(rawBody) };
+  });
+
   return {
     headline: m["headline"] ?? ABOUT_CONTENT.headline,
     subheadline: m["subheadline"] ?? ABOUT_CONTENT.subheadline,
-    sections: SECTION_IDS.map((id, i) => ({
-      id,
-      title: m[`section_${id}_title`] ?? ABOUT_CONTENT.sections[i]?.title ?? "",
-      body: m[`section_${id}_body`] ?? ABOUT_CONTENT.sections[i]?.body ?? "",
-    })),
-    closing: m["closing"] ?? ABOUT_CONTENT.closing,
+    sections,
+    closing: toHtml(m["closing"] ?? ABOUT_CONTENT.closing),
   };
 }
 

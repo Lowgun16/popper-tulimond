@@ -14,19 +14,6 @@ export type PageEditorHandle = {
 };
 
 const PAGE_FIELDS: Record<string, Array<{ key: string; label: string }>> = {
-  about: [
-    { key: "headline", label: "Headline" },
-    { key: "subheadline", label: "Subheadline" },
-    { key: "section_billboard_title", label: "Section 1 — Title" },
-    { key: "section_billboard_body", label: "Section 1 — Body" },
-    { key: "section_foundation_title", label: "Section 2 — Title" },
-    { key: "section_foundation_body", label: "Section 2 — Body" },
-    { key: "section_meal_title", label: "Section 3 — Title" },
-    { key: "section_meal_body", label: "Section 3 — Body" },
-    { key: "section_silent_contract_title", label: "Section 4 — Title" },
-    { key: "section_silent_contract_body", label: "Section 4 — Body" },
-    { key: "closing", label: "Closing" },
-  ],
   protocol: [
     { key: "header", label: "Header" },
     { key: "title", label: "Title" },
@@ -132,9 +119,40 @@ export const PageEditor = forwardRef<PageEditorHandle, Props>(function PageEdito
 
   const fields = PAGE_FIELDS[pageSlug] ?? [];
 
+  const sectionCount = pageSlug === "about"
+    ? parseInt(localDrafts["section_count"] ?? liveContent["section_count"] ?? "4", 10)
+    : 0;
+
   function handleChange(fieldKey: string, value: string) {
     setLocalDrafts((prev) => ({ ...prev, [fieldKey]: value }));
     updateField(fieldKey, value);
+  }
+
+  function addSection() {
+    const newIdx = sectionCount;
+    const newCount = sectionCount + 1;
+    setLocalDrafts((prev) => ({
+      ...prev,
+      section_count: String(newCount),
+      [`section_${newIdx}_title`]: "",
+      [`section_${newIdx}_body`]: "",
+    }));
+    updateField("section_count", String(newCount));
+  }
+
+  function removeSection(idx: number) {
+    const newCount = sectionCount - 1;
+    setLocalDrafts((prev) => {
+      const next: Record<string, string> = { ...prev, section_count: String(newCount) };
+      for (let j = idx; j < newCount; j++) {
+        next[`section_${j}_title`] = prev[`section_${j + 1}_title`] ?? "";
+        next[`section_${j}_body`] = prev[`section_${j + 1}_body`] ?? "";
+      }
+      delete next[`section_${newCount}_title`];
+      delete next[`section_${newCount}_body`];
+      return next;
+    });
+    updateField("section_count", String(newCount));
   }
 
   async function handleSaveDraft() {
@@ -185,19 +203,97 @@ export const PageEditor = forwardRef<PageEditorHandle, Props>(function PageEdito
         </div>
       </div>
 
-      {/* Field list — single column (split view is handled by EditPagesPanel layout) */}
+      {/* Field list */}
       <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-        {fields.map((field) => (
-          <FieldEditor
-            key={`${pageSlug}-${field.key}`}
-            label={field.label}
-            liveValue={liveContent[field.key] ?? ""}
-            draftValue={localDrafts[field.key] ?? ""}
-            customColors={customColors}
-            onAddCustomColor={onAddCustomColor}
-            onChange={(value) => handleChange(field.key, value)}
-          />
-        ))}
+        {pageSlug === "about" ? (
+          <>
+            {/* Headline + Subheadline */}
+            <FieldEditor
+              key="about-headline"
+              label="Headline"
+              liveValue={liveContent["headline"] ?? ""}
+              draftValue={localDrafts["headline"] ?? ""}
+              customColors={customColors}
+              onAddCustomColor={onAddCustomColor}
+              onChange={(v) => handleChange("headline", v)}
+            />
+            <FieldEditor
+              key="about-subheadline"
+              label="Subheadline"
+              liveValue={liveContent["subheadline"] ?? ""}
+              draftValue={localDrafts["subheadline"] ?? ""}
+              customColors={customColors}
+              onAddCustomColor={onAddCustomColor}
+              onChange={(v) => handleChange("subheadline", v)}
+            />
+
+            {/* Dynamic sections */}
+            {Array.from({ length: sectionCount }, (_, i) => (
+              <div key={i} className="border border-white/10 p-4 flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-[9px] uppercase tracking-widest text-white/30">Section {i + 1}</p>
+                  {sectionCount > 1 && (
+                    <button
+                      onClick={() => removeSection(i)}
+                      className="text-[9px] uppercase tracking-widest text-white/20 hover:text-red-400 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <div className="flex flex-col gap-1">
+                  <p className="text-[9px] uppercase tracking-widest text-white/30">Title</p>
+                  <input
+                    type="text"
+                    value={localDrafts[`section_${i}_title`] ?? ""}
+                    placeholder={liveContent[`section_${i}_title`] ?? ""}
+                    onChange={(e) => handleChange(`section_${i}_title`, e.target.value)}
+                    className="bg-transparent border border-white/10 text-white/80 text-sm px-3 py-2 outline-none focus:border-white/30 placeholder:text-white/20"
+                  />
+                </div>
+                <FieldEditor
+                  key={`about-section-${i}-body`}
+                  label="Body"
+                  liveValue={liveContent[`section_${i}_body`] ?? ""}
+                  draftValue={localDrafts[`section_${i}_body`] ?? ""}
+                  customColors={customColors}
+                  onAddCustomColor={onAddCustomColor}
+                  onChange={(v) => handleChange(`section_${i}_body`, v)}
+                />
+              </div>
+            ))}
+
+            <button
+              onClick={addSection}
+              className="border border-dashed border-white/20 py-3 text-white/30 hover:text-white/50 text-[9px] uppercase tracking-widest transition-colors"
+            >
+              + Add Section
+            </button>
+
+            {/* Closing */}
+            <FieldEditor
+              key="about-closing"
+              label="Closing"
+              liveValue={liveContent["closing"] ?? ""}
+              draftValue={localDrafts["closing"] ?? ""}
+              customColors={customColors}
+              onAddCustomColor={onAddCustomColor}
+              onChange={(v) => handleChange("closing", v)}
+            />
+          </>
+        ) : (
+          fields.map((field) => (
+            <FieldEditor
+              key={`${pageSlug}-${field.key}`}
+              label={field.label}
+              liveValue={liveContent[field.key] ?? ""}
+              draftValue={localDrafts[field.key] ?? ""}
+              customColors={customColors}
+              onAddCustomColor={onAddCustomColor}
+              onChange={(value) => handleChange(field.key, value)}
+            />
+          ))
+        )}
       </div>
 
       {showPublishModal && (
