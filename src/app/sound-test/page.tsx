@@ -8,6 +8,7 @@ import {
   playCoinOnMarble,
   playWhiskeyCorkPull,
   playCartAddSound,
+  playSealStampSound,
 } from "@/lib/sounds";
 
 const GOLD = "#C4A456";
@@ -68,12 +69,20 @@ const SOUNDS = [
     emoji: "🍾",
   },
   {
-    id: "current",
-    label: "Current: Gold Coin Chime",
-    description: "Two ascending sine tones. The sound currently used for Add to Cart.",
+    id: "seal",
+    label: "Wax Seal Stamp",
+    description: "Three-layer impact: thud, warm resonant bloom, gold shimmer. Plays on the New Member Congratulations screen.",
     filePath: null,
+    synth: playSealStampSound,
+    emoji: "🔏",
+  },
+  {
+    id: "current",
+    label: "Current: Add to Cart (Revolver Cock)",
+    description: "The live Add to Cart sound.",
+    filePath: "/assets/sounds/revolver-cock.mp3",
     synth: playCartAddSound,
-    emoji: "✦",
+    emoji: "🔫",
   },
 ];
 

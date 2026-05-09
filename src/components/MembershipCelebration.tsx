@@ -100,11 +100,22 @@ export function MembershipCelebration({ onEnterVault, content, disableSound }: M
       document.removeEventListener("pointerdown", playOnce);
       playSealStampSound();
     };
-    const soundTimer = setTimeout(playOnce, 450);
+
+    // Check whether AudioContext will start running (requires a prior user gesture).
+    // If suspended (e.g. direct URL navigation), skip the auto-timer and rely solely
+    // on the pointerdown listener — first tap will fire the sound.
+    let canAutoPlay = false;
+    try {
+      const probe = new AudioContext();
+      canAutoPlay = probe.state === "running";
+      probe.close();
+    } catch { /* ignore */ }
+
+    const soundTimer = canAutoPlay ? setTimeout(playOnce, 450) : null;
     document.addEventListener("pointerdown", playOnce, { once: true });
 
     return () => {
-      clearTimeout(soundTimer);
+      if (soundTimer) clearTimeout(soundTimer);
       document.removeEventListener("pointerdown", playOnce);
     };
   }, [disableSound]);
