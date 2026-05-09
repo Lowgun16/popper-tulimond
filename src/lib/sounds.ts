@@ -418,24 +418,45 @@ export function playWhiskeyCorkPull(): void {
   } catch { /* ignore */ }
 }
 
-// Preload revolver-cock.mp3 as soon as the module loads so it's ready to fire
-// with zero decode delay when the user clicks Add to Cart.
-const _revolverAudio: HTMLAudioElement | null =
-  typeof window !== "undefined"
-    ? Object.assign(new Audio("/assets/sounds/revolver-cock.mp3"), { preload: "auto" })
-    : null;
-if (_revolverAudio) _revolverAudio.load();
+// Decode revolver-cock.mp3 into a Web Audio AudioBuffer on page load.
+// BufferSource.start(0) is sample-accurate — no decode latency on click.
+let _revolverBuffer: AudioBuffer | null = null;
+let _revolverCtx: AudioContext | null = null;
+
+if (typeof window !== "undefined") {
+  setTimeout(() => {
+    try {
+      _revolverCtx = new AudioContext();
+      fetch("/assets/sounds/revolver-cock.mp3")
+        .then((r) => r.arrayBuffer())
+        .then((ab) => _revolverCtx!.decodeAudioData(ab))
+        .then((buf) => { _revolverBuffer = buf; })
+        .catch(() => {});
+    } catch { /* ignore */ }
+  }, 200); // slight defer so it doesn't compete with initial page render
+}
 
 /**
- * Cart add — revolver cock MP3 (preloaded), falls back to chime if unavailable.
+ * Cart add — revolver cock via AudioBuffer (zero decode latency), falls back to chime.
  */
 export function playCartAddSound(): void {
-  if (_revolverAudio) {
-    _revolverAudio.currentTime = 0;
-    _revolverAudio.play().catch(() => _playCartAddChime());
-  } else {
-    _playCartAddChime();
+  if (_revolverBuffer && _revolverCtx) {
+    try {
+      const play = () => {
+        const source = _revolverCtx!.createBufferSource();
+        source.buffer = _revolverBuffer!;
+        source.connect(_revolverCtx!.destination);
+        source.start(0);
+      };
+      if (_revolverCtx.state === "suspended") {
+        _revolverCtx.resume().then(play).catch(() => _playCartAddChime());
+      } else {
+        play();
+      }
+      return;
+    } catch { /* fall through */ }
   }
+  _playCartAddChime();
 }
 
 function _playCartAddChime(): void {
