@@ -419,10 +419,14 @@ export function playWhiskeyCorkPull(): void {
 }
 
 /**
- * Cart add chime — two ascending sine tones, soft and bright.
- * Sounds like being handed a gold coin.
+ * Cart add — revolver cock MP3, falls back to chime if file unavailable.
  */
 export function playCartAddSound(): void {
+  const audio = new Audio("/assets/sounds/revolver-cock.mp3");
+  audio.play().catch(() => _playCartAddChime());
+}
+
+function _playCartAddChime(): void {
   const ctx = getCtx();
   if (!ctx) return;
 
