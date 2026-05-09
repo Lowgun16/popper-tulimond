@@ -418,12 +418,24 @@ export function playWhiskeyCorkPull(): void {
   } catch { /* ignore */ }
 }
 
+// Preload revolver-cock.mp3 as soon as the module loads so it's ready to fire
+// with zero decode delay when the user clicks Add to Cart.
+const _revolverAudio: HTMLAudioElement | null =
+  typeof window !== "undefined"
+    ? Object.assign(new Audio("/assets/sounds/revolver-cock.mp3"), { preload: "auto" })
+    : null;
+if (_revolverAudio) _revolverAudio.load();
+
 /**
- * Cart add — revolver cock MP3, falls back to chime if file unavailable.
+ * Cart add — revolver cock MP3 (preloaded), falls back to chime if unavailable.
  */
 export function playCartAddSound(): void {
-  const audio = new Audio("/assets/sounds/revolver-cock.mp3");
-  audio.play().catch(() => _playCartAddChime());
+  if (_revolverAudio) {
+    _revolverAudio.currentTime = 0;
+    _revolverAudio.play().catch(() => _playCartAddChime());
+  } else {
+    _playCartAddChime();
+  }
 }
 
 function _playCartAddChime(): void {
