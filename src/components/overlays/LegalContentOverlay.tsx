@@ -39,7 +39,6 @@ const body: CSSProperties = {
   fontSize: "14px",
   lineHeight: "1.85",
   color: "rgba(240,232,215,0.65)",
-  whiteSpace: "pre-line",
 };
 
 function LegalTextContent({ content }: { content: LegalContent }) {
@@ -47,7 +46,7 @@ function LegalTextContent({ content }: { content: LegalContent }) {
     <>
       <p style={eyebrow}>Popper Tulimond — {content.lastUpdated}</p>
       <h1 style={heading}>{content.title}</h1>
-      <p style={body}>{content.body}</p>
+      <div style={body} className="[&_p+p]:mt-[1.5em] [&_p]:m-0" dangerouslySetInnerHTML={{ __html: content.body }} />
     </>
   );
 }

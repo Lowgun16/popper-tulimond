@@ -148,9 +148,13 @@ export function EditPagesPanel({ onClose }: Props) {
                   <button
                     onClick={() => pageEditorRef.current?.save()}
                     disabled={pageEditorRef.current?.saving}
-                    className="shrink-0 px-3 py-1.5 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest disabled:opacity-40"
+                    className={`shrink-0 px-3 py-1.5 border text-[9px] uppercase tracking-widest disabled:opacity-40 transition-colors ${
+                      pageEditorRef.current?.savedFlash
+                        ? "border-green-500/50 text-green-400"
+                        : "border-white/20 text-white/60"
+                    }`}
                   >
-                    Save
+                    {pageEditorRef.current?.saving ? "Saving..." : pageEditorRef.current?.savedFlash ? "Saved ✓" : "Save"}
                   </button>
                   <button
                     onClick={() => pageEditorRef.current?.triggerPublish()}

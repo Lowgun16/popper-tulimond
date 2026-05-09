@@ -9,6 +9,7 @@ export type PageEditorHandle = {
   triggerPublish: () => void;
   saving: boolean;
   publishing: boolean;
+  savedFlash: boolean;
   getDrafts: () => Record<string, string>;
 };
 
@@ -119,6 +120,7 @@ export const PageEditor = forwardRef<PageEditorHandle, Props>(function PageEdito
   const { drafts, saving, publishing, loadDrafts, updateField, saveDraft, publish } = useEditPages(pageSlug);
   const [localDrafts, setLocalDrafts] = useState<Record<string, string>>({});
   const [showPublishModal, setShowPublishModal] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
 
   useEffect(() => {
     loadDrafts().then(() => {});
@@ -137,6 +139,8 @@ export const PageEditor = forwardRef<PageEditorHandle, Props>(function PageEdito
 
   async function handleSaveDraft() {
     await saveDraft(localDrafts);
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 1800);
   }
 
   async function handlePublishConfirm() {
@@ -150,8 +154,9 @@ export const PageEditor = forwardRef<PageEditorHandle, Props>(function PageEdito
     triggerPublish: () => setShowPublishModal(true),
     saving,
     publishing,
+    savedFlash,
     getDrafts: () => localDrafts,
-  }), [handleSaveDraft, saving, publishing, localDrafts]);
+  }), [handleSaveDraft, saving, publishing, savedFlash, localDrafts]);
 
   return (
     <div className="flex flex-col h-full">
@@ -162,9 +167,13 @@ export const PageEditor = forwardRef<PageEditorHandle, Props>(function PageEdito
           <button
             onClick={handleSaveDraft}
             disabled={saving}
-            className="px-5 py-2 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest hover:border-white/40 disabled:opacity-40"
+            className={`px-5 py-2 border text-[9px] uppercase tracking-widest transition-colors disabled:opacity-40 ${
+              savedFlash
+                ? "border-green-500/50 text-green-400"
+                : "border-white/20 text-white/60 hover:border-white/40"
+            }`}
           >
-            {saving ? "Saving..." : "Save Draft"}
+            {saving ? "Saving..." : savedFlash ? "Saved ✓" : "Save Draft"}
           </button>
           <button
             onClick={() => setShowPublishModal(true)}

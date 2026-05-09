@@ -13,6 +13,16 @@ import {
   RESERVATION_CONTENT,
 } from "@/lib/staticContent";
 
+// Convert plain text (with \n paragraph breaks) to HTML <p> tags so TipTap
+// initializes with proper paragraph structure and the overlays render correctly.
+function toHtml(text: string): string {
+  if (/<[a-z][\s\S]*>/i.test(text)) return text; // already HTML
+  return text
+    .split(/\n\n+/)
+    .map((para) => `<p>${para.replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
 // Static defaults for every editable field, keyed by page slug then field_key.
 // The editor shows these when nothing has been saved to the DB yet.
 const STATIC_DEFAULTS: Record<string, Record<string, string>> = {
@@ -20,14 +30,14 @@ const STATIC_DEFAULTS: Record<string, Record<string, string>> = {
     headline: ABOUT_CONTENT.headline,
     subheadline: ABOUT_CONTENT.subheadline,
     section_billboard_title: ABOUT_CONTENT.sections[0].title,
-    section_billboard_body: ABOUT_CONTENT.sections[0].body,
+    section_billboard_body: toHtml(ABOUT_CONTENT.sections[0].body),
     section_foundation_title: ABOUT_CONTENT.sections[1].title,
-    section_foundation_body: ABOUT_CONTENT.sections[1].body,
+    section_foundation_body: toHtml(ABOUT_CONTENT.sections[1].body),
     section_meal_title: ABOUT_CONTENT.sections[2].title,
-    section_meal_body: ABOUT_CONTENT.sections[2].body,
+    section_meal_body: toHtml(ABOUT_CONTENT.sections[2].body),
     section_silent_contract_title: ABOUT_CONTENT.sections[3].title,
-    section_silent_contract_body: ABOUT_CONTENT.sections[3].body,
-    closing: ABOUT_CONTENT.closing,
+    section_silent_contract_body: toHtml(ABOUT_CONTENT.sections[3].body),
+    closing: toHtml(ABOUT_CONTENT.closing),
   },
   protocol: {
     header: PROTOCOL_CONTENT.header,
@@ -55,39 +65,39 @@ const STATIC_DEFAULTS: Record<string, Record<string, string>> = {
   terms: {
     title: TERMS_CONTENT.title,
     last_updated: TERMS_CONTENT.lastUpdated,
-    body: TERMS_CONTENT.body,
+    body: toHtml(TERMS_CONTENT.body),
   },
   privacy: {
     title: PRIVACY_CONTENT.title,
     last_updated: PRIVACY_CONTENT.lastUpdated,
-    body: PRIVACY_CONTENT.body,
+    body: toHtml(PRIVACY_CONTENT.body),
   },
   shipping: {
     title: SHIPPING_CONTENT.title,
     last_updated: SHIPPING_CONTENT.lastUpdated,
-    body: SHIPPING_CONTENT.body,
+    body: toHtml(SHIPPING_CONTENT.body),
   },
   refund: {
     title: REFUND_CONTENT.title,
     last_updated: REFUND_CONTENT.lastUpdated,
-    body: REFUND_CONTENT.body,
+    body: toHtml(REFUND_CONTENT.body),
   },
   "membership-celebration": {
     congratulations_headline: MEMBERSHIP_CELEBRATION_CONTENT.congratulations_headline,
     subtitle: MEMBERSHIP_CELEBRATION_CONTENT.subtitle,
-    body_1: MEMBERSHIP_CELEBRATION_CONTENT.body_1,
-    body_2: MEMBERSHIP_CELEBRATION_CONTENT.body_2,
+    body_1: toHtml(MEMBERSHIP_CELEBRATION_CONTENT.body_1),
+    body_2: toHtml(MEMBERSHIP_CELEBRATION_CONTENT.body_2),
     closing_line: MEMBERSHIP_CELEBRATION_CONTENT.closing_line,
     cta_text: MEMBERSHIP_CELEBRATION_CONTENT.cta_text,
   },
   reservation: {
     headline: RESERVATION_CONTENT.headline,
-    body_1: RESERVATION_CONTENT.body_1,
-    body_2: RESERVATION_CONTENT.body_2,
+    body_1: toHtml(RESERVATION_CONTENT.body_1),
+    body_2: toHtml(RESERVATION_CONTENT.body_2),
     cta_text: RESERVATION_CONTENT.cta_text,
     fine_print: RESERVATION_CONTENT.fine_print,
     success_headline: RESERVATION_CONTENT.success_headline,
-    success_body: RESERVATION_CONTENT.success_body,
+    success_body: toHtml(RESERVATION_CONTENT.success_body),
   },
 };
 

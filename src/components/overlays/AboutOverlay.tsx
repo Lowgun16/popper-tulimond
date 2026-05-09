@@ -34,7 +34,6 @@ const bodyText: CSSProperties = {
   color: "rgba(240,232,215,0.65)",
   lineHeight: "1.85",
   letterSpacing: "0.02em",
-  whiteSpace: "pre-line",
 };
 
 export default function AboutOverlay({ isOpen, onClose, content }: AboutOverlayProps) {
@@ -63,13 +62,13 @@ export default function AboutOverlay({ isOpen, onClose, content }: AboutOverlayP
       {content.sections.map((section) => (
         <div key={section.id}>
           <h2 style={sectionTitle} dangerouslySetInnerHTML={{ __html: section.title }} />
-          <p style={bodyText} dangerouslySetInnerHTML={{ __html: section.body }} />
+          <div style={bodyText} className="[&_p+p]:mt-[1.5em] [&_p]:m-0" dangerouslySetInnerHTML={{ __html: section.body }} />
         </div>
       ))}
 
       {/* Closing */}
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: "48px", paddingTop: "32px" }}>
-        <p style={{ ...bodyText, color: "rgba(196,164,86,0.5)", whiteSpace: "pre-line" }}
+        <div style={{ ...bodyText, color: "rgba(196,164,86,0.5)", whiteSpace: "pre-line" }}
           dangerouslySetInnerHTML={{ __html: content.closing }} />
       </div>
     </OverlayShell>
