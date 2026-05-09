@@ -119,18 +119,22 @@ export async function GET(req: NextRequest) {
   const content: Record<string, string> = { ...defaults };
   for (const row of rows) content[row.field_key] = row.value;
 
-  // Translate legacy about section keys (section_billboard_*) to numbered format
+  // Translate legacy about section keys (section_billboard_*) to numbered format.
+  // Must use dbKeys to check which keys actually came from the DB — the static
+  // defaults already pre-populate the numbered keys, so a presence check alone
+  // would never trigger the translation.
   if (pageSlug === "about") {
+    const dbKeys = new Set(rows.map((r) => r.field_key));
     const legacyIds = ["billboard", "foundation", "meal", "silent-contract"];
     legacyIds.forEach((id, i) => {
-      if (!content[`section_${i}_title`] && content[`section_${id}_title`]) {
+      if (dbKeys.has(`section_${id}_title`)) {
         content[`section_${i}_title`] = content[`section_${id}_title`];
       }
-      if (!content[`section_${i}_body`] && content[`section_${id}_body`]) {
+      if (dbKeys.has(`section_${id}_body`)) {
         content[`section_${i}_body`] = content[`section_${id}_body`];
       }
     });
-    if (!content["section_count"]) content["section_count"] = "4";
+    if (!dbKeys.has("section_count")) content["section_count"] = "4";
   }
 
   return NextResponse.json(content);
