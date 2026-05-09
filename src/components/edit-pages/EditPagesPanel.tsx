@@ -131,8 +131,15 @@ export function EditPagesPanel({ onClose }: Props) {
             {/* Mobile: combined sticky top bar — page selector + actions */}
             <div className="md:hidden flex items-center gap-2 px-3 py-2.5 border-b border-white/10 shrink-0">
               <select
-                value={activePage}
-                onChange={(e) => { setActivePage(e.target.value); setShowAdmin(false); }}
+                value={showAdmin ? "__admin__" : activePage}
+                onChange={(e) => {
+                  if (e.target.value === "__admin__") {
+                    setShowAdmin(true);
+                  } else {
+                    setActivePage(e.target.value);
+                    setShowAdmin(false);
+                  }
+                }}
                 className="flex-1 bg-transparent border border-white/20 text-white text-[10px] px-2 py-1.5 outline-none min-w-0"
               >
                 <optgroup label="Brand Pages">
@@ -148,8 +155,13 @@ export function EditPagesPanel({ onClose }: Props) {
                     <option key={p.slug} value={p.slug} className="bg-black">{p.label}</option>
                   ))}
                 </optgroup>
+                {isOwner && (
+                  <optgroup label="Settings">
+                    <option value="__admin__" className="bg-black">Admin</option>
+                  </optgroup>
+                )}
               </select>
-              {activePage !== "products" && (
+              {!showAdmin && activePage !== "products" && (
                 <>
                   <button
                     onClick={async () => {
