@@ -38,6 +38,18 @@ function toHtml(text: string): string {
     .join("");
 }
 
+// Strip HTML tags from fields that must be plain text (phone, email, titles, etc.)
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
+}
+
 // ── Page-specific parsers ─────────────────────────────────────────────────────
 
 const LEGACY_SECTION_IDS = ["billboard", "foundation", "meal", "silent-contract"] as const;
@@ -48,7 +60,7 @@ export function parseAbout(rows: ContentRow[]): AboutContent {
 
   const sections = Array.from({ length: sectionCount }, (_, i) => {
     const legacyId = LEGACY_SECTION_IDS[i];
-    const title =
+    const rawTitle =
       m[`section_${i}_title`] ??
       (legacyId ? m[`section_${legacyId}_title`] : undefined) ??
       ABOUT_CONTENT.sections[i]?.title ??
@@ -58,7 +70,7 @@ export function parseAbout(rows: ContentRow[]): AboutContent {
       (legacyId ? m[`section_${legacyId}_body`] : undefined) ??
       ABOUT_CONTENT.sections[i]?.body ??
       "";
-    return { id: `section-${i}`, title, body: toHtml(rawBody) };
+    return { id: `section-${i}`, title: stripHtml(rawTitle), body: toHtml(rawBody) };
   });
 
   return {
@@ -88,11 +100,11 @@ export function parseContact(rows: ContentRow[]): ContactContent {
   return {
     headline: m["headline"] ?? CONTACT_CONTENT.headline,
     address: {
-      line1: m["address_line1"] ?? CONTACT_CONTENT.address.line1,
-      line2: m["address_line2"] ?? CONTACT_CONTENT.address.line2,
+      line1: stripHtml(m["address_line1"] ?? CONTACT_CONTENT.address.line1),
+      line2: stripHtml(m["address_line2"] ?? CONTACT_CONTENT.address.line2),
     },
-    phone: m["phone"] ?? CONTACT_CONTENT.phone,
-    email: m["email"] ?? CONTACT_CONTENT.email,
+    phone: stripHtml(m["phone"] ?? CONTACT_CONTENT.phone),
+    email: stripHtml(m["email"] ?? CONTACT_CONTENT.email),
     note: m["note"] ?? CONTACT_CONTENT.note,
   };
 }
@@ -103,8 +115,8 @@ export function parseLegal(
 ): LegalContent {
   const m = rowsToMap(rows);
   return {
-    title: m["title"] ?? fallback.title,
-    lastUpdated: m["lastUpdated"] ?? fallback.lastUpdated,
+    title: stripHtml(m["title"] ?? fallback.title),
+    lastUpdated: stripHtml(m["last_updated"] ?? m["lastUpdated"] ?? fallback.lastUpdated),
     body: m["body"] ?? fallback.body,
   };
 }
@@ -113,12 +125,12 @@ export function parseContactUs(rows: ContentRow[]): ContactUsContent {
   const m = rowsToMap(rows);
   return {
     address: {
-      line1: m["address_line1"] ?? CONTACT_CONTENT.address.line1,
-      line2: m["address_line2"] ?? CONTACT_CONTENT.address.line2,
+      line1: stripHtml(m["address_line1"] ?? CONTACT_CONTENT.address.line1),
+      line2: stripHtml(m["address_line2"] ?? CONTACT_CONTENT.address.line2),
     },
-    phone: m["phone"] ?? CONTACT_CONTENT.phone,
-    email: m["email"] ?? CONTACT_CONTENT.email,
-    note: m["note"] ?? CONTACT_CONTENT.note,
+    phone: stripHtml(m["phone"] ?? CONTACT_CONTENT.phone),
+    email: stripHtml(m["email"] ?? CONTACT_CONTENT.email),
+    note: stripHtml(m["note"] ?? CONTACT_CONTENT.note),
   };
 }
 

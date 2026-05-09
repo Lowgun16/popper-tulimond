@@ -4,6 +4,14 @@ import { useEditPages } from "@/hooks/useEditPages";
 import { FieldEditor } from "./FieldEditor";
 import { PublishModal } from "./PublishModal";
 
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, "")
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+    .trim();
+}
+
 export type PageEditorHandle = {
   save: () => Promise<void>;
   triggerPublish: () => void;
@@ -245,8 +253,8 @@ export const PageEditor = forwardRef<PageEditorHandle, Props>(function PageEdito
                   <p className="text-[9px] uppercase tracking-widest text-white/30">Title</p>
                   <input
                     type="text"
-                    value={localDrafts[`section_${i}_title`] ?? ""}
-                    placeholder={liveContent[`section_${i}_title`] ?? ""}
+                    value={stripHtml(localDrafts[`section_${i}_title`] ?? "")}
+                    placeholder={stripHtml(liveContent[`section_${i}_title`] ?? "")}
                     onChange={(e) => handleChange(`section_${i}_title`, e.target.value)}
                     className="bg-transparent border border-white/10 text-white/80 text-sm px-3 py-2 outline-none focus:border-white/30 placeholder:text-white/20"
                   />
