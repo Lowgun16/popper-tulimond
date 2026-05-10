@@ -33,7 +33,7 @@ export default function ClientPage({ allContent, productOverrides }: ClientPageP
 
   return (
     <main>
-      <Portal onAddToCart={handleAddToCart} allContent={allContent} productOverrides={productOverrides} />
+      <Portal onAddToCart={handleAddToCart} allContent={allContent} productOverrides={productOverrides} modelProfiles={allContent.modelProfiles} />
       <CartIcon />
       <CartDrawer
         onCheckout={() => { /* Stripe wired in Tasks 15-16 */ }}
