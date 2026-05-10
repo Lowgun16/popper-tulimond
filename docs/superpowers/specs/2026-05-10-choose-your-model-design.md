@@ -59,15 +59,21 @@ Full-screen dark overlay (z-index above VaultOverlay and LookbookOverlay). Shown
 - A customer opens the lookbook and has no saved model preference
 - Any user clicks "Change Model"
 
-**Layout:**
+**Layout — Full-screen carousel (one model per screen):**
 - Headline: *"Choose the model who most closely resembles your body type."*
 - Subtext: *"Your choice personalizes the lookbook. You can always change it."*
-- **Desktop:** 4 tall portrait cards in a single row. Each card uses a 2:3 aspect ratio (fashion photo proportioned) — wide enough to read the full body, tall enough to show the whole figure including legs for future full-outfit looks.
-- **Mobile:** 2 tall portrait cards side by side, both visible without scrolling. Each card is ~45% screen width and ~65% screen height. Jack and Ethan appear below in the same 2-column layout when the customer scrolls down.
-- Each card: looping video (falls back to static model photo), name in gold caps, height · weight stat line, one-line tagline, 3–5 sentence bio, **"Choose [Name]"** button at the bottom
-- No close/dismiss without selecting — the selection is the action
+- One model occupies the full screen at a time. The customer swipes (touch) or clicks directional arrows to move between models.
+- Store position order (left → right): **Jerome → Angel → Jack → Ethan**. Swiping left goes to the previous model; swiping right goes to the next model.
+- The carousel is finite (not infinite loop) — Jerome has no left neighbor, Ethan has no right neighbor.
+- Left/right arrow buttons sit on the sides of the screen. The left arrow is hidden when Jerome is active; the right arrow is hidden when Ethan is active.
+- Each full-screen slide: looping video or static photo fills the background (top half / full bleed), name in gold caps, height · weight stat line, one-line tagline, 3–5 sentence bio, **"Choose [Name]"** button centered at the bottom.
+- No close/dismiss without selecting — the selection is the action.
+
+**Default model:** The `ChooseModelModal` accepts an optional `defaultModelId` prop. When opened from a product, `defaultModelId` is the model ID from that product's `lookbook[0].modelId` (or the product's assigned model from `MODEL_INVENTORY`). The carousel opens directly to that model's slide. When no `defaultModelId` is provided, the carousel opens to Jerome (first in store order).
 
 **Video behavior:** `<video autoPlay loop muted playsInline>`. The model's existing static `imageSrc` from `MODEL_INVENTORY` renders beneath the video element as a fallback while loading or if no video URL is set.
+
+**Touch/swipe:** Standard touch events (`touchstart` / `touchend`) detect horizontal swipe. Minimum swipe threshold: 50px. No vertical scroll interference.
 
 **On selection:** calls `selectModel(id)`, then either opens the lookbook (if entering from a product) or simply closes (if triggered by "Change Model" from within the lookbook).
 
