@@ -13,6 +13,7 @@ interface LookbookOverlayProps {
   item: LookbookContext | null;
   onClose: () => void;
   onAddToCart: (item: LookbookContext, size: string) => void;
+  onChangeModel?: () => void;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -242,7 +243,7 @@ function FilterRows({ dimensions, activeFilters, onToggle }: FilterRowsProps) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayProps) {
+export function LookbookOverlay({ item, onClose, onAddToCart, onChangeModel }: LookbookOverlayProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
   const [added, setAdded] = useState(false);
@@ -330,6 +331,32 @@ export function LookbookOverlay({ item, onClose, onAddToCart }: LookbookOverlayP
             className="lookbook-panel"
             style={{ pointerEvents: "auto", background: "#121212", display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}
           >
+            {onChangeModel && (
+              <button
+                onClick={onChangeModel}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 44,
+                  height: 44,
+                  background: "none",
+                  border: "none",
+                  color: "rgba(196,164,86,0.7)",
+                  fontFamily: "var(--font-title, serif)",
+                  fontSize: "8px",
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  paddingRight: 12,
+                  zIndex: 10,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Change Model
+              </button>
+            )}
             <button
               onClick={onClose}
               aria-label="Close"

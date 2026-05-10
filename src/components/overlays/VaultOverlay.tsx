@@ -16,6 +16,7 @@ interface VaultOverlayProps {
   onClose: () => void;
   onAddToCart: (item: OutfitItem, size: string) => void;
   onOpenLookbook: (ctx: LookbookContext) => void;
+  onChangeModel?: () => void;
   productOverrides?: ProductOverride[];
 }
 
@@ -89,6 +90,7 @@ export default function VaultOverlay({
   onClose,
   onAddToCart,
   onOpenLookbook,
+  onChangeModel,
   productOverrides,
 }: VaultOverlayProps) {
   const effectiveInventory =
@@ -99,6 +101,25 @@ export default function VaultOverlay({
 
   return (
     <OverlayShell isOpen={isOpen} onClose={onClose} label="The Vault">
+      {onChangeModel && (
+        <button
+          onClick={onChangeModel}
+          style={{
+            background: "none",
+            border: "none",
+            color: "rgba(196,164,86,0.6)",
+            fontFamily: "var(--font-title, serif)",
+            fontSize: "9px",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            cursor: "pointer",
+            padding: "0 0 16px 0",
+            display: "block",
+          }}
+        >
+          ← Change Model
+        </button>
+      )}
       <p style={{
         fontFamily: "var(--font-title, serif)",
         fontSize: "9px",

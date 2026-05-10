@@ -16,6 +16,8 @@ import { MODEL_INVENTORY } from "@/data/inventory";
 import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import { DEFAULT_SHADOW } from "./studio/studioTypes";
 import { LookbookOverlay } from "./studio/LookbookOverlay";
+import { ChooseModelModal } from "@/components/overlays/ChooseModelModal";
+import { useModelPreference } from "@/hooks/useModelPreference";
 import { EditPagesPanel } from "./edit-pages/EditPagesPanel";
 import OverlayPortal from "@/components/OverlayPortal";
 import AboutOverlay from "./overlays/AboutOverlay";
@@ -560,6 +562,10 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
   const [protocolGateOpen, setProtocolGateOpen] = useState(false);
   const [activeLegalPage, setActiveLegalPage] = useState<LegalPage | null>(null);
   const [showEditPages, setShowEditPages] = useState(false);
+  const { modelId, selectModel } = useModelPreference();
+  const [chooseModalOpen, setChooseModalOpen] = useState(false);
+  const [pendingLookbookItem, setPendingLookbookItem] = useState<LookbookContext | null>(null);
+  const [defaultChooseModelId, setDefaultChooseModelId] = useState<string | null>(null);
 
   useMotionValueEvent(opacity, "change", (v) => {
     setActive(v > 0.05);
@@ -578,6 +584,42 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
   const handleModelDrag = useCallback((slotId: string, newLeftPct: number, newBottomPct: number) => {
     setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, leftPct: newLeftPct, bottomPct: newBottomPct } : s));
   }, []);
+
+  const handleOpenLookbook = useCallback((ctx: LookbookContext) => {
+    if (!modelId) {
+      const ctxId = (ctx as OutfitItem).id;
+      const modelSlot = MODEL_INVENTORY.find((s) =>
+        s.outfit.some((o) => o.id === ctxId)
+      );
+      setDefaultChooseModelId(modelSlot?.id ?? "jerome");
+      setPendingLookbookItem(ctx);
+      setChooseModalOpen(true);
+    } else {
+      setLookbookDot(ctx);
+    }
+  }, [modelId]);
+
+  function handleChangeModelFromVault() {
+    setDefaultChooseModelId(modelId ?? "jerome");
+    setPendingLookbookItem(null);
+    setChooseModalOpen(true);
+  }
+
+  function handleChangeModelFromLookbook() {
+    setDefaultChooseModelId(modelId ?? "jerome");
+    setPendingLookbookItem(lookbookDot);
+    setLookbookDot(null);
+    setChooseModalOpen(true);
+  }
+
+  function handleModelSelected(id: string) {
+    selectModel(id);
+    setChooseModalOpen(false);
+    if (pendingLookbookItem) {
+      setLookbookDot(pendingLookbookItem);
+      setPendingLookbookItem(null);
+    }
+  }
 
   const handleClearDraft = useCallback(() => {
     const confirmed = window.confirm("Are you sure you want to delete your changes from this session?");
@@ -660,10 +702,10 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
 
       {isStudioMode 
         ? studioSlots.map((s, i) => (
-            <ModelStage key={s.id} slot={MODEL_INVENTORY.find(m => m.id === s.id) || { id: s.id, outfit: [] }} index={i} revealed={revealed} isStudioMode={true} studioSlot={s} isSelected={selectedModelId === s.id} onSelect={() => setSelectedModelId(s.id)} onStudioDotDrop={(dotId: string, top: number, left: number) => updateDot(s.id, dotId, { topPct: top, leftPct: left })} onModelDrag={handleModelDrag} onUpdateStudioSlot={updateSlot} activeDotId={activeDotId} onToggleDot={setActiveDotId} onOpenLookbook={setLookbookDot} />
+            <ModelStage key={s.id} slot={MODEL_INVENTORY.find(m => m.id === s.id) || { id: s.id, outfit: [] }} index={i} revealed={revealed} isStudioMode={true} studioSlot={s} isSelected={selectedModelId === s.id} onSelect={() => setSelectedModelId(s.id)} onStudioDotDrop={(dotId: string, top: number, left: number) => updateDot(s.id, dotId, { topPct: top, leftPct: left })} onModelDrag={handleModelDrag} onUpdateStudioSlot={updateSlot} activeDotId={activeDotId} onToggleDot={setActiveDotId} onOpenLookbook={handleOpenLookbook} />
           ))
         : MODEL_INVENTORY.map((slot, i) => (
-            <ModelStage key={slot.id} slot={slot} index={i} revealed={revealed} isStudioMode={false} activeDotId={activeDotId} onToggleDot={setActiveDotId} onOpenLookbook={setLookbookDot} />
+            <ModelStage key={slot.id} slot={slot} index={i} revealed={revealed} isStudioMode={false} activeDotId={activeDotId} onToggleDot={setActiveDotId} onOpenLookbook={handleOpenLookbook} />
           ))
       }
 
@@ -736,6 +778,7 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
           onAddToCart={(item, size) => {
             onAddToCart(item, size);
           }}
+          onChangeModel={handleChangeModelFromLookbook}
         />
       )}
 
@@ -815,6 +858,7 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
           setActiveOverlay(null);
           setLookbookDot(ctx);
         }}
+        onChangeModel={handleChangeModelFromVault}
         productOverrides={productOverrides}
       />
 
@@ -844,6 +888,13 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
           <EditPagesPanel onClose={() => setShowEditPages(false)} />
         </OverlayPortal>
       )}
+
+      <ChooseModelModal
+        isOpen={chooseModalOpen}
+        modelProfiles={modelProfiles}
+        defaultModelId={defaultChooseModelId}
+        onSelect={handleModelSelected}
+      />
     </div>
   );
 }
