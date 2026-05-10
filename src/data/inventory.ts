@@ -42,7 +42,7 @@ export interface ModelSlot {
 
 export const MODEL_INVENTORY: ModelSlot[] = [
   {
-    id: "lounge-model",
+    id: "angel",
     displayName: "Angel",
     position: "left-[27.7%] md:left-[27.7%] bottom-[11.3%] md:bottom-[11.3%]",
     scale: "md:scale-[0.90]",
@@ -51,7 +51,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     imageSrc: "/assets/models/Angel/Angel-Heart-Long.png",
     outfit: [
       {
-        id: "lounge-showstopper",
+        id: "angel-heartbreaker",
         name: "Heartbreaker",
         collection: "The Constable",
         colorway: "Guilt Grey (Long Sleeve)",
@@ -72,7 +72,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     shadow: { offsetX: 0, offsetY: -8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
   },
   {
-    id: "center-model",
+    id: "jerome",
     displayName: "Jerome",
     position: "left-[4.7%] md:left-[4.7%] bottom-[15.3%] md:bottom-[15.3%]",
     scale: "md:scale-[0.84]",
@@ -81,7 +81,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     imageSrc: "/assets/models/Jerome/Jerome-Show-Short.png",
     outfit: [
       {
-        id: "center-showstopper",
+        id: "jerome-showstopper",
         name: "Showstopper",
         collection: "The Constable",
         colorway: "Ivory (Short Sleeve)",
@@ -102,7 +102,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     shadow: { offsetX: 0, offsetY: -8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
   },
   {
-    id: "vault-model",
+    id: "jack",
     displayName: "Jack",
     position: "left-[48.3%] md:left-[48.3%] bottom-[17.2%] md:bottom-[17.2%]",
     scale: "md:scale-[0.77]",
@@ -111,7 +111,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     imageSrc: "/assets/models/Jack/Jack-Show-Long.png",
     outfit: [
       {
-        id: "vault-showstopper",
+        id: "jack-showstopper",
         name: "Showstopper",
         collection: "The Constable",
         colorway: "Ivory (Long Sleeve)",
@@ -132,7 +132,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     shadow: { offsetX: -28, offsetY: -2, scaleX: 0.90, scaleY: 0.080, opacity: 0.35, blur: 14 },
   },
   {
-    id: "rack-model",
+    id: "ethan",
     displayName: "Ethan",
     position: "right-[4.5%] md:right-[4.5%] bottom-[13.9%] md:bottom-[13.9%]",
     scale: "md:scale-[0.87]",
@@ -141,7 +141,7 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     imageSrc: "/assets/models/Ethan/Ethan-Heart-Short.png",
     outfit: [
       {
-        id: "rack-showstopper",
+        id: "ethan-heartbreaker",
         name: "Heartbreaker",
         collection: "The Constable",
         colorway: "Guilt Grey (Short Sleeve)",
