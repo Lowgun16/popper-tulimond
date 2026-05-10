@@ -6,6 +6,7 @@ import { EditPagesSidebar, BRAND_PAGES, LEGAL_PAGES } from "./EditPagesSidebar";
 import { PageEditor, type PageEditorHandle } from "./PageEditor";
 import { AdminPanel } from "./AdminPanel";
 import { ProductEditor } from "./ProductEditor";
+import { ModelProfileEditor } from "./ModelProfileEditor";
 import { PreviewPane } from "./PreviewPane";
 
 type Props = {
@@ -81,7 +82,7 @@ export function EditPagesPanel({ onClose }: Props) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
           <p className="text-[9px] uppercase tracking-widest text-white/30">Edit Pages</p>
           <div className="flex items-center gap-4">
-            {session.status === "authenticated" && !showAdmin && activePage !== "products" && (
+            {session.status === "authenticated" && !showAdmin && activePage !== "products" && activePage !== "models" && (
               <button
                 onClick={() => setShowPreview(true)}
                 className="text-white/30 hover:text-white text-xs uppercase tracking-widest"
@@ -210,6 +211,13 @@ export function EditPagesPanel({ onClose }: Props) {
                   />
                 ) : activePage === "products" ? (
                   <ProductEditor />
+                ) : activePage === "models" ? (
+                  <ModelProfileEditor
+                    ref={pageEditorRef}
+                    liveContent={liveContent}
+                    customColors={palette}
+                    onAddCustomColor={handleAddCustomColor}
+                  />
                 ) : (
                   <PageEditor
                     ref={pageEditorRef}

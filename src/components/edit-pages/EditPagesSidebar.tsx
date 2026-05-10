@@ -10,6 +10,7 @@ export const BRAND_PAGES: PageItem[] = [
   { slug: "protocol", label: "The Protocol" },
   { slug: "contact", label: "Contact" },
   { slug: "vault", label: "Vault" },
+  { slug: "models", label: "Models" },
   { slug: "membership-celebration", label: "Welcome — New Member" },
   { slug: "reservation", label: "Reserve My Place Popup" },
 ];
