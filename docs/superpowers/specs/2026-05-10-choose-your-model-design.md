@@ -4,10 +4,25 @@
 
 Give customers a personalized entry point into the lookbook by letting them choose the model who most closely resembles their body type. The selection persists across their visit and can be changed at any time. Model profiles (bio, stats, intro video) are fully editable from the admin CMS.
 
+## Model ID Rename (prerequisite)
+
+Before building the selector, the MODEL_INVENTORY slot IDs are renamed from location-based names to character names. This is the first implementation task.
+
+| Old slot ID | New slot ID | Old outfit ID | New outfit ID |
+|---|---|---|---|
+| `lounge-model` | `angel` | `lounge-showstopper` | `angel-heartbreaker` |
+| `center-model` | `jerome` | `center-showstopper` | `jerome-showstopper` |
+| `vault-model` | `jack` | `vault-showstopper` | `jack-showstopper` |
+| *(4th model)* | `ethan` | *(4th outfit)* | `ethan-{name}` |
+
+A DB migration updates any `product_overrides` rows referencing old outfit IDs. The localStorage key `pt_model_preference` stores the new short names (`"angel"`, `"jerome"`, etc.).
+
+---
+
 ## Architecture
 
 ### Persistence
-Model preference is stored in `localStorage` under the key `pt_model_preference`. Value is the model's `id` from `MODEL_INVENTORY` (e.g., `"lounge-model"` for Angel). No login required. Persists across page reloads and return visits. A `useModelPreference` hook reads and writes this value.
+Model preference is stored in `localStorage` under the key `pt_model_preference`. Value is the model's renamed slot ID (`"angel"`, `"jerome"`, `"jack"`, `"ethan"`). No login required. Persists across page reloads and return visits. A `useModelPreference` hook reads and writes this value.
 
 ### Model profiles
 Stored in the existing `page_content` DB table using `page_slug = "models"`. Field keys are namespaced by model id: `angel_tagline`, `angel_height`, `angel_weight`, `angel_body_type`, `angel_bio`, `angel_video_url` — and the same four fields for `jerome`, `jack`, `ethan`. The existing save/publish flow (page_drafts → page_content → revalidatePath) handles all of this with no schema changes.
@@ -47,8 +62,9 @@ Full-screen dark overlay (z-index above VaultOverlay and LookbookOverlay). Shown
 **Layout:**
 - Headline: *"Choose the model who most closely resembles your body type."*
 - Subtext: *"Your choice personalizes the lookbook. You can always change it."*
-- 2×2 card grid on desktop, single-column scroll on mobile
-- Each card: looping video (falls back to static model photo), name in gold caps, height · weight stat line, one-line tagline, 3–5 sentence bio, **"Choose [Name]"** button
+- **Desktop:** 4 tall portrait cards in a single row. Each card uses a 2:3 aspect ratio (fashion photo proportioned) — wide enough to read the full body, tall enough to show the whole figure including legs for future full-outfit looks.
+- **Mobile:** 2 tall portrait cards side by side, both visible without scrolling. Each card is ~45% screen width and ~65% screen height. Jack and Ethan appear below in the same 2-column layout when the customer scrolls down.
+- Each card: looping video (falls back to static model photo), name in gold caps, height · weight stat line, one-line tagline, 3–5 sentence bio, **"Choose [Name]"** button at the bottom
 - No close/dismiss without selecting — the selection is the action
 
 **Video behavior:** `<video autoPlay loop muted playsInline>`. The model's existing static `imageSrc` from `MODEL_INVENTORY` renders beneath the video element as a fallback while loading or if no video URL is set.
