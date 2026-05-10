@@ -10,8 +10,10 @@ import type {
   LegalContent,
   ContactUsContent,
   AllPageContent,
+  ModelProfile,
 } from "./contentTypes";
 import type { ProductOverride } from "./productOverrides";
+import { MODEL_INVENTORY } from "@/data/inventory";
 import {
   ABOUT_CONTENT,
   PROTOCOL_CONTENT,
@@ -157,6 +159,25 @@ const fetchRows = cache(async (slug: string): Promise<ContentRow[]> => {
   }
 });
 
+// ── Model profiles ────────────────────────────────────────────────────────────
+
+export async function fetchModelProfiles(): Promise<ModelProfile[]> {
+  const rows = await fetchRows("models");
+  const m: Record<string, string> = rowsToMap(rows);
+
+  return MODEL_INVENTORY.map((slot) => ({
+    id: slot.id,
+    displayName: slot.displayName ?? slot.id,
+    imageSrc: slot.imageSrc,
+    tagline: m[`${slot.id}_tagline`] ?? "",
+    height: m[`${slot.id}_height`] ?? "",
+    weight: m[`${slot.id}_weight`] ?? "",
+    bodyType: m[`${slot.id}_body_type`] ?? "",
+    bio: m[`${slot.id}_bio`] ?? "",
+    videoUrl: m[`${slot.id}_video_url`] ?? "",
+  }));
+}
+
 // ── Main export used by page.tsx ──────────────────────────────────────────────
 
 export async function fetchAllPageContent(): Promise<AllPageContent> {
@@ -170,6 +191,7 @@ export async function fetchAllPageContent(): Promise<AllPageContent> {
     refundRows,
     contactUsRows,
     productOverrides,
+    modelProfiles,
   ] = await Promise.all([
     fetchRows("about"),
     fetchRows("protocol"),
@@ -180,6 +202,7 @@ export async function fetchAllPageContent(): Promise<AllPageContent> {
     fetchRows("refund"),
     fetchRows("contact-us"),
     fetchPublishedOverrides(),
+    fetchModelProfiles(),
   ]);
 
   return {
@@ -192,6 +215,7 @@ export async function fetchAllPageContent(): Promise<AllPageContent> {
     refund: parseLegal(refundRows, REFUND_CONTENT),
     contactUs: parseContactUs(contactUsRows),
     productOverrides,
+    modelProfiles,
   };
 }
 

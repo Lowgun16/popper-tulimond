@@ -65,6 +65,18 @@ export type MembershipCelebrationContent = {
   cta_text: string;
 };
 
+export type ModelProfile = {
+  id: string;
+  displayName: string;
+  imageSrc: string;
+  tagline: string;
+  height: string;
+  weight: string;
+  bodyType: string;
+  bio: string;
+  videoUrl: string;
+};
+
 export type AllPageContent = {
   about: AboutContent;
   protocol: ProtocolContent;
@@ -75,4 +87,5 @@ export type AllPageContent = {
   refund: LegalContent;
   contactUs: ContactUsContent;
   productOverrides: ProductOverride[];
+  modelProfiles: ModelProfile[];
 };
