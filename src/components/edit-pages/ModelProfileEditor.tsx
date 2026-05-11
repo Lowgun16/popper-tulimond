@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useImperativeHandle, forwardRef, useRef } from "react";
-import { upload } from "@vercel/blob/client";
 import { useEditPages } from "@/hooks/useEditPages";
 import { FieldEditor } from "./FieldEditor";
 import { PublishModal } from "./PublishModal";
@@ -32,7 +31,6 @@ export const ModelProfileEditor = forwardRef<PageEditorHandle, Props>(
     const [savedFlash, setSavedFlash] = useState(false);
     const [expandedModel, setExpandedModel] = useState<string>("jerome");
     const [uploadingFor, setUploadingFor] = useState<string | null>(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const uploadingModelRef = useRef<string | null>(null);
@@ -67,18 +65,25 @@ export const ModelProfileEditor = forwardRef<PageEditorHandle, Props>(
       if (!modelId || !e.target.files?.[0]) return;
       const file = e.target.files[0];
       setUploadingFor(modelId);
-      setUploadProgress(0);
       setUploadError(null);
       try {
-        const ext = file.type === "video/webm" ? "webm" : "mp4";
-        const blob = await upload(`models/${modelId}/${Date.now()}.${ext}`, file, {
-          access: "public",
-          handleUploadUrl: "/api/upload/model-video",
-          onUploadProgress: ({ percentage }) => setUploadProgress(Math.round(percentage)),
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("modelId", modelId);
+        const res = await fetch("/api/upload/model-video", {
+          method: "POST",
+          credentials: "include",
+          body: fd,
         });
-        handleChange(`${modelId}_video_url`, blob.url);
-      } catch (err) {
-        setUploadError(err instanceof Error ? err.message : "Upload failed. Check your connection.");
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          setUploadError((err as { error?: string }).error ?? "Upload failed.");
+          return;
+        }
+        const { url } = await res.json() as { url: string };
+        handleChange(`${modelId}_video_url`, url);
+      } catch {
+        setUploadError("Upload failed. Check your connection.");
       } finally {
         setUploadingFor(null);
         if (fileInputRef.current) fileInputRef.current.value = "";
@@ -171,7 +176,7 @@ export const ModelProfileEditor = forwardRef<PageEditorHandle, Props>(
                       disabled={uploadingFor === modelId}
                       className="self-start px-4 py-2 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest hover:border-white/40 disabled:opacity-40"
                     >
-                      {uploadingFor === modelId ? `Uploading… ${uploadProgress > 0 ? uploadProgress + "%" : ""}` : videoUrl ? "Replace Video" : "Upload Video (.mp4 / .webm)"}
+                      {uploadingFor === modelId ? "Uploading…" : videoUrl ? "Replace Video" : "Upload Video (.mp4 / .webm)"}
                     </button>
                     {uploadError && uploadingModelRef.current === modelId && (
                       <p className="text-red-400 text-[10px]">{uploadError}</p>
