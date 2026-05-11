@@ -12,6 +12,7 @@ interface ChooseModelModalProps {
   modelProfiles: ModelProfile[];
   defaultModelId?: string | null;
   onSelect: (modelId: string) => void;
+  onDismiss?: () => void;
 }
 
 export function ChooseModelModal({
@@ -19,6 +20,7 @@ export function ChooseModelModal({
   modelProfiles,
   defaultModelId,
   onSelect,
+  onDismiss,
 }: ChooseModelModalProps) {
   const defaultIdx = defaultModelId
     ? Math.max(0, MODEL_CAROUSEL_ORDER.indexOf(defaultModelId as typeof MODEL_CAROUSEL_ORDER[number]))
@@ -35,6 +37,17 @@ export function ChooseModelModal({
       );
     }
   }, [isOpen, defaultModelId]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    history.pushState({ chooseModel: true }, "");
+    const handlePopState = () => { onDismiss?.(); };
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      if (history.state?.chooseModel) history.back();
+    };
+  }, [isOpen, onDismiss]);
 
   const touchStartX = useRef<number | null>(null);
 
@@ -86,7 +99,25 @@ export function ChooseModelModal({
           onTouchEnd={handleTouchEnd}
         >
           {/* Header */}
-          <div style={{ textAlign: "center", padding: "32px 24px 16px" }}>
+          <div style={{ textAlign: "center", padding: "32px 24px 16px", position: "relative" }}>
+            {onDismiss && (
+              <button
+                onClick={onDismiss}
+                aria-label="Close"
+                style={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  background: "none",
+                  border: "none",
+                  color: "rgba(255,255,255,0.35)",
+                  fontSize: 18,
+                  cursor: "pointer",
+                  lineHeight: 1,
+                  padding: 4,
+                }}
+              >✕</button>
+            )}
             <p style={{
               fontFamily: "var(--font-title, serif)",
               fontSize: "9px",

@@ -621,6 +621,11 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
     }
   }
 
+  function handleModalDismiss() {
+    setChooseModalOpen(false);
+    setPendingLookbookItem(null);
+  }
+
   const handleClearDraft = useCallback(() => {
     const confirmed = window.confirm("Are you sure you want to delete your changes from this session?");
     if (confirmed) {
@@ -894,6 +899,7 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
         modelProfiles={modelProfiles}
         defaultModelId={defaultChooseModelId}
         onSelect={handleModelSelected}
+        onDismiss={handleModalDismiss}
       />
     </div>
   );
