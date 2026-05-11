@@ -6,34 +6,35 @@ const ALLOWED_TYPES = ["video/mp4", "video/webm"];
 const MAX_BYTES = 200 * 1024 * 1024; // 200 MB
 
 export async function POST(req: NextRequest) {
-  // @vercel/blob client upload sends two request types:
-  // 1. "blob.generate-client-token" — browser asks for an upload token
-  // 2. "blob.upload-completed"       — blob notifies us the upload finished
   const body = await req.json() as HandleUploadBody;
-
-  const sessionOrResponse = await requireSession(req);
-  if (sessionOrResponse instanceof NextResponse) return sessionOrResponse;
 
   try {
     const jsonResponse = await handleUpload({
       body,
       request: req,
       onBeforeGenerateToken: async (pathname) => {
-        // Validate file type from the pathname extension
+        // Auth check only runs for the browser's token request, not Vercel's completion callback
+        const sessionOrResponse = await requireSession(req);
+        if (sessionOrResponse instanceof NextResponse) {
+          throw new Error("Unauthorized");
+        }
+
         const ext = pathname.split(".").pop()?.toLowerCase();
         const mimeType = ext === "webm" ? "video/webm" : "video/mp4";
         if (!ALLOWED_TYPES.includes(mimeType)) {
           throw new Error("Only .mp4 and .webm files are allowed");
         }
+
         return {
           maximumSizeInBytes: MAX_BYTES,
           allowedContentTypes: ALLOWED_TYPES,
         };
       },
       onUploadCompleted: async () => {
-        // Nothing to do — the client reads the URL from the upload() response
+        // No auth needed — this is called by Vercel Blob's servers, not the browser
       },
     });
+
     return NextResponse.json(jsonResponse);
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 400 });
