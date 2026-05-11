@@ -58,6 +58,21 @@ export function AdminPanel({ currentUserId, onBack }: Props) {
     loadUsers();
   }
 
+  const [sendingLinkFor, setSendingLinkFor] = useState<string | null>(null);
+  const [sentLinkFor, setSentLinkFor] = useState<string | null>(null);
+
+  async function sendLoginLink(email: string, userId: string) {
+    setSendingLinkFor(userId);
+    await fetch("/api/admin/login-link/request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    setSendingLinkFor(null);
+    setSentLinkFor(userId);
+    setTimeout(() => setSentLinkFor((prev) => (prev === userId ? null : prev)), 4000);
+  }
+
   async function updateRole(userId: string, role: "owner" | "editor") {
     await fetch(`/api/admin/users/${userId}/role`, {
       method: "PATCH",
@@ -184,22 +199,31 @@ export function AdminPanel({ currentUserId, onBack }: Props) {
               <p className="text-white/40 text-[10px]">{user.email}</p>
               <p className="text-[#D4B896]/60 text-[9px] uppercase tracking-widest mt-1">{user.role}</p>
             </div>
-            {user.id !== currentUserId && (
-              <div className="flex flex-col gap-1 items-end">
-                <button
-                  onClick={() => updateRole(user.id, user.role === "owner" ? "editor" : "owner")}
-                  className="text-[9px] uppercase tracking-widest text-white/30 hover:text-white"
-                >
-                  {user.role === "owner" ? "Demote" : "Promote"}
-                </button>
-                <button
-                  onClick={() => removeUser(user.id)}
-                  className="text-[9px] uppercase tracking-widest text-red-400/60 hover:text-red-400"
-                >
-                  Remove
-                </button>
-              </div>
-            )}
+            <div className="flex flex-col gap-1 items-end">
+              <button
+                onClick={() => sendLoginLink(user.email, user.id)}
+                disabled={sendingLinkFor === user.id}
+                className="text-[9px] uppercase tracking-widest text-[#D4B896]/50 hover:text-[#D4B896] disabled:opacity-40"
+              >
+                {sentLinkFor === user.id ? "Link Sent ✓" : sendingLinkFor === user.id ? "Sending…" : "Send Sign-in Link"}
+              </button>
+              {user.id !== currentUserId && (
+                <>
+                  <button
+                    onClick={() => updateRole(user.id, user.role === "owner" ? "editor" : "owner")}
+                    className="text-[9px] uppercase tracking-widest text-white/30 hover:text-white"
+                  >
+                    {user.role === "owner" ? "Demote" : "Promote"}
+                  </button>
+                  <button
+                    onClick={() => removeUser(user.id)}
+                    className="text-[9px] uppercase tracking-widest text-red-400/60 hover:text-red-400"
+                  >
+                    Remove
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
           {user.credentials && user.credentials.length > 0 && (

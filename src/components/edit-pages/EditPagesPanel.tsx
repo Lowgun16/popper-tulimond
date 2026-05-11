@@ -124,6 +124,17 @@ export function EditPagesPanel({ onClose }: Props) {
             >
               Authenticate with Face ID / Fingerprint
             </button>
+            <div className="flex items-center gap-3 w-full max-w-xs">
+              <div className="flex-1 h-px bg-white/10" />
+              <span className="text-white/20 text-[9px] uppercase tracking-widest">or</span>
+              <div className="flex-1 h-px bg-white/10" />
+            </div>
+            <a
+              href="/admin/login"
+              className="text-[#D4B896]/60 text-[9px] uppercase tracking-widest hover:text-[#D4B896]"
+            >
+              Sign in with email instead →
+            </a>
           </div>
         ) : (
           /* Authenticated — main UI */
