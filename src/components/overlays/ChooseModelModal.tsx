@@ -231,13 +231,15 @@ export function ChooseModelModal({
                   marginBottom: 20,
                   flexShrink: 0,
                 }}>
-                  <Image
-                    src={profile.imageSrc}
-                    alt={profile.displayName}
-                    fill
-                    style={{ objectFit: "cover", objectPosition: "top center" }}
-                    sizes="320px"
-                  />
+                  {!profile.videoUrl && (
+                    <Image
+                      src={profile.imageSrc}
+                      alt={profile.displayName}
+                      fill
+                      style={{ objectFit: "cover", objectPosition: "top center" }}
+                      sizes="320px"
+                    />
+                  )}
                   {profile.videoUrl && (
                     <video
                       key={profile.videoUrl}
