@@ -25,7 +25,10 @@ export async function POST(req: NextRequest) {
 
   const ext = file.type === "video/webm" ? "webm" : "mp4";
   try {
-    const blob = await put(`models/${modelId}/${Date.now()}.${ext}`, file, { access: "public" });
+    const blob = await put(`models/${modelId}/${Date.now()}.${ext}`, file, {
+      access: "public",
+      token: process.env.BLOB_PUBLIC_READ_WRITE_TOKEN,
+    });
     return NextResponse.json({ url: blob.url });
   } catch (err) {
     console.error("[upload/model-video] put() failed:", err);
