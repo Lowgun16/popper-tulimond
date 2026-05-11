@@ -271,16 +271,43 @@ export function ChooseModelModal({
                 </p>
 
                 {/* Stats */}
-                {(profile.height || profile.weight) && (
-                  <p style={{
-                    fontFamily: "var(--font-body, sans-serif)",
-                    fontSize: "11px",
-                    color: "rgba(255,255,255,0.4)",
-                    letterSpacing: "0.08em",
-                    marginBottom: 8,
+                {(profile.height || profile.weight || profile.bodyType) && (
+                  <div style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 6,
+                    marginBottom: 14,
+                    padding: "12px 20px",
+                    border: "1px solid rgba(196,164,86,0.2)",
+                    borderRadius: 2,
+                    width: "100%",
+                    maxWidth: 280,
                   }}>
-                    {[profile.height, profile.weight].filter(Boolean).join(" · ")}
-                  </p>
+                    {(profile.height || profile.weight) && (
+                      <p style={{
+                        fontFamily: "var(--font-body, sans-serif)",
+                        fontSize: "13px",
+                        color: "rgba(255,255,255,0.85)",
+                        letterSpacing: "0.1em",
+                        margin: 0,
+                      }}>
+                        {[profile.height, profile.weight].filter(Boolean).join(" · ")}
+                      </p>
+                    )}
+                    {profile.bodyType && (
+                      <p style={{
+                        fontFamily: "var(--font-body, sans-serif)",
+                        fontSize: "11px",
+                        color: "rgba(196,164,86,0.7)",
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        margin: 0,
+                      }}>
+                        {profile.bodyType}
+                      </p>
+                    )}
+                  </div>
                 )}
 
                 {/* Tagline */}
