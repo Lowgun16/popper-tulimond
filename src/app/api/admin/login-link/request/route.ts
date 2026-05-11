@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import crypto from "crypto";
 import { Resend } from "resend";
+import { render } from "@react-email/render";
 import AdminLoginLink from "@/emails/AdminLoginLink";
 
 const EXPIRY_MINUTES = 15;
@@ -31,12 +32,13 @@ export async function POST(req: NextRequest) {
   const origin = req.nextUrl.origin;
   const loginUrl = `${origin}/admin/login?token=${token}`;
 
+  const html = await render(AdminLoginLink({ loginUrl, name: user.name }));
   const resend = new Resend(process.env.RESEND_API_KEY);
   const { error } = await resend.emails.send({
     from: process.env.FROM_EMAIL ?? "noreply@poppertulimond.com",
     to: user.email,
     subject: "Your Popper Tulimond sign-in link",
-    react: AdminLoginLink({ loginUrl, name: user.name }),
+    html,
   });
 
   if (error) {
