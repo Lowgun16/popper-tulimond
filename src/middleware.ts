@@ -16,11 +16,13 @@ export async function middleware(request: NextRequest) {
     (pathname.startsWith("/api/admin/") &&
       !pathname.startsWith("/api/admin/webauthn/") &&
       !pathname.startsWith("/api/admin/recover/") &&
-      !pathname.startsWith("/api/admin/invite/")) ||
+      !pathname.startsWith("/api/admin/invite/") &&
+      !pathname.startsWith("/api/admin/login-link/")) ||
     (pathname.startsWith("/admin/") &&
       !pathname.startsWith("/admin/setup") &&
       !pathname.startsWith("/admin/recover") &&
-      !pathname.startsWith("/admin/invite"))
+      !pathname.startsWith("/admin/invite") &&
+      !pathname.startsWith("/admin/login"))
   ) {
     const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
     if (!token) {
