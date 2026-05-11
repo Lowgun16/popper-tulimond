@@ -90,6 +90,30 @@ export function EditPagesPanel({ onClose }: Props) {
                 Preview
               </button>
             )}
+            {session.status === "authenticated" && !showAdmin && activePage !== "products" && (
+              <div className="hidden md:flex items-center gap-3">
+                <button
+                  onClick={async () => {
+                    await pageEditorRef.current?.save();
+                    setSavedFlash(true);
+                    setTimeout(() => setSavedFlash(false), 1800);
+                  }}
+                  disabled={pageEditorRef.current?.saving}
+                  className={`px-3 py-1.5 border text-[9px] uppercase tracking-widest disabled:opacity-40 transition-colors ${
+                    savedFlash ? "border-green-500/50 text-green-400" : "border-white/20 text-white/60"
+                  }`}
+                >
+                  {savedFlash ? "Saved ✓" : "Save"}
+                </button>
+                <button
+                  onClick={() => pageEditorRef.current?.triggerPublish()}
+                  disabled={pageEditorRef.current?.publishing}
+                  className="px-3 py-1.5 bg-[#D4B896] text-black text-[9px] uppercase tracking-widest disabled:opacity-40"
+                >
+                  Publish
+                </button>
+              </div>
+            )}
             <button
               onClick={onClose}
               className="text-white/30 hover:text-white text-xs uppercase tracking-widest"
