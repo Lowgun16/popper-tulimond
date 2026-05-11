@@ -32,12 +32,17 @@ export async function POST(req: NextRequest) {
   const loginUrl = `${origin}/admin/login?token=${token}`;
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: process.env.FROM_EMAIL ?? "noreply@poppertulimond.com",
     to: user.email,
     subject: "Your Popper Tulimond sign-in link",
     react: AdminLoginLink({ loginUrl, name: user.name }),
   });
+
+  if (error) {
+    console.error("[login-link] Resend error:", error);
+    return NextResponse.json({ error: "Failed to send email. Check server logs." }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }

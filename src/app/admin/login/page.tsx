@@ -18,14 +18,23 @@ function LoginForm() {
     }
   }, [token]);
 
+  const [sendError, setSendError] = useState("");
+
   async function handleRequest() {
     if (!email) return;
     setStatus("sending");
-    await fetch("/api/admin/login-link/request", {
+    setSendError("");
+    const res = await fetch("/api/admin/login-link/request", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setSendError(data.error ?? "Something went wrong. Try again.");
+      setStatus("idle");
+      return;
+    }
     setStatus("sent");
   }
 
@@ -66,6 +75,9 @@ function LoginForm() {
       <p className="text-sm text-white/40 max-w-xs text-center leading-relaxed">
         Enter your email and we&apos;ll send you a sign-in link.
       </p>
+      {sendError && (
+        <p className="text-red-400/70 text-xs text-center max-w-xs">{sendError}</p>
+      )}
       {error && (
         <p className="text-red-400/70 text-xs text-center max-w-xs">
           {error === "expired" ? "That link has expired or already been used. Request a new one below." : "Invalid link. Request a new one below."}
