@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useImperativeHandle, forwardRef, useRef } from "react";
+import { upload } from "@vercel/blob/client";
 import { useEditPages } from "@/hooks/useEditPages";
 import { FieldEditor } from "./FieldEditor";
 import { PublishModal } from "./PublishModal";
@@ -67,23 +68,15 @@ export const ModelProfileEditor = forwardRef<PageEditorHandle, Props>(
       setUploadingFor(modelId);
       setUploadError(null);
       try {
-        const fd = new FormData();
-        fd.append("file", file);
-        fd.append("modelId", modelId);
-        const res = await fetch("/api/upload/model-video", {
-          method: "POST",
-          credentials: "include",
-          body: fd,
+        const ext = file.type === "video/webm" ? "webm" : "mp4";
+        const blob = await upload(`models/${modelId}/${Date.now()}.${ext}`, file, {
+          access: "public",
+          handleUploadUrl: "/api/upload/model-video",
+          clientPayload: JSON.stringify({ modelId }),
         });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          setUploadError((err as { error?: string }).error ?? "Upload failed.");
-          return;
-        }
-        const { url } = await res.json() as { url: string };
-        handleChange(`${modelId}_video_url`, url);
-      } catch {
-        setUploadError("Upload failed. Check your connection.");
+        handleChange(`${modelId}_video_url`, blob.url);
+      } catch (err) {
+        setUploadError(err instanceof Error ? err.message : "Upload failed. Check your connection.");
       } finally {
         setUploadingFor(null);
         if (fileInputRef.current) fileInputRef.current.value = "";
