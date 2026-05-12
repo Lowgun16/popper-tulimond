@@ -137,6 +137,9 @@ export function LookbookDeepDive({
         <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "11px", color: "rgba(255,255,255,0.45)", margin: "0 0 4px" }}>
           {sleeve || item.colorway}
         </p>
+        <p style={{ fontFamily: "var(--font-display, Georgia, serif)", fontSize: "1.8rem", color: "#C4A456", margin: "8px 0 4px", lineHeight: 1.1 }}>
+          {formatPrice(price)}
+        </p>
 
         {item.story && (
           <p style={{ fontFamily: "var(--font-display, serif)", fontSize: "12px", fontWeight: 300, fontStyle: "italic", color: "rgba(240,232,215,0.6)", lineHeight: 1.6, margin: "12px 0" }}>

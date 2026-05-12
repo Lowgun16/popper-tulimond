@@ -168,15 +168,15 @@ export function LookbookCompareMode({
         </button>
       </div>
 
-      {/* Single scrollable container — panels + info scroll together */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "0 14px 40px" }}>
+      {/* Panels — pinned, never scroll off screen */}
+      <div style={{ display: "flex", gap: 8, padding: "0 14px 10px", flexShrink: 0 }}>
+        <ComparePanel item={left} media={media[left.id] ?? []} dimmed={crowned !== null && crowned !== left.id} onTap={() => handleTap(left.id)} />
+        <div style={{ width: 1, background: "rgba(196,164,86,0.15)", alignSelf: "stretch" }} />
+        <ComparePanel item={right} media={media[right.id] ?? []} dimmed={crowned !== null && crowned !== right.id} onTap={() => handleTap(right.id)} />
+      </div>
 
-        {/* Panels row */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-          <ComparePanel item={left} media={media[left.id] ?? []} dimmed={crowned !== null && crowned !== left.id} onTap={() => handleTap(left.id)} />
-          <div style={{ width: 1, background: "rgba(196,164,86,0.15)", alignSelf: "stretch" }} />
-          <ComparePanel item={right} media={media[right.id] ?? []} dimmed={crowned !== null && crowned !== right.id} onTap={() => handleTap(right.id)} />
-        </div>
+      {/* Scrollable info below — panels stay pinned above */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "0 14px 40px" }}>
 
         {/* State ①: Neutral — tap to explore */}
         {!crowned && (
