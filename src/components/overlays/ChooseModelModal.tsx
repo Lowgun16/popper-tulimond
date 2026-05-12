@@ -13,6 +13,7 @@ interface ChooseModelModalProps {
   defaultModelId?: string | null;
   onSelect: (modelId: string) => void;
   onDismiss?: () => void;
+  dismissLabel?: string;
 }
 
 export function ChooseModelModal({
@@ -21,6 +22,7 @@ export function ChooseModelModal({
   defaultModelId,
   onSelect,
   onDismiss,
+  dismissLabel,
 }: ChooseModelModalProps) {
   const defaultIdx = defaultModelId
     ? Math.max(0, MODEL_CAROUSEL_ORDER.indexOf(defaultModelId as typeof MODEL_CAROUSEL_ORDER[number]))
@@ -111,12 +113,14 @@ export function ChooseModelModal({
                   background: "none",
                   border: "none",
                   color: "rgba(255,255,255,0.35)",
-                  fontSize: 18,
+                  fontSize: dismissLabel ? 11 : 18,
+                  fontFamily: dismissLabel ? "var(--font-body, sans-serif)" : undefined,
+                  letterSpacing: dismissLabel ? "0.08em" : undefined,
                   cursor: "pointer",
                   lineHeight: 1,
                   padding: 4,
                 }}
-              >✕</button>
+              >{dismissLabel ?? "✕"}</button>
             )}
             <p style={{
               fontFamily: "var(--font-title, serif)",
