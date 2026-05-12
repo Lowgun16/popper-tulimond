@@ -4,6 +4,7 @@ import { useEffect, useState, useImperativeHandle, forwardRef, useRef } from "re
 import { useEditPages } from "@/hooks/useEditPages";
 import { FieldEditor } from "./FieldEditor";
 import { PublishModal } from "./PublishModal";
+import { LookbookMediaEditor } from "./LookbookMediaEditor";
 import { MODEL_CAROUSEL_ORDER } from "@/components/overlays/ChooseModelModal";
 import type { PageEditorHandle } from "./PageEditor";
 
@@ -28,6 +29,7 @@ export const ModelProfileEditor = forwardRef<PageEditorHandle, Props>(
       useEditPages("models");
     const [localDrafts, setLocalDrafts] = useState<Record<string, string>>({});
     const [showPublishModal, setShowPublishModal] = useState(false);
+    const [activeTab, setActiveTab] = useState<"profile" | "lookbook">("profile");
     const [savedFlash, setSavedFlash] = useState(false);
     const [expandedModel, setExpandedModel] = useState<string>("jerome");
     const [uploadingFor, setUploadingFor] = useState<string | null>(null);
@@ -106,7 +108,29 @@ export const ModelProfileEditor = forwardRef<PageEditorHandle, Props>(
           onChange={handleVideoUpload}
         />
 
-        {MODEL_CAROUSEL_ORDER.map((modelId) => {
+        {/* Tab bar */}
+        <div className="flex border-b border-white/10 px-6 gap-6 shrink-0">
+          {(["profile", "lookbook"] as const).map((tab) => {
+            const label = tab === "profile" ? "Profile" : "Lookbook Media";
+            const isActive = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className="py-3 text-[10px] uppercase tracking-widest transition-colors"
+                style={{
+                  color: isActive ? "#C4A456" : "rgba(255,255,255,0.4)",
+                  borderBottom: isActive ? "1px solid #C4A456" : "1px solid transparent",
+                  marginBottom: "-1px",
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {activeTab === "profile" && MODEL_CAROUSEL_ORDER.map((modelId) => {
           const isExpanded = expandedModel === modelId;
           const name = MODEL_NAMES[modelId] ?? modelId;
           const videoUrl = getVal(`${modelId}_video_url`);
@@ -187,6 +211,8 @@ export const ModelProfileEditor = forwardRef<PageEditorHandle, Props>(
             </div>
           );
         })}
+
+        {activeTab === "lookbook" && <LookbookMediaEditor />}
 
         {showPublishModal && (
           <PublishModal
