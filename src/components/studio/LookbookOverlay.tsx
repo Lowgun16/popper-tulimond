@@ -43,6 +43,7 @@ export function LookbookOverlay({
   const [compareVersions, setCompareVersions] = useState<[VersionItem, VersionItem] | null>(null);
   const [allMedia, setAllMedia] = useState<Record<string, LookbookMediaItem[]>>({});
   const [showProfileCarousel, setShowProfileCarousel] = useState(false);
+  const [returnToCompareMode, setReturnToCompareMode] = useState(false);
 
   // Fetch all published lookbook media when overlay opens
   useEffect(() => {
@@ -52,6 +53,23 @@ export function LookbookOverlay({
       .then((data: Record<string, LookbookMediaItem[]>) => setAllMedia(data))
       .catch(() => setAllMedia({}));
   }, [item]);
+
+  // When overlay opens for a product, auto-deepdive if only 1 version
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!item) return;
+    const slot = MODEL_INVENTORY.find((s) => s.id === activeModelId);
+    const vers = (slot?.outfit ?? []).filter((o) => o.collection === item.collection) as unknown as VersionItem[];
+    if (vers.length === 1) {
+      setSelectedVersion(vers[0]);
+      setScreen("deepdive");
+    } else {
+      setScreen("grid");
+      setSelectedVersion(null);
+      setCompareVersions(null);
+      setReturnToCompareMode(false);
+    }
+  }, [item?.id]); // fires when a new product is opened
 
   // When model switches, stay on current screen with equivalent version for new model
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,8 +97,11 @@ export function LookbookOverlay({
         setCompareVersions(null);
         setSelectedVersion(null);
       }
+    } else if (screen === "grid" && newVersions.length === 1) {
+      setSelectedVersion(newVersions[0]);
+      setScreen("deepdive");
     }
-    // screen === "grid": versions auto-recompute from activeModelId, no reset needed
+    // else grid with multiple versions: auto-recomputes from activeModelId
   }, [activeModelId]); // intentionally excludes screen/selectedVersion/compareVersions
 
   // Keyboard close
@@ -100,13 +121,21 @@ export function LookbookOverlay({
   const defaultSize = activeProfile?.defaultSize ?? "M";
 
   function handleSelectVersion(version: VersionItem) {
+    setReturnToCompareMode(false);
     setSelectedVersion(version);
     setScreen("deepdive");
   }
 
   function handleCompare(selected: [VersionItem, VersionItem]) {
+    setReturnToCompareMode(false);
     setCompareVersions(selected);
     setScreen("compare");
+  }
+
+  function handleChangeCompare() {
+    setCompareVersions(null);
+    setReturnToCompareMode(true);
+    setScreen("grid");
   }
 
   function handleAddToCartFromOverlay(versionItem: VersionItem, size: string) {
@@ -172,6 +201,7 @@ export function LookbookOverlay({
                 media={allMedia}
                 onSelectVersion={handleSelectVersion}
                 onCompare={handleCompare}
+                startInCompareMode={returnToCompareMode}
               />
             </motion.div>
           )}
@@ -211,6 +241,7 @@ export function LookbookOverlay({
                 defaultSize={defaultSize}
                 isMember={isMember}
                 onBack={() => setScreen("grid")}
+                onChangeCompare={handleChangeCompare}
                 onAddToCart={handleAddToCartFromOverlay}
               />
             </motion.div>
