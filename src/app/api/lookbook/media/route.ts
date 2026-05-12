@@ -6,7 +6,7 @@ export async function GET() {
   const rows = await sql`
     SELECT field_key, field_value
     FROM page_content
-    WHERE page_slug = 'lookbook'
+    WHERE page_slug IN ('lookbook', 'models')
       AND status = 'published'
       AND field_key LIKE 'lookbook_%'
   `;
