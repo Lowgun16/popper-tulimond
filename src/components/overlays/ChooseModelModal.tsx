@@ -54,11 +54,11 @@ export function ChooseModelModal({
   const touchStartX = useRef<number | null>(null);
 
   const goNext = useCallback(() => {
-    setActiveIdx((i) => Math.min(i + 1, MODEL_CAROUSEL_ORDER.length - 1));
+    setActiveIdx((i) => (i + 1) % MODEL_CAROUSEL_ORDER.length);
   }, []);
 
   const goPrev = useCallback(() => {
-    setActiveIdx((i) => Math.max(i - 1, 0));
+    setActiveIdx((i) => (i - 1 + MODEL_CAROUSEL_ORDER.length) % MODEL_CAROUSEL_ORDER.length);
   }, []);
 
   function handleTouchStart(e: React.TouchEvent) {
@@ -154,57 +154,53 @@ export function ChooseModelModal({
 
           {/* Carousel area */}
           <div style={{ flex: 1, position: "relative", overflow: "hidden", display: "flex", alignItems: "stretch" }}>
-            {/* Left arrow */}
-            {activeIdx > 0 && (
-              <button
-                onClick={goPrev}
-                aria-label="Previous model"
-                style={{
-                  position: "absolute",
-                  left: 12,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  zIndex: 10,
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  background: "rgba(0,0,0,0.7)",
-                  border: "1px solid rgba(196,164,86,0.3)",
-                  color: "rgba(196,164,86,0.9)",
-                  fontSize: 20,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                }}
-              >‹</button>
-            )}
+            {/* Left arrow — always visible, wraps around */}
+            <button
+              onClick={goPrev}
+              aria-label="Previous model"
+              style={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 10,
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background: "rgba(0,0,0,0.7)",
+                border: "1px solid rgba(196,164,86,0.3)",
+                color: "rgba(196,164,86,0.9)",
+                fontSize: 20,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >‹</button>
 
-            {/* Right arrow */}
-            {activeIdx < MODEL_CAROUSEL_ORDER.length - 1 && (
-              <button
-                onClick={goNext}
-                aria-label="Next model"
-                style={{
-                  position: "absolute",
-                  right: 12,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  zIndex: 10,
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  background: "rgba(0,0,0,0.7)",
-                  border: "1px solid rgba(196,164,86,0.3)",
-                  color: "rgba(196,164,86,0.9)",
-                  fontSize: 20,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                }}
-              >›</button>
-            )}
+            {/* Right arrow — always visible, wraps around */}
+            <button
+              onClick={goNext}
+              aria-label="Next model"
+              style={{
+                position: "absolute",
+                right: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 10,
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background: "rgba(0,0,0,0.7)",
+                border: "1px solid rgba(196,164,86,0.3)",
+                color: "rgba(196,164,86,0.9)",
+                fontSize: 20,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >›</button>
 
             {/* Model slide */}
             <AnimatePresence mode="wait">

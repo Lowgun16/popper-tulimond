@@ -53,12 +53,35 @@ export function LookbookOverlay({
       .catch(() => setAllMedia({}));
   }, [item]);
 
-  // Reset to grid when model switches
+  // When model switches, stay on current screen with equivalent version for new model
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    setScreen("grid");
-    setSelectedVersion(null);
-    setCompareVersions(null);
-  }, [activeModelId]);
+    const newSlot = MODEL_INVENTORY.find((s) => s.id === activeModelId);
+    const newVersions: VersionItem[] = item
+      ? (newSlot?.outfit ?? []).filter((o) => o.collection === item.collection) as unknown as VersionItem[]
+      : [];
+
+    if (screen === "deepdive" && selectedVersion) {
+      const equiv = newVersions.find((v) => v.name === selectedVersion.name);
+      if (equiv) {
+        setSelectedVersion(equiv);
+      } else {
+        setScreen("grid");
+        setSelectedVersion(null);
+      }
+    } else if (screen === "compare" && compareVersions) {
+      const newLeft = newVersions.find((v) => v.name === compareVersions[0].name);
+      const newRight = newVersions.find((v) => v.name === compareVersions[1].name);
+      if (newLeft && newRight) {
+        setCompareVersions([newLeft, newRight]);
+      } else {
+        setScreen("grid");
+        setCompareVersions(null);
+        setSelectedVersion(null);
+      }
+    }
+    // screen === "grid": versions auto-recompute from activeModelId, no reset needed
+  }, [activeModelId]); // intentionally excludes screen/selectedVersion/compareVersions
 
   // Keyboard close
   useEffect(() => {

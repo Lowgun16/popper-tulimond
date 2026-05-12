@@ -3,6 +3,12 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { VersionItem } from "@/components/overlays/LookbookVersionGrid";
+
+function parseColorway(colorway: string): { color: string; sleeve: string } {
+  const match = colorway.match(/^(.+?)\s*\((.+?)\)$/);
+  if (match) return { color: match[1].trim(), sleeve: match[2].trim() };
+  return { color: colorway, sleeve: "" };
+}
 import type { LookbookMediaItem } from "@/lib/contentTypes";
 import { formatPrice } from "@/lib/formatPrice";
 import { playCartAddSound } from "@/lib/sounds";
@@ -181,14 +187,16 @@ export function LookbookCompareMode({
         )}
 
         {/* State ②: One crowned */}
-        {crownedItem && (
+        {crownedItem && (() => {
+          const { color: cColor, sleeve: cSleeve } = parseColorway(crownedItem.colorway);
+          return (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ height: 1, background: "rgba(196,164,86,0.2)", marginBottom: 4 }} />
             <p style={{ fontFamily: "var(--font-title, serif)", fontSize: "8px", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(196,164,86,0.7)", margin: 0 }}>
-              {crownedItem.collection} · {crownedItem.name}
+              {crownedItem.collection} · {crownedItem.name}{cColor ? ` (${cColor})` : ""}
             </p>
             <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "10px", color: "rgba(255,255,255,0.4)", margin: 0, lineHeight: 1.5 }}>
-              {crownedItem.colorway}
+              {cSleeve || crownedItem.colorway}
             </p>
             {crownedItem.story && (
               <p style={{ fontFamily: "var(--font-display, serif)", fontSize: "11px", fontWeight: 300, fontStyle: "italic", color: "rgba(240,232,215,0.55)", lineHeight: 1.6, margin: "4px 0" }}>
@@ -220,7 +228,8 @@ export function LookbookCompareMode({
               Tap again to deselect
             </button>
           </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

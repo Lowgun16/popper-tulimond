@@ -3,6 +3,12 @@
 import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { VersionItem } from "@/components/overlays/LookbookVersionGrid";
+
+function parseColorway(colorway: string): { color: string; sleeve: string } {
+  const match = colorway.match(/^(.+?)\s*\((.+?)\)$/);
+  if (match) return { color: match[1].trim(), sleeve: match[2].trim() };
+  return { color: colorway, sleeve: "" };
+}
 import type { LookbookMediaItem } from "@/lib/contentTypes";
 import { formatPrice } from "@/lib/formatPrice";
 import { playCartAddSound } from "@/lib/sounds";
@@ -55,6 +61,7 @@ export function LookbookDeepDive({
 
   const price = isMember ? item.memberPriceCents : item.initiationPriceCents;
   const current = media[activeIdx];
+  const { color, sleeve } = parseColorway(item.colorway);
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -125,10 +132,10 @@ export function LookbookDeepDive({
         <div style={{ width: 32, height: 2, background: "rgba(255,255,255,0.12)", borderRadius: 1, margin: "0 auto 14px" }} />
 
         <p style={{ fontFamily: "var(--font-title, serif)", fontSize: "9px", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(196,164,86,0.7)", margin: "0 0 4px" }}>
-          {item.collection} · {item.name}
+          {item.collection} · {item.name}{color ? ` (${color})` : ""}
         </p>
         <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "11px", color: "rgba(255,255,255,0.45)", margin: "0 0 4px" }}>
-          {item.colorway}
+          {sleeve || item.colorway}
         </p>
 
         {item.story && (

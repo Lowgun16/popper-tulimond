@@ -28,6 +28,12 @@ interface LookbookVersionGridProps {
   onCompare: (selected: [VersionItem, VersionItem]) => void;
 }
 
+function parseColorway(colorway: string): { color: string; sleeve: string } {
+  const match = colorway.match(/^(.+?)\s*\((.+?)\)$/);
+  if (match) return { color: match[1].trim(), sleeve: match[2].trim() };
+  return { color: colorway, sleeve: "" };
+}
+
 export function LookbookVersionGrid({
   productName,
   versions,
@@ -149,21 +155,26 @@ export function LookbookVersionGrid({
               </div>
 
               {/* Label */}
-              <div style={{ padding: "6px 8px" }}>
-                <p style={{
-                  fontFamily: "var(--font-title, serif)",
-                  fontSize: "7px",
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                  color: isSelectedForCompare ? "#C4A456" : "rgba(255,255,255,0.6)",
-                  margin: 0,
-                  textAlign: "center",
-                  lineHeight: 1.4,
-                }}>
-                  {version.name}<br />
-                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "6px" }}>{version.colorway}</span>
-                </p>
-              </div>
+              {(() => {
+                const { color, sleeve } = parseColorway(version.colorway);
+                return (
+                  <div style={{ padding: "6px 8px" }}>
+                    <p style={{
+                      fontFamily: "var(--font-title, serif)",
+                      fontSize: "7px",
+                      letterSpacing: "0.15em",
+                      textTransform: "uppercase",
+                      color: isSelectedForCompare ? "#C4A456" : "rgba(255,255,255,0.6)",
+                      margin: 0,
+                      textAlign: "center",
+                      lineHeight: 1.4,
+                    }}>
+                      {version.name}{color ? ` (${color})` : ""}<br />
+                      <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "6px" }}>{sleeve}</span>
+                    </p>
+                  </div>
+                );
+              })()}
             </button>
           );
         })}
