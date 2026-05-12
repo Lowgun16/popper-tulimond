@@ -158,11 +158,19 @@ export function LookbookOverlay({
         transition={{ duration: 0.25 }}
         style={{
           position: "fixed", inset: 0, zIndex: 6000,
-          background: "rgba(6,6,6,0.97)",
+          background: "rgba(0,0,0,0.88)",
           backdropFilter: "blur(24px)",
-          display: "flex", flexDirection: "column", overflow: "hidden",
+          display: "flex", alignItems: "center", justifyContent: "center",
         }}
       >
+        {/* Phone-frame panel — full screen on mobile, capped on desktop */}
+        <div style={{
+          width: "100%", maxWidth: 460,
+          height: "100dvh", maxHeight: 900,
+          background: "rgba(6,6,6,0.97)",
+          display: "flex", flexDirection: "column", overflow: "hidden",
+          position: "relative",
+        }}>
         {/* Close button */}
         <div style={{ position: "absolute", top: 14, right: 16, zIndex: 10 }}>
           <button
@@ -247,6 +255,7 @@ export function LookbookOverlay({
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </motion.div>
     </AnimatePresence>
   );

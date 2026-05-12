@@ -4,10 +4,9 @@ import type { LookbookMediaItem } from "@/lib/contentTypes";
 
 export async function GET() {
   const rows = await sql`
-    SELECT field_key, field_value
+    SELECT field_key, value
     FROM page_content
     WHERE page_slug IN ('lookbook', 'models')
-      AND status = 'published'
       AND field_key LIKE 'lookbook_%'
   `;
 
@@ -15,7 +14,7 @@ export async function GET() {
   for (const row of rows) {
     const outfitItemId = (row.field_key as string).replace(/^lookbook_/, "");
     try {
-      media[outfitItemId] = JSON.parse(row.field_value as string) as LookbookMediaItem[];
+      media[outfitItemId] = JSON.parse(row.value as string) as LookbookMediaItem[];
     } catch {
       media[outfitItemId] = [];
     }
