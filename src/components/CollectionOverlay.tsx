@@ -783,7 +783,12 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
           onAddToCart={(item, size) => {
             onAddToCart(item, size);
           }}
-          onChangeModel={handleChangeModelFromLookbook}
+          modelProfiles={modelProfiles}
+          activeModelId={modelId ?? "jerome"}
+          onSwitchModel={(newModelId) => {
+            selectModel(newModelId);
+          }}
+          isMember={false}
         />
       )}
 

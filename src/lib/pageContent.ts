@@ -161,6 +161,13 @@ const fetchRows = cache(async (slug: string): Promise<ContentRow[]> => {
 
 // ── Model profiles ────────────────────────────────────────────────────────────
 
+const MODEL_DEFAULT_SIZES: Record<string, string> = {
+  angel: "S",
+  jack: "M",
+  ethan: "L",
+  jerome: "XL",
+};
+
 export async function fetchModelProfiles(): Promise<ModelProfile[]> {
   const rows = await fetchRows("models");
   const m: Record<string, string> = rowsToMap(rows);
@@ -175,6 +182,7 @@ export async function fetchModelProfiles(): Promise<ModelProfile[]> {
     bodyType: m[`${slot.id}_body_type`] ?? "",
     bio: m[`${slot.id}_bio`] ?? "",
     videoUrl: m[`${slot.id}_video_url`] ?? "",
+    defaultSize: MODEL_DEFAULT_SIZES[slot.id] ?? "M",
   }));
 }
 

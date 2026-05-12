@@ -27,6 +27,7 @@ export interface FilterDimension {
 
 /** Minimal shape shared by StudioDot + OutfitItem for the overlay */
 export interface LookbookContext {
+  id: string;
   name: string;
   collection: string;
   colorway: string;
