@@ -175,6 +175,7 @@ export async function fetchModelProfiles(): Promise<ModelProfile[]> {
     bodyType: m[`${slot.id}_body_type`] ?? "",
     bio: m[`${slot.id}_bio`] ?? "",
     videoUrl: m[`${slot.id}_video_url`] ?? "",
+    defaultSize: m[`${slot.id}_default_size`] ?? "",
   }));
 }
 

@@ -65,6 +65,11 @@ export type MembershipCelebrationContent = {
   cta_text: string;
 };
 
+export type LookbookMediaItem = {
+  url: string;
+  type: "video" | "image";
+};
+
 export type ModelProfile = {
   id: string;
   displayName: string;
@@ -75,6 +80,7 @@ export type ModelProfile = {
   bodyType: string;
   bio: string;
   videoUrl: string;
+  defaultSize: string;
 };
 
 export type AllPageContent = {
