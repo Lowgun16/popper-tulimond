@@ -98,8 +98,8 @@ Side-by-side comparison of two versions. Three states:
 
 ## Add Both to Cart — Behavior
 
-- Adds both versions to cart in the customer's pre-selected size (based on chosen model)
-- Size is adjustable in cart before checkout
+- Adds both versions to cart using whichever size is currently selected for each (defaults to the model's size, but the customer may have changed it)
+- Size remains fully editable in cart as well
 - "Add Both" available in: State ② below the primary Add to Cart, and State ③ as the gentle nudge
 
 ---
@@ -146,8 +146,11 @@ The version grid shows all `outfit` items where `collection === product.collecti
 `lookbook_{outfitItemId}` — e.g. `lookbook_jerome-heartbreaker`
 Stores a JSON-serialized `LookbookMediaItem[]`.
 
-**Model size mapping** (for pre-selecting size chips):
-Determined by the chosen model's typical size. Each `ModelProfile` already has height/weight — add a `defaultSize` field (e.g. `"M"`, `"L"`) to `ModelProfile` in `contentTypes.ts`. Confirm exact sizes with Logan before implementation.
+**Model size mapping** (for pre-selecting size chips — customer can always change before adding to cart):
+```ts
+{ angel: "S", jack: "M", ethan: "L", jerome: "XL" }
+```
+Add a `defaultSize` field to `ModelProfile` in `contentTypes.ts` to store these values. The pre-selected size is a convenience default only — all size chips remain fully tappable at all times. The customer has free will over their size selection throughout the entire experience.
 
 ---
 
