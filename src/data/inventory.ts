@@ -9,8 +9,10 @@ export interface OutfitItem {
   name: string;
   collection: string;
   colorway: string;
-  /** Price as a display string, e.g. "$179" */
-  price: string;
+  /** Initiation Night price in cents, e.g. 12900 for $129 */
+  initiationPriceCents: number;
+  /** Member price in cents, e.g. 22900 for $229 */
+  memberPriceCents: number;
   type: AccessType;
   dotPosition: string;
   lookbook?: LookbookItem[];
@@ -22,6 +24,8 @@ export interface OutfitItem {
   sizeGuide?: string;
   /** Product thumbnail shown in the Vault listing. Path relative to /public. */
   productImage?: string;
+  /** Cart thumbnail — overrides productImage in the cart drawer when set. */
+  cartImage?: string;
 }
 
 export interface ModelSlot {
@@ -38,7 +42,7 @@ export interface ModelSlot {
 
 export const MODEL_INVENTORY: ModelSlot[] = [
   {
-    id: "lounge-model",
+    id: "angel",
     displayName: "Angel",
     position: "left-[27.7%] md:left-[27.7%] bottom-[11.3%] md:bottom-[11.3%]",
     scale: "md:scale-[0.90]",
@@ -47,11 +51,12 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     imageSrc: "/assets/models/Angel/Angel-Heart-Long.png",
     outfit: [
       {
-        id: "lounge-showstopper",
+        id: "angel-heartbreaker",
         name: "Heartbreaker",
         collection: "The Constable",
         colorway: "Guilt Grey (Long Sleeve)",
-        price: "$159",
+        initiationPriceCents: 15900,
+        memberPriceCents: 25900,
         type: "public",
         dotPosition: "top-[33.3%] left-[60.5%]",
         filterDimensions: [],
@@ -63,11 +68,29 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
         productImage: "/assets/models/Angel/Angel-Heart-Long.png",
       },
+      {
+        id: "angel-showstopper",
+        name: "Showstopper",
+        collection: "The Constable",
+        colorway: "Ivory (Short Sleeve)",
+        initiationPriceCents: 12900,
+        memberPriceCents: 22900,
+        type: "public",
+        dotPosition: "top-[33.3%] left-[60.5%]",
+        filterDimensions: [],
+        lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { "S": { chest: "38\"", length: "28\"" }, "M": { chest: "40\"", length: "29\"" }, "L": { chest: "42\"", length: "30\"" }, "XL": { chest: "44\"", length: "31\"" }, "XXL": { chest: "46\"", length: "32\"" } },
+        story: "The Showstopper in Ivory. The shirt that says everything without a word spoken.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
+        productImage: "/assets/models/Angel/Angel-pro-lit.png",
+      },
     ],
     shadow: { offsetX: 0, offsetY: -8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
   },
   {
-    id: "center-model",
+    id: "jerome",
     displayName: "Jerome",
     position: "left-[4.7%] md:left-[4.7%] bottom-[15.3%] md:bottom-[15.3%]",
     scale: "md:scale-[0.84]",
@@ -76,11 +99,12 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     imageSrc: "/assets/models/Jerome/Jerome-Show-Short.png",
     outfit: [
       {
-        id: "center-showstopper",
+        id: "jerome-showstopper",
         name: "Showstopper",
         collection: "The Constable",
         colorway: "Ivory (Short Sleeve)",
-        price: "$129",
+        initiationPriceCents: 12900,
+        memberPriceCents: 22900,
         type: "public",
         dotPosition: "top-[34.5%] left-[40.1%]",
         filterDimensions: [],
@@ -92,11 +116,29 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
         productImage: "/assets/models/Jerome/Jerome-Show-Short.png",
       },
+      {
+        id: "jerome-heartbreaker",
+        name: "Heartbreaker",
+        collection: "The Constable",
+        colorway: "Guilt Grey (Long Sleeve)",
+        initiationPriceCents: 15900,
+        memberPriceCents: 25900,
+        type: "public",
+        dotPosition: "top-[34.5%] left-[40.1%]",
+        filterDimensions: [],
+        lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { "S": { chest: "38\"", length: "28\"" }, "M": { chest: "40\"", length: "29\"" }, "L": { chest: "42\"", length: "30\"" }, "XL": { chest: "44\"", length: "31\"" }, "XXL": { chest: "46\"", length: "32\"" } },
+        story: "The Heartbreaker in Guilt Grey. Worn by the man who never explains himself.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
+        productImage: "/assets/models/Jerome/Jerome-pro-lit.png",
+      },
     ],
     shadow: { offsetX: 0, offsetY: -8, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },
   },
   {
-    id: "vault-model",
+    id: "jack",
     displayName: "Jack",
     position: "left-[48.3%] md:left-[48.3%] bottom-[17.2%] md:bottom-[17.2%]",
     scale: "md:scale-[0.77]",
@@ -105,11 +147,12 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     imageSrc: "/assets/models/Jack/Jack-Show-Long.png",
     outfit: [
       {
-        id: "vault-showstopper",
+        id: "jack-showstopper",
         name: "Showstopper",
         collection: "The Constable",
         colorway: "Ivory (Long Sleeve)",
-        price: "$159",
+        initiationPriceCents: 15900,
+        memberPriceCents: 25900,
         type: "public",
         dotPosition: "top-[34.8%] left-[44.8%]",
         filterDimensions: [],
@@ -121,11 +164,29 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
         productImage: "/assets/models/Jack/Show.Long.Mid.Brick.jpeg",
       },
+      {
+        id: "jack-heartbreaker",
+        name: "Heartbreaker",
+        collection: "The Constable",
+        colorway: "Guilt Grey (Short Sleeve)",
+        initiationPriceCents: 12900,
+        memberPriceCents: 22900,
+        type: "public",
+        dotPosition: "top-[34.8%] left-[44.8%]",
+        filterDimensions: [],
+        lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { "S": { chest: "38\"", length: "28\"" }, "M": { chest: "40\"", length: "29\"" }, "L": { chest: "42\"", length: "30\"" }, "XL": { chest: "44\"", length: "31\"" }, "XXL": { chest: "46\"", length: "32\"" } },
+        story: "The Heartbreaker in Guilt Grey. The short sleeve for when restraint itself becomes the statement.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
+        productImage: "/assets/models/Jack/Jack-pro-lit.png",
+      },
     ],
     shadow: { offsetX: -28, offsetY: -2, scaleX: 0.90, scaleY: 0.080, opacity: 0.35, blur: 14 },
   },
   {
-    id: "rack-model",
+    id: "ethan",
     displayName: "Ethan",
     position: "right-[4.5%] md:right-[4.5%] bottom-[13.9%] md:bottom-[13.9%]",
     scale: "md:scale-[0.87]",
@@ -134,11 +195,12 @@ export const MODEL_INVENTORY: ModelSlot[] = [
     imageSrc: "/assets/models/Ethan/Ethan-Heart-Short.png",
     outfit: [
       {
-        id: "rack-showstopper",
+        id: "ethan-heartbreaker",
         name: "Heartbreaker",
         collection: "The Constable",
         colorway: "Guilt Grey (Short Sleeve)",
-        price: "$129",
+        initiationPriceCents: 12900,
+        memberPriceCents: 22900,
         type: "public",
         dotPosition: "top-[33.6%] left-[56.6%]",
         filterDimensions: [],
@@ -148,7 +210,25 @@ export const MODEL_INVENTORY: ModelSlot[] = [
         story: "Built for the man who doesn't need to announce himself. The Constable's ivory Showstopper is the uniform of quiet authority.",
         materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
         sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
-        productImage: "/assets/models/Jerome/Heart.Short.Mid.Studio.jpeg",
+        productImage: "/assets/models/Ethan/Heart.Short.Mid.Studio.jpeg",
+      },
+      {
+        id: "ethan-showstopper",
+        name: "Showstopper",
+        collection: "The Constable",
+        colorway: "Ivory (Long Sleeve)",
+        initiationPriceCents: 15900,
+        memberPriceCents: 25900,
+        type: "public",
+        dotPosition: "top-[33.6%] left-[56.6%]",
+        filterDimensions: [],
+        lookbook: [],
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        sizeChart: { "S": { chest: "38\"", length: "28\"" }, "M": { chest: "40\"", length: "29\"" }, "L": { chest: "42\"", length: "30\"" }, "XL": { chest: "44\"", length: "31\"" }, "XXL": { chest: "46\"", length: "32\"" } },
+        story: "The Showstopper in Ivory. Long sleeve for the man who commands attention in silence.",
+        materials: "98% Supima Cotton, 2% Elastane. Structured collar. Reinforced placket seam.",
+        sizeGuide: "Cut close through the chest and tapered through the torso. If between sizes, size up.",
+        productImage: "/assets/models/Ethan/Ethan-pro-lit.png",
       },
     ],
     shadow: { offsetX: 0, offsetY: 0, scaleX: 0.90, scaleY: 0.080, opacity: 0.45, blur: 14 },

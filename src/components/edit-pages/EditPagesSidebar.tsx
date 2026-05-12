@@ -5,14 +5,17 @@ export type PageItem = {
   label: string;
 };
 
-const BRAND_PAGES: PageItem[] = [
+export const BRAND_PAGES: PageItem[] = [
   { slug: "about", label: "About" },
   { slug: "protocol", label: "The Protocol" },
   { slug: "contact", label: "Contact" },
   { slug: "vault", label: "Vault" },
+  { slug: "models", label: "Models" },
+  { slug: "membership-celebration", label: "Welcome — New Member" },
+  { slug: "reservation", label: "Reserve My Place Popup" },
 ];
 
-const LEGAL_PAGES: PageItem[] = [
+export const LEGAL_PAGES: PageItem[] = [
   { slug: "terms", label: "Terms of Use" },
   { slug: "privacy", label: "Privacy Policy" },
   { slug: "shipping", label: "Shipping & Fulfillment" },

@@ -10,8 +10,10 @@ import type {
   LegalContent,
   ContactUsContent,
   AllPageContent,
+  ModelProfile,
 } from "./contentTypes";
 import type { ProductOverride } from "./productOverrides";
+import { MODEL_INVENTORY } from "@/data/inventory";
 import {
   ABOUT_CONTENT,
   PROTOCOL_CONTENT,
@@ -30,21 +32,54 @@ export function rowsToMap(rows: ContentRow[]): Record<string, string> {
   return Object.fromEntries(rows.map((r) => [r.field_key, r.value]));
 }
 
+function toHtml(text: string): string {
+  if (/<[a-z][\s\S]*>/i.test(text)) return text;
+  return text
+    .split(/\n\n+/)
+    .map((para) => `<p>${para.replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
+// Strip HTML tags from fields that must be plain text (phone, email, titles, etc.)
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
+}
+
 // ── Page-specific parsers ─────────────────────────────────────────────────────
 
-const SECTION_IDS = ["billboard", "foundation", "meal", "silent-contract"] as const;
+const LEGACY_SECTION_IDS = ["billboard", "foundation", "meal", "silent-contract"] as const;
 
 export function parseAbout(rows: ContentRow[]): AboutContent {
   const m = rowsToMap(rows);
+  const sectionCount = parseInt(m["section_count"] ?? "4", 10);
+
+  const sections = Array.from({ length: sectionCount }, (_, i) => {
+    const legacyId = LEGACY_SECTION_IDS[i];
+    const rawTitle =
+      m[`section_${i}_title`] ??
+      (legacyId ? m[`section_${legacyId}_title`] : undefined) ??
+      ABOUT_CONTENT.sections[i]?.title ??
+      "";
+    const rawBody =
+      m[`section_${i}_body`] ??
+      (legacyId ? m[`section_${legacyId}_body`] : undefined) ??
+      ABOUT_CONTENT.sections[i]?.body ??
+      "";
+    return { id: `section-${i}`, title: stripHtml(rawTitle), body: toHtml(rawBody) };
+  });
+
   return {
     headline: m["headline"] ?? ABOUT_CONTENT.headline,
     subheadline: m["subheadline"] ?? ABOUT_CONTENT.subheadline,
-    sections: SECTION_IDS.map((id, i) => ({
-      id,
-      title: m[`section_${id}_title`] ?? ABOUT_CONTENT.sections[i]?.title ?? "",
-      body: m[`section_${id}_body`] ?? ABOUT_CONTENT.sections[i]?.body ?? "",
-    })),
-    closing: m["closing"] ?? ABOUT_CONTENT.closing,
+    sections,
+    closing: toHtml(m["closing"] ?? ABOUT_CONTENT.closing),
   };
 }
 
@@ -67,11 +102,11 @@ export function parseContact(rows: ContentRow[]): ContactContent {
   return {
     headline: m["headline"] ?? CONTACT_CONTENT.headline,
     address: {
-      line1: m["address_line1"] ?? CONTACT_CONTENT.address.line1,
-      line2: m["address_line2"] ?? CONTACT_CONTENT.address.line2,
+      line1: stripHtml(m["address_line1"] ?? CONTACT_CONTENT.address.line1),
+      line2: stripHtml(m["address_line2"] ?? CONTACT_CONTENT.address.line2),
     },
-    phone: m["phone"] ?? CONTACT_CONTENT.phone,
-    email: m["email"] ?? CONTACT_CONTENT.email,
+    phone: stripHtml(m["phone"] ?? CONTACT_CONTENT.phone),
+    email: stripHtml(m["email"] ?? CONTACT_CONTENT.email),
     note: m["note"] ?? CONTACT_CONTENT.note,
   };
 }
@@ -82,8 +117,8 @@ export function parseLegal(
 ): LegalContent {
   const m = rowsToMap(rows);
   return {
-    title: m["title"] ?? fallback.title,
-    lastUpdated: m["lastUpdated"] ?? fallback.lastUpdated,
+    title: stripHtml(m["title"] ?? fallback.title),
+    lastUpdated: stripHtml(m["last_updated"] ?? m["lastUpdated"] ?? fallback.lastUpdated),
     body: m["body"] ?? fallback.body,
   };
 }
@@ -92,12 +127,12 @@ export function parseContactUs(rows: ContentRow[]): ContactUsContent {
   const m = rowsToMap(rows);
   return {
     address: {
-      line1: m["address_line1"] ?? CONTACT_CONTENT.address.line1,
-      line2: m["address_line2"] ?? CONTACT_CONTENT.address.line2,
+      line1: stripHtml(m["address_line1"] ?? CONTACT_CONTENT.address.line1),
+      line2: stripHtml(m["address_line2"] ?? CONTACT_CONTENT.address.line2),
     },
-    phone: m["phone"] ?? CONTACT_CONTENT.phone,
-    email: m["email"] ?? CONTACT_CONTENT.email,
-    note: m["note"] ?? CONTACT_CONTENT.note,
+    phone: stripHtml(m["phone"] ?? CONTACT_CONTENT.phone),
+    email: stripHtml(m["email"] ?? CONTACT_CONTENT.email),
+    note: stripHtml(m["note"] ?? CONTACT_CONTENT.note),
   };
 }
 
@@ -124,6 +159,33 @@ const fetchRows = cache(async (slug: string): Promise<ContentRow[]> => {
   }
 });
 
+// ── Model profiles ────────────────────────────────────────────────────────────
+
+const MODEL_DEFAULT_SIZES: Record<string, string> = {
+  angel: "S",
+  jack: "M",
+  ethan: "L",
+  jerome: "XL",
+};
+
+export async function fetchModelProfiles(): Promise<ModelProfile[]> {
+  const rows = await fetchRows("models");
+  const m: Record<string, string> = rowsToMap(rows);
+
+  return MODEL_INVENTORY.map((slot) => ({
+    id: slot.id,
+    displayName: slot.displayName ?? slot.id,
+    imageSrc: slot.imageSrc,
+    tagline: m[`${slot.id}_tagline`] ?? "",
+    height: m[`${slot.id}_height`] ?? "",
+    weight: m[`${slot.id}_weight`] ?? "",
+    bodyType: m[`${slot.id}_body_type`] ?? "",
+    bio: m[`${slot.id}_bio`] ?? "",
+    videoUrl: m[`${slot.id}_video_url`] ?? "",
+    defaultSize: MODEL_DEFAULT_SIZES[slot.id] ?? "M",
+  }));
+}
+
 // ── Main export used by page.tsx ──────────────────────────────────────────────
 
 export async function fetchAllPageContent(): Promise<AllPageContent> {
@@ -137,6 +199,7 @@ export async function fetchAllPageContent(): Promise<AllPageContent> {
     refundRows,
     contactUsRows,
     productOverrides,
+    modelProfiles,
   ] = await Promise.all([
     fetchRows("about"),
     fetchRows("protocol"),
@@ -147,6 +210,7 @@ export async function fetchAllPageContent(): Promise<AllPageContent> {
     fetchRows("refund"),
     fetchRows("contact-us"),
     fetchPublishedOverrides(),
+    fetchModelProfiles(),
   ]);
 
   return {
@@ -159,6 +223,7 @@ export async function fetchAllPageContent(): Promise<AllPageContent> {
     refund: parseLegal(refundRows, REFUND_CONTENT),
     contactUs: parseContactUs(contactUsRows),
     productOverrides,
+    modelProfiles,
   };
 }
 

@@ -247,7 +247,8 @@ function DotEditor({ dot, onUpdate, onRemove }: any) {
           <TextInput label="Item Name" value={dot.name} onChange={(v: string) => onUpdate({ name: v })} />
           <TextInput label="Collection" value={dot.collection} onChange={(v: string) => onUpdate({ collection: v })} />
           <TextInput label="Colorway" value={dot.colorway} onChange={(v: string) => onUpdate({ colorway: v })} />
-          <TextInput label="Price" value={dot.price} onChange={(v: string) => onUpdate({ price: v })} />
+          <TextInput label="Initiation Price (cents)" value={String(dot.initiationPriceCents)} onChange={(v: string) => onUpdate({ initiationPriceCents: parseInt(v, 10) || 0 })} />
+          <TextInput label="Member Price (cents)" value={String(dot.memberPriceCents)} onChange={(v: string) => onUpdate({ memberPriceCents: parseInt(v, 10) || 0 })} />
 
           {/* Access type toggle */}
           <div className="flex items-center gap-3 mt-1">

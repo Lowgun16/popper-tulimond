@@ -13,6 +13,9 @@ const PAGE_PATHS: Record<string, string[]> = {
   shipping: ["/shipping"],
   refund: ["/refund"],
   "contact-us": ["/contact-us"],
+  "membership-celebration": ["/membership-setup"],
+  reservation: ["/"],
+  models: ["/"],
 };
 
 /** POST /api/edit-pages/publish — body: { pageSlug } */

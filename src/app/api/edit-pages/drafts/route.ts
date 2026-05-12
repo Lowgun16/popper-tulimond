@@ -20,6 +20,21 @@ export async function GET(req: NextRequest) {
   const draft: Record<string, string> = {};
   for (const row of rows) draft[row.field_key] = row.value;
 
+  // Translate legacy about section keys to numbered format
+  if (pageSlug === "about") {
+    const dbKeys = new Set(rows.map((r) => r.field_key));
+    const legacyIds = ["billboard", "foundation", "meal", "silent-contract"];
+    legacyIds.forEach((id, i) => {
+      if (dbKeys.has(`section_${id}_title`)) {
+        draft[`section_${i}_title`] = draft[`section_${id}_title`];
+      }
+      if (dbKeys.has(`section_${id}_body`)) {
+        draft[`section_${i}_body`] = draft[`section_${id}_body`];
+      }
+    });
+    if (!dbKeys.has("section_count")) draft["section_count"] = "4";
+  }
+
   return NextResponse.json(draft);
 }
 

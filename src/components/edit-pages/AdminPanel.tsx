@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { startRegistration } from "@simplewebauthn/browser";
 
 type Credential = {
   id: string;
@@ -27,6 +28,10 @@ export function AdminPanel({ currentUserId, onBack }: Props) {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [addingDevice, setAddingDevice] = useState(false);
+  const [deviceName, setDeviceName] = useState("");
+  const [addDeviceStatus, setAddDeviceStatus] = useState<"idle" | "working" | "success" | "error">("idle");
+  const [addDeviceError, setAddDeviceError] = useState("");
 
   const loadUsers = useCallback(async () => {
     const res = await fetch("/api/admin/users", { credentials: "include" });
@@ -53,6 +58,21 @@ export function AdminPanel({ currentUserId, onBack }: Props) {
     loadUsers();
   }
 
+  const [sendingLinkFor, setSendingLinkFor] = useState<string | null>(null);
+  const [sentLinkFor, setSentLinkFor] = useState<string | null>(null);
+
+  async function sendLoginLink(email: string, userId: string) {
+    setSendingLinkFor(userId);
+    await fetch("/api/admin/login-link/request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    setSendingLinkFor(null);
+    setSentLinkFor(userId);
+    setTimeout(() => setSentLinkFor((prev) => (prev === userId ? null : prev)), 4000);
+  }
+
   async function updateRole(userId: string, role: "owner" | "editor") {
     await fetch(`/api/admin/users/${userId}/role`, {
       method: "PATCH",
@@ -63,11 +83,92 @@ export function AdminPanel({ currentUserId, onBack }: Props) {
     loadUsers();
   }
 
+  async function registerNewDevice() {
+    setAddDeviceStatus("working");
+    setAddDeviceError("");
+    try {
+      const optRes = await fetch("/api/admin/webauthn/add-credential-options", { credentials: "include" });
+      if (!optRes.ok) {
+        setAddDeviceError("Could not start registration. Try again.");
+        setAddDeviceStatus("error");
+        return;
+      }
+      const options = await optRes.json();
+      const registrationResponse = await startRegistration({ optionsJSON: options });
+      const verifyRes = await fetch("/api/admin/webauthn/add-credential-verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ registrationResponse, deviceName: deviceName.trim() || null }),
+      });
+      if (!verifyRes.ok) {
+        const err = await verifyRes.json().catch(() => ({}));
+        setAddDeviceError(err.error ?? "Registration failed. Try again.");
+        setAddDeviceStatus("error");
+        return;
+      }
+      setAddDeviceStatus("success");
+      setDeviceName("");
+      setAddingDevice(false);
+      loadUsers();
+    } catch (err) {
+      setAddDeviceError(String(err));
+      setAddDeviceStatus("error");
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6 p-6 overflow-y-auto h-full">
       <div className="flex items-center gap-4">
         <button onClick={onBack} className="text-white/40 hover:text-white text-xs">← Back</button>
         <h2 className="text-sm uppercase tracking-widest text-white">Admin Management</h2>
+      </div>
+
+      {/* Register New Device — for adding this device while authenticated elsewhere */}
+      <div className="border border-white/10 p-4 flex flex-col gap-3">
+        <p className="text-[9px] uppercase tracking-widest text-white/40">My Devices</p>
+        <p className="text-[10px] text-white/40 leading-relaxed">
+          Authenticated on another device? Register this device here so you can log in from it directly.
+        </p>
+        {!addingDevice ? (
+          <button
+            onClick={() => { setAddingDevice(true); setAddDeviceStatus("idle"); setAddDeviceError(""); }}
+            className="self-start px-4 py-2 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest hover:border-white/40"
+          >
+            + Register New Device
+          </button>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <input
+              type="text"
+              value={deviceName}
+              onChange={(e) => setDeviceName(e.target.value)}
+              placeholder="Device name (e.g. Mac Studio, iPhone)"
+              className="bg-transparent border border-white/20 text-white/80 text-[11px] px-3 py-2 outline-none focus:border-white/40 placeholder:text-white/20"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={registerNewDevice}
+                disabled={addDeviceStatus === "working"}
+                className="px-4 py-2 bg-[#D4B896] text-black text-[9px] uppercase tracking-widest disabled:opacity-40"
+              >
+                {addDeviceStatus === "working" ? "Registering…" : "Register with Fingerprint / Face ID"}
+              </button>
+              <button
+                onClick={() => { setAddingDevice(false); setAddDeviceStatus("idle"); setAddDeviceError(""); }}
+                className="text-white/30 hover:text-white text-[9px] uppercase tracking-widest"
+              >
+                Cancel
+              </button>
+            </div>
+            {addDeviceStatus === "error" && (
+              <p className="text-red-400 text-[10px]">{addDeviceError}</p>
+            )}
+            {addDeviceStatus === "success" && (
+              <p className="text-green-400 text-[10px]">Device registered successfully.</p>
+            )}
+          </div>
+        )}
       </div>
 
       <div>
@@ -98,27 +199,36 @@ export function AdminPanel({ currentUserId, onBack }: Props) {
               <p className="text-white/40 text-[10px]">{user.email}</p>
               <p className="text-[#D4B896]/60 text-[9px] uppercase tracking-widest mt-1">{user.role}</p>
             </div>
-            {user.id !== currentUserId && (
-              <div className="flex flex-col gap-1 items-end">
-                <button
-                  onClick={() => updateRole(user.id, user.role === "owner" ? "editor" : "owner")}
-                  className="text-[9px] uppercase tracking-widest text-white/30 hover:text-white"
-                >
-                  {user.role === "owner" ? "Demote" : "Promote"}
-                </button>
-                <button
-                  onClick={() => removeUser(user.id)}
-                  className="text-[9px] uppercase tracking-widest text-red-400/60 hover:text-red-400"
-                >
-                  Remove
-                </button>
-              </div>
-            )}
+            <div className="flex flex-col gap-1 items-end">
+              <button
+                onClick={() => sendLoginLink(user.email, user.id)}
+                disabled={sendingLinkFor === user.id}
+                className="text-[9px] uppercase tracking-widest text-[#D4B896]/50 hover:text-[#D4B896] disabled:opacity-40"
+              >
+                {sentLinkFor === user.id ? "Link Sent ✓" : sendingLinkFor === user.id ? "Sending…" : "Send Sign-in Link"}
+              </button>
+              {user.id !== currentUserId && (
+                <>
+                  <button
+                    onClick={() => updateRole(user.id, user.role === "owner" ? "editor" : "owner")}
+                    className="text-[9px] uppercase tracking-widest text-white/30 hover:text-white"
+                  >
+                    {user.role === "owner" ? "Demote" : "Promote"}
+                  </button>
+                  <button
+                    onClick={() => removeUser(user.id)}
+                    className="text-[9px] uppercase tracking-widest text-red-400/60 hover:text-red-400"
+                  >
+                    Remove
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
           {user.credentials && user.credentials.length > 0 && (
             <div className="flex flex-col gap-1">
-              <p className="text-[8px] uppercase tracking-widest text-white/20">Devices</p>
+              <p className="text-[8px] uppercase tracking-widest text-white/20">Registered Devices</p>
               {user.credentials.map((cred) => (
                 <div key={cred.id} className="flex items-center justify-between gap-2">
                   <p className="text-[10px] text-white/50">{cred.device_name ?? cred.credential_id.slice(0, 12) + "…"}</p>

@@ -27,11 +27,12 @@ export interface FilterDimension {
 
 /** Minimal shape shared by StudioDot + OutfitItem for the overlay */
 export interface LookbookContext {
+  id: string;
   name: string;
   collection: string;
   colorway: string;
-  /** Price as a display string, e.g. "$179" */
-  price: string;
+  initiationPriceCents: number;
+  memberPriceCents: number;
   type: AccessType;
   lookbook: LookbookItem[];
   filterDimensions?: FilterDimension[];
@@ -40,6 +41,7 @@ export interface LookbookContext {
   sizeGuide?: string;
   sizes: string[];
   sizeChart?: Record<string, { chest: string; length: string }>;
+  cartImage?: string;
 }
 
 // ── StudioDot ─────────────────────────────────────────────────────────────────

@@ -10,11 +10,14 @@ import {
 } from "framer-motion";
 import { StudioInspector } from "./studio/StudioInspector";
 import { modelSlotToStudio, exportInventoryCode } from "./studio/studioUtils";
+import { formatPrice } from "@/lib/formatPrice";
 import type { StudioSlot, StudioDot, ShadowConfig, LookbookContext } from "./studio/studioTypes";
 import { MODEL_INVENTORY } from "@/data/inventory";
 import type { ModelSlot, OutfitItem } from "@/data/inventory";
 import { DEFAULT_SHADOW } from "./studio/studioTypes";
 import { LookbookOverlay } from "./studio/LookbookOverlay";
+import { ChooseModelModal } from "@/components/overlays/ChooseModelModal";
+import { useModelPreference } from "@/hooks/useModelPreference";
 import { EditPagesPanel } from "./edit-pages/EditPagesPanel";
 import OverlayPortal from "@/components/OverlayPortal";
 import AboutOverlay from "./overlays/AboutOverlay";
@@ -29,7 +32,7 @@ import SmsSignupSheet from "./SmsSignupSheet";
 import ProtocolGate from "./ProtocolGate";
 import AtelierNav from "./AtelierNav";
 import type { NavPage } from "./AtelierNav";
-import type { AllPageContent } from "@/lib/contentTypes";
+import type { AllPageContent, ModelProfile } from "@/lib/contentTypes";
 import type { ProductOverride } from "@/lib/productOverrides";
 
 const STUDIO_DRAFT_KEY = "tulimond-studio-draft";
@@ -226,7 +229,7 @@ function ObsidianCard({ id, item, layout, onClose, onAction }: ObsidianCardProps
           {item.collection}
         </p>
         <h3 style={{ fontSize: "16px", color: "white", marginBottom: "4px" }}>{item.name}</h3>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "16px" }}>{item.price}</p>
+        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "16px" }}>{formatPrice(item.initiationPriceCents)}</p>
         <button
           onClick={(e) => { e.stopPropagation(); onAction(); }}
           style={{
@@ -235,7 +238,7 @@ function ObsidianCard({ id, item, layout, onClose, onAction }: ObsidianCardProps
             border: `1px solid ${GOLD}`, color: GOLD, cursor: "pointer",
           }}
         >
-          Find Your Size
+          More Details
         </button>
       </div>
     </motion.div>
@@ -538,9 +541,10 @@ interface CollectionOverlayProps {
   onAddToCart: (item: LookbookContext, size: string) => void;
   allContent: AllPageContent;
   productOverrides: ProductOverride[];
+  modelProfiles: ModelProfile[];
 }
 
-export default function CollectionOverlay({ opacity, onAddToCart, allContent, productOverrides }: CollectionOverlayProps) {
+export default function CollectionOverlay({ opacity, onAddToCart, allContent, productOverrides, modelProfiles }: CollectionOverlayProps) {
   const router = useRouter();
   const [active, setActive] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -558,6 +562,10 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
   const [protocolGateOpen, setProtocolGateOpen] = useState(false);
   const [activeLegalPage, setActiveLegalPage] = useState<LegalPage | null>(null);
   const [showEditPages, setShowEditPages] = useState(false);
+  const { modelId, selectModel } = useModelPreference();
+  const [chooseModalOpen, setChooseModalOpen] = useState(false);
+  const [pendingLookbookItem, setPendingLookbookItem] = useState<LookbookContext | null>(null);
+  const [defaultChooseModelId, setDefaultChooseModelId] = useState<string | null>(null);
 
   useMotionValueEvent(opacity, "change", (v) => {
     setActive(v > 0.05);
@@ -576,6 +584,47 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
   const handleModelDrag = useCallback((slotId: string, newLeftPct: number, newBottomPct: number) => {
     setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, leftPct: newLeftPct, bottomPct: newBottomPct } : s));
   }, []);
+
+  const handleOpenLookbook = useCallback((ctx: LookbookContext) => {
+    if (!modelId) {
+      const ctxId = (ctx as OutfitItem).id;
+      const modelSlot = MODEL_INVENTORY.find((s) =>
+        s.outfit.some((o) => o.id === ctxId)
+      );
+      setDefaultChooseModelId(modelSlot?.id ?? "jerome");
+      setPendingLookbookItem(ctx);
+      setChooseModalOpen(true);
+    } else {
+      setLookbookDot(ctx);
+    }
+  }, [modelId]);
+
+  function handleChangeModelFromVault() {
+    setDefaultChooseModelId(modelId ?? "jerome");
+    setPendingLookbookItem(null);
+    setChooseModalOpen(true);
+  }
+
+  function handleChangeModelFromLookbook() {
+    setDefaultChooseModelId(modelId ?? "jerome");
+    setPendingLookbookItem(lookbookDot);
+    setLookbookDot(null);
+    setChooseModalOpen(true);
+  }
+
+  function handleModelSelected(id: string) {
+    selectModel(id);
+    setChooseModalOpen(false);
+    if (pendingLookbookItem) {
+      setLookbookDot(pendingLookbookItem);
+      setPendingLookbookItem(null);
+    }
+  }
+
+  function handleModalDismiss() {
+    setChooseModalOpen(false);
+    setPendingLookbookItem(null);
+  }
 
   const handleClearDraft = useCallback(() => {
     const confirmed = window.confirm("Are you sure you want to delete your changes from this session?");
@@ -633,7 +682,7 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
           }}
           copyConfirm={copyConfirm}
           onAddDot={(slotId) => {
-            const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "The Constable", colorway: "", price: "", type: "public", topPct: 50, leftPct: 50, lookbook: [], filterDimensions: [], sizes: ["S", "M", "L", "XL", "XXL"], sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } }, story: "", materials: "", sizeGuide: "" };
+            const newDot: StudioDot = { id: `dot-${Date.now()}`, name: "New Item", collection: "The Constable", colorway: "", initiationPriceCents: 12900, memberPriceCents: 22900, type: "public", topPct: 50, leftPct: 50, lookbook: [], filterDimensions: [], sizes: ["S", "M", "L", "XL", "XXL"], sizeChart: { S: { chest: '38"', length: '28"' }, M: { chest: '40"', length: '29"' }, L: { chest: '42"', length: '30"' }, XL: { chest: '44"', length: '31"' }, XXL: { chest: '46"', length: '32"' } }, story: "", materials: "", sizeGuide: "" };
             setStudioSlots(prev => prev.map(s => s.id === slotId ? { ...s, dots: [...s.dots, newDot] } : s));
           }}
           onRemoveDot={(slotId, dotId) => {
@@ -658,10 +707,10 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
 
       {isStudioMode 
         ? studioSlots.map((s, i) => (
-            <ModelStage key={s.id} slot={MODEL_INVENTORY.find(m => m.id === s.id) || { id: s.id, outfit: [] }} index={i} revealed={revealed} isStudioMode={true} studioSlot={s} isSelected={selectedModelId === s.id} onSelect={() => setSelectedModelId(s.id)} onStudioDotDrop={(dotId: string, top: number, left: number) => updateDot(s.id, dotId, { topPct: top, leftPct: left })} onModelDrag={handleModelDrag} onUpdateStudioSlot={updateSlot} activeDotId={activeDotId} onToggleDot={setActiveDotId} onOpenLookbook={setLookbookDot} />
+            <ModelStage key={s.id} slot={MODEL_INVENTORY.find(m => m.id === s.id) || { id: s.id, outfit: [] }} index={i} revealed={revealed} isStudioMode={true} studioSlot={s} isSelected={selectedModelId === s.id} onSelect={() => setSelectedModelId(s.id)} onStudioDotDrop={(dotId: string, top: number, left: number) => updateDot(s.id, dotId, { topPct: top, leftPct: left })} onModelDrag={handleModelDrag} onUpdateStudioSlot={updateSlot} activeDotId={activeDotId} onToggleDot={setActiveDotId} onOpenLookbook={handleOpenLookbook} />
           ))
         : MODEL_INVENTORY.map((slot, i) => (
-            <ModelStage key={slot.id} slot={slot} index={i} revealed={revealed} isStudioMode={false} activeDotId={activeDotId} onToggleDot={setActiveDotId} onOpenLookbook={setLookbookDot} />
+            <ModelStage key={slot.id} slot={slot} index={i} revealed={revealed} isStudioMode={false} activeDotId={activeDotId} onToggleDot={setActiveDotId} onOpenLookbook={handleOpenLookbook} />
           ))
       }
 
@@ -733,8 +782,13 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
           onClose={() => setLookbookDot(null)}
           onAddToCart={(item, size) => {
             onAddToCart(item, size);
-            setLookbookDot(null);
           }}
+          modelProfiles={modelProfiles}
+          activeModelId={modelId ?? "jerome"}
+          onSwitchModel={(newModelId) => {
+            selectModel(newModelId);
+          }}
+          isMember={false}
         />
       )}
 
@@ -751,9 +805,9 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
       {/* Nav — moved here from Portal to share overlay state */}
       <AtelierNav
         opacity={opacity}
-        onNavClick={(page) => setActiveOverlay(page)}
+        onNavClick={(page) => { setActiveDotId(null); setActiveOverlay(page); }}
         footerOpen={footerOpen}
-        onLegalClick={() => setFooterOpen((v) => !v)}
+        onLegalClick={() => { setActiveDotId(null); setFooterOpen((v) => !v); }}
       />
 
       {/* Bottom scrim — gradient from transparent to dark so "View Footer" is legible over the floor */}
@@ -807,14 +861,14 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
       <VaultOverlay
         isOpen={activeOverlay === "vault"}
         onClose={() => setActiveOverlay(null)}
-        onProtocolGate={() => {
-          setActiveOverlay(null);
-          setProtocolGateOpen(true);
+        onAddToCart={(item, size) => {
+          onAddToCart(item as LookbookContext, size);
         }}
         onOpenLookbook={(ctx) => {
           setActiveOverlay(null);
           setLookbookDot(ctx);
         }}
+        onChangeModel={handleChangeModelFromVault}
         productOverrides={productOverrides}
       />
 
@@ -844,6 +898,14 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
           <EditPagesPanel onClose={() => setShowEditPages(false)} />
         </OverlayPortal>
       )}
+
+      <ChooseModelModal
+        isOpen={chooseModalOpen}
+        modelProfiles={modelProfiles}
+        defaultModelId={defaultChooseModelId}
+        onSelect={handleModelSelected}
+        onDismiss={handleModalDismiss}
+      />
     </div>
   );
 }

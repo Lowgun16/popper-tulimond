@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Cinzel, Jost } from "next/font/google";
 import "./globals.css";
+import { CartProvider } from "@/contexts/CartContext";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-display",
@@ -37,7 +38,7 @@ export default function RootLayout({
       className={`${cormorant.variable} ${cinzel.variable} ${jost.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-obsidian text-parchment overflow-x-hidden">
-        {children}
+        <CartProvider>{children}</CartProvider>
       </body>
     </html>
   );

@@ -28,6 +28,7 @@ const inputStyle: CSSProperties = {
 };
 
 export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupSheetProps) {
+  const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -36,6 +37,7 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!firstName.trim()) { setError("First name is required."); return; }
     if (!phone.trim()) { setError("Phone number is required."); return; }
     setSubmitting(true);
     setError(null);
@@ -44,12 +46,13 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
       const res = await fetch("/api/sms-signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: phone.trim(), email: email.trim() || null, source }),
+        body: JSON.stringify({ firstName: firstName.trim(), phone: phone.trim(), email: email.trim() || null, source }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error((data as { error?: string }).error || "Submission failed");
       }
+      setFirstName("");
       setSubmitted(true);
     } catch (err) {
       console.error("[SmsSignup] Submission error:", err);
@@ -60,6 +63,7 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
   };
 
   const handleClose = () => {
+    setFirstName("");
     setPhone("");
     setEmail("");
     setSubmitted(false);
@@ -151,6 +155,15 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
                 </p>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
+                  <input
+                    type="text"
+                    placeholder="First name *"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    style={inputStyle}
+                    aria-label="First name"
+                  />
                   <input
                     type="tel"
                     placeholder="Phone number *"

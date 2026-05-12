@@ -46,6 +46,43 @@ export type AllLegalContent = {
   contactUs: ContactUsContent;
 };
 
+export type ReservationContent = {
+  headline: string;
+  body_1: string;
+  body_2: string;
+  cta_text: string;
+  fine_print: string;
+  success_headline: string;
+  success_body: string;
+};
+
+export type MembershipCelebrationContent = {
+  congratulations_headline: string;
+  subtitle: string;
+  body_1: string;
+  body_2: string;
+  closing_line: string;
+  cta_text: string;
+};
+
+export type LookbookMediaItem = {
+  url: string;
+  type: "video" | "image";
+};
+
+export type ModelProfile = {
+  id: string;
+  displayName: string;
+  imageSrc: string;
+  tagline: string;
+  height: string;
+  weight: string;
+  bodyType: string;
+  bio: string;
+  videoUrl: string;
+  defaultSize: string;
+};
+
 export type AllPageContent = {
   about: AboutContent;
   protocol: ProtocolContent;
@@ -56,4 +93,5 @@ export type AllPageContent = {
   refund: LegalContent;
   contactUs: ContactUsContent;
   productOverrides: ProductOverride[];
+  modelProfiles: ModelProfile[];
 };
