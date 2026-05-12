@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useEditPages } from "@/hooks/useEditPages";
 import { MODEL_INVENTORY } from "@/data/inventory";
 import { MODEL_CAROUSEL_ORDER } from "@/components/overlays/ChooseModelModal";
@@ -139,12 +139,42 @@ function MediaStrip({
 export function LookbookMediaEditor() {
   const { drafts, loadDrafts, saveDraft } = useEditPages("models");
   const [localDrafts, setLocalDrafts] = useState<Record<string, string>>({});
+  const [publishedBaseline, setPublishedBaseline] = useState<Record<string, string>>({});
   const [activeModel, setActiveModel] = useState<string>(MODEL_CAROUSEL_ORDER[0]);
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
   const [uploadState, setUploadState] = useState<UploadState | null>(null);
+  const prevDraftsRef = useRef<Record<string, string>>({});
 
-  useEffect(() => { loadDrafts(); }, [loadDrafts]);
-  useEffect(() => { setLocalDrafts(drafts); }, [drafts]);
+  const fetchPublishedBaseline = useCallback(async () => {
+    try {
+      const res = await fetch("/api/lookbook/media");
+      if (!res.ok) return;
+      const published = await res.json() as Record<string, LookbookMediaItem[]>;
+      const baseline: Record<string, string> = {};
+      for (const [id, items] of Object.entries(published)) {
+        baseline[`lookbook_${id}`] = JSON.stringify(items);
+      }
+      setPublishedBaseline(baseline);
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => {
+    fetchPublishedBaseline();
+    loadDrafts();
+  }, [fetchPublishedBaseline, loadDrafts]);
+
+  // After publish: drafts are cleared — reload published baseline so editor stays populated
+  useEffect(() => {
+    const wasNonEmpty = Object.keys(prevDraftsRef.current).length > 0;
+    const isNowEmpty = Object.keys(drafts).length === 0;
+    prevDraftsRef.current = drafts;
+    if (wasNonEmpty && isNowEmpty) fetchPublishedBaseline();
+  }, [drafts, fetchPublishedBaseline]);
+
+  // Merge: published as baseline, pending drafts override
+  useEffect(() => {
+    setLocalDrafts({ ...publishedBaseline, ...drafts });
+  }, [publishedBaseline, drafts]);
 
   const modelSlot = MODEL_INVENTORY.find((s) => s.id === activeModel);
   const outfitItems = modelSlot?.outfit ?? [];
