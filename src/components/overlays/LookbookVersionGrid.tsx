@@ -188,17 +188,10 @@ export function LookbookVersionGrid({
                       sizes="160px"
                       style={{ objectFit: "cover", objectPosition: "top center" }}
                     />
-                  ) : version.productImage ? (
-                    <Image
-                      src={version.productImage}
-                      alt={version.name}
-                      fill
-                      sizes="160px"
-                      style={{ objectFit: "cover", objectPosition: "top center" }}
-                    />
                   ) : (
-                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ color: "#333", fontSize: 24 }}>▶</span>
+                    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                      <span style={{ color: "rgba(255,255,255,0.1)", fontSize: 18 }}>+</span>
+                      <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "7px", fontFamily: "var(--font-title, serif)", letterSpacing: "0.15em", textTransform: "uppercase" }}>No photo yet</span>
                     </div>
                   )}
 

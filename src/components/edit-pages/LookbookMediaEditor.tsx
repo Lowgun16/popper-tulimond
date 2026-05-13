@@ -292,7 +292,9 @@ export function LookbookMediaEditor() {
                       )}
 
                       {/* Per-item hidden file input */}
+                      {/* key forces remount after each upload so onChange fires reliably */}
                       <input
+                        key={`${inputId}-${media.length}`}
                         id={inputId}
                         type="file"
                         accept="video/mp4,video/webm,image/jpeg,image/png,image/webp"
