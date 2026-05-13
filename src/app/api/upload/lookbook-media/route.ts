@@ -43,11 +43,10 @@ export async function POST(req: NextRequest) {
     const ext = extMap[file.type];
     const mediaType = file.type.startsWith("video/") ? "video" : "image";
 
-    // Let the SDK read BLOB_READ_WRITE_TOKEN from env automatically
     const blob = await put(
       `lookbook/${outfitItemId}/${Date.now()}.${ext}`,
       file,
-      { access: "public" }
+      { access: "public", token: process.env.BLOB_PUBLIC_READ_WRITE_TOKEN }
     );
     return NextResponse.json({ url: blob.url, type: mediaType });
 
