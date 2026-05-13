@@ -291,22 +291,20 @@ export function LookbookMediaEditor() {
                         <p className="text-[9px] text-white/20 italic">No media yet — upload below</p>
                       )}
 
-                      {/* Per-item hidden file input */}
-                      {/* key forces remount after each upload so onChange fires reliably */}
-                      <input
-                        key={`${inputId}-${media.length}`}
-                        id={inputId}
-                        type="file"
-                        accept="video/mp4,video/webm,image/jpeg,image/png,image/webp"
-                        className="hidden"
-                        onChange={(e) => handleFileChange(e, outfitItem.id)}
-                      />
+                      {/* Input nested inside label — avoids iOS Safari htmlFor/id caching bug */}
                       <label
-                        htmlFor={isUploading ? undefined : inputId}
                         className={`self-start px-4 py-2 border border-white/20 text-white/60 text-[9px] uppercase tracking-widest select-none ${
-                          isUploading ? "opacity-40 cursor-default" : "hover:border-white/40 cursor-pointer"
+                          isUploading ? "opacity-40 cursor-default pointer-events-none" : "hover:border-white/40 cursor-pointer"
                         }`}
                       >
+                        <input
+                          key={`${outfitItem.id}-${media.length}`}
+                          type="file"
+                          accept="video/mp4,video/webm,image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          disabled={isUploading}
+                          onChange={(e) => handleFileChange(e, outfitItem.id)}
+                        />
                         {isUploading ? "Uploading…" : media.length > 0 ? "Add More" : "Upload Photo / Video"}
                       </label>
 
