@@ -95,17 +95,17 @@ export function LookbookDeepDive({
         {count === 0 ? (
           <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
             {item.productImage ? (
-              <Image src={item.productImage} alt={item.name} fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "top center" }} />
+              <Image src={item.productImage} alt={item.name} fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "center 30%" }} />
             ) : (
               <span style={{ color: "#333", fontSize: 28 }}>▶</span>
             )}
           </div>
         ) : current && isVideo(current) ? (
           <video key={current.url} src={current.url} autoPlay loop muted playsInline
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 30%" }} />
         ) : current ? (
           <Image key={current.url} src={current.url} alt={item.name} fill sizes="100vw"
-            style={{ objectFit: "cover", objectPosition: "top center" }} />
+            style={{ objectFit: "cover", objectPosition: "center 30%" }} />
         ) : null}
 
         {/* Arrows */}
