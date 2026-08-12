@@ -61,7 +61,7 @@
 
 **Critical registration note:** `credential.id` from `@simplewebauthn/server` v9+ is already a `Base64URLString` (plain string). Store it directly — do NOT pass it through `isoBase64URL.fromBuffer()`. The `publicKey` field IS a `Uint8Array` and should be converted via `fromBuffer`. Same pattern applies to `verifyAuthenticationResponse`: pass `credential.id` as the string directly, convert `publicKey` via `toBuffer`.
 
-### Phase C — Product Editor (complete, live)
+### Phase C — Product Editor + Lookbook Media Bank (complete, live)
 - `product_overrides` table in Neon (migration: `scripts/migrate-phase-c.sql` — already run in production)
 - Three product statuses: `active`, `sold_out`, `hidden`
 - `src/lib/productOverrides.ts` — `ProductOverride` type + `mergeInventoryWithOverrides()` utility
@@ -70,6 +70,29 @@
 - Products tab in Edit Pages panel (owner only) — edit price, image path, status per item
 - API routes: `GET/POST /api/edit-pages/products` (owner only), `POST /api/edit-pages/products/publish`
 - `revalidatePath("/")` on publish to bust cache
+
+**Lookbook Media Bank (complete, live):**
+- Admin uploads photos/videos per outfit item (per model × per colorway)
+- Files stored in Vercel Blob public store (`BLOB_PUBLIC_READ_WRITE_TOKEN`)
+- Upload route: `POST /api/upload/lookbook-media` — accepts jpg/png/webp/mp4/webm, 200MB limit
+- Media metadata stored in `page_content` table as JSON under keys like `lookbook_{outfitItemId}`
+- Published via existing draft/publish pipeline (`useEditPages("models")`)
+- Lookbook Media tab in Edit Pages panel — per-model tabs, per-collection accordions, drag-and-drop reorder with ‹ › arrow fallback, delete
+- Media served via `GET /api/lookbook/media` — returns `Record<outfitItemId, LookbookMediaItem[]>`
+- LookbookVersionGrid tiles show uploaded cover image; deep dive shows full media carousel
+- `objectPosition: "center 30%"` on all media in LookbookDeepDive — crops 9:16 portraits to show model face/upper body, not sky
+
+**Critical Blob note:** There are two Vercel Blob stores. Upload route must explicitly pass `token: process.env.BLOB_PUBLIC_READ_WRITE_TOKEN` to `put()`. Omitting the token defaults to the private store and fails with "Cannot use public access on a private store."
+
+**Critical media API note:** `page_content` table has columns `(page_slug, field_key, value, updated_at, updated_by)`. There is NO `field_value` column and NO `status` column. The media API queries `value` — never `field_value`.
+
+**Inventory — all 4 models now have full Constable variant set:**
+Each model has: Heartbreaker SS ($129), Heartbreaker LS ($159), Showstopper SS ($129), Showstopper LS ($159). See `src/data/inventory.ts`.
+
+**Admin button visibility fix (2026-08-12):**
+- Edit Pages and Studio Mode buttons now gated behind admin session (server-side `getSession()` in `page.tsx`), not `NEXT_PUBLIC_STUDIO_ENABLED` env var
+- Public visitors never see these buttons; only authenticated admins do
+- `NEXT_PUBLIC_STUDIO_ENABLED` env var is now irrelevant for button visibility (can be removed)
 
 ---
 
