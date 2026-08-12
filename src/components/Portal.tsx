@@ -15,9 +15,10 @@ interface PortalProps {
   allContent: AllPageContent;
   productOverrides: ProductOverride[];
   modelProfiles: ModelProfile[];
+  isAdmin: boolean;
 }
 
-export default function Portal({ onAddToCart, allContent, productOverrides, modelProfiles }: PortalProps) {
+export default function Portal({ onAddToCart, allContent, productOverrides, modelProfiles, isAdmin }: PortalProps) {
   const t = usePortalTransforms();
   const [scope, animate] = useAnimate();
   const shakeRanRef = useRef(false);
@@ -65,7 +66,7 @@ export default function Portal({ onAddToCart, allContent, productOverrides, mode
         />
 
         {/* Model Stage + all overlays/nav — owned by CollectionOverlay */}
-        <CollectionOverlay opacity={t.navOpacity} onAddToCart={onAddToCart} allContent={allContent} productOverrides={productOverrides} modelProfiles={modelProfiles} />
+        <CollectionOverlay opacity={t.navOpacity} onAddToCart={onAddToCart} allContent={allContent} productOverrides={productOverrides} modelProfiles={modelProfiles} isAdmin={isAdmin} />
 
       </div>
     </div>

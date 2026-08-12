@@ -542,9 +542,10 @@ interface CollectionOverlayProps {
   allContent: AllPageContent;
   productOverrides: ProductOverride[];
   modelProfiles: ModelProfile[];
+  isAdmin: boolean;
 }
 
-export default function CollectionOverlay({ opacity, onAddToCart, allContent, productOverrides, modelProfiles }: CollectionOverlayProps) {
+export default function CollectionOverlay({ opacity, onAddToCart, allContent, productOverrides, modelProfiles, isAdmin }: CollectionOverlayProps) {
   const router = useRouter();
   const [active, setActive] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -721,7 +722,7 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
       )}
 
       {/* Studio Controls Stack — only rendered when studio is enabled */}
-      {process.env.NEXT_PUBLIC_STUDIO_ENABLED === "true" && (
+      {isAdmin && (
       <div className="fixed bottom-10 right-10 flex flex-col items-end gap-3 pointer-events-auto z-[5999]" style={{ minWidth: '150px' }}>
         {isStudioMode && (
           <button

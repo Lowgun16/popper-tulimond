@@ -13,9 +13,10 @@ import type { ProductOverride } from "@/lib/productOverrides";
 interface ClientPageProps {
   allContent: AllPageContent;
   productOverrides: ProductOverride[];
+  isAdmin: boolean;
 }
 
-export default function ClientPage({ allContent, productOverrides }: ClientPageProps) {
+export default function ClientPage({ allContent, productOverrides, isAdmin }: ClientPageProps) {
   const { addItem } = useCart();
 
   const handleAddToCart = useCallback((item: LookbookContext & { id?: string; productImage?: string }, size: string) => {
@@ -33,7 +34,7 @@ export default function ClientPage({ allContent, productOverrides }: ClientPageP
 
   return (
     <main>
-      <Portal onAddToCart={handleAddToCart} allContent={allContent} productOverrides={productOverrides} modelProfiles={allContent.modelProfiles} />
+      <Portal onAddToCart={handleAddToCart} allContent={allContent} productOverrides={productOverrides} modelProfiles={allContent.modelProfiles} isAdmin={isAdmin} />
       <CartIcon />
       <CartDrawer
         onCheckout={() => { /* Stripe wired in Tasks 15-16 */ }}
