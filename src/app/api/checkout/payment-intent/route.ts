@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sql } from "@/lib/db";
-import { getStorePhase, type DropRow } from "@/lib/storeState";
+import { getStorePhase } from "@/lib/storeState";
 import { getMemberSession } from "@/lib/memberAuth";
+import { getCurrentDrop } from "@/lib/drops";
+import { getInventoryItem } from "@/lib/inventoryLookup";
+import { itemPriceCents, canNonMemberPurchase } from "@/lib/pricing";
 
 const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -11,10 +14,7 @@ export async function POST(req: NextRequest) {
   const { items, phone } = (await req.json()) as {
     items: Array<{
       itemId: string;
-      name: string;
       size: string;
-      initiationPriceCents: number;
-      memberPriceCents: number;
     }>;
     phone?: string;
   };
@@ -23,53 +23,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
   }
 
-  // Check member session
   const memberSession = await getMemberSession();
   const isMember = !!memberSession;
 
-  // Check store state for non-members
+  // Resolve every line item against canonical server inventory (never trust client prices).
+  const resolved = items.map((i) => {
+    const inv = getInventoryItem(i.itemId);
+    if (!inv) throw new Error(`Unknown item: ${i.itemId}`);
+    return { itemId: i.itemId, name: inv.name, size: i.size, inv };
+  });
+
   if (!isMember) {
-    const dropRows = await sql`SELECT * FROM initiation_drops ORDER BY drop_month DESC LIMIT 1`;
-    if (dropRows.length === 0) {
-      return NextResponse.json({ error: "Store is not open" }, { status: 403 });
-    }
-    const drop = dropRows[0] as DropRow;
+    // Non-members: store must be open (or early access w/ valid token), and only public items.
+    const drop = await getCurrentDrop();
+    if (!drop) return NextResponse.json({ error: "Store is not open" }, { status: 403 });
     const phase = getStorePhase(drop, new Date());
 
-    // Check early access cookie for early_access phase
-    const earlyAccessToken = req.cookies.get("early_access_session")?.value;
-    if (phase === "early_access" && !earlyAccessToken) {
-      return NextResponse.json({ error: "Early access required" }, { status: 403 });
-    }
     if (phase !== "open" && phase !== "early_access") {
       return NextResponse.json({ error: "Store is closed" }, { status: 403 });
     }
-    if (phase === "early_access" && earlyAccessToken) {
-      // Validate token against DB
-      const tokenRows = await sql`
-        SELECT id FROM early_access_tokens WHERE token = ${earlyAccessToken} AND drop_id = ${drop.id}
-      `;
-      if (tokenRows.length === 0) {
-        return NextResponse.json({ error: "Invalid early access token" }, { status: 403 });
+    if (phase === "early_access") {
+      const token = req.cookies.get("early_access_session")?.value;
+      const ok = token
+        ? (await sql`SELECT 1 FROM early_access_tokens WHERE token = ${token} AND drop_id = ${drop.id}`).length > 0
+        : false;
+      if (!ok) return NextResponse.json({ error: "Early access required" }, { status: 403 });
+    }
+    for (const r of resolved) {
+      if (!canNonMemberPurchase(r.inv)) {
+        return NextResponse.json({ error: "Members only" }, { status: 403 });
       }
     }
   }
 
-  // Compute prices
-  // Non-members: 1st Constable at initiation price, 2nd at member price
-  // Members: always member price
-  let constableCount = 0;
-  const lineItems = items.map((item) => {
-    if (!isMember) {
-      constableCount++;
-      const priceCents =
-        constableCount === 1 ? item.initiationPriceCents : item.memberPriceCents;
-      return { ...item, priceCents };
-    }
-    return { ...item, priceCents: item.memberPriceCents };
-  });
-
-  const totalCents = lineItems.reduce((sum, i) => sum + i.priceCents, 0);
+  // Flat price for everyone.
+  const lineItems = resolved.map((r) => ({
+    itemId: r.itemId, name: r.name, size: r.size, priceCents: itemPriceCents(r.inv),
+  }));
+  const totalCents = lineItems.reduce((s, i) => s + i.priceCents, 0);
 
   const paymentIntent = await getStripe().paymentIntents.create({
     amount: totalCents,
