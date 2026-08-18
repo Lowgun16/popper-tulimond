@@ -8,6 +8,7 @@ const base: DropRow = {
   available_count: 500, sold_count: 0, is_open: true, status: "scheduled",
   announce_at: "2026-08-22T20:00:00Z", announce_message: null, announce_sent_at: null,
   reminder_at: "2026-08-24T19:45:00Z", reminder_sent_at: null, earlybird_sent_at: null,
+  limit_one_per_nonmember: false,
 };
 
 test("announce due when announce_at passed and unsent", () => {

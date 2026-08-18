@@ -14,6 +14,7 @@ const base: DropRow = {
   status: "announced",
   announce_at: null, announce_message: null, announce_sent_at: null,
   reminder_at: null, reminder_sent_at: null, earlybird_sent_at: null,
+  limit_one_per_nonmember: false,
 };
 
 test("signup before early access", () => {

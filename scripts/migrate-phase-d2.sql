@@ -14,6 +14,8 @@ ALTER TABLE initiation_drops
   ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS earlybird_sent_at TIMESTAMPTZ;
 
+ALTER TABLE initiation_drops ADD COLUMN IF NOT EXISTS limit_one_per_nonmember BOOLEAN NOT NULL DEFAULT false;
+
 -- Backfill any existing legacy rows (drop_month + time strings) into timestamps.
 -- Legacy early access was 11:45pm the day BEFORE drop_month; open at midnight of drop_month.
 UPDATE initiation_drops

@@ -17,6 +17,7 @@ export interface DropRow {
   reminder_at: string | null;
   reminder_sent_at: string | null;
   earlybird_sent_at: string | null;
+  limit_one_per_nonmember: boolean;
 }
 
 /**
