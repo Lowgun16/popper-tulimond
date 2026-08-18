@@ -8,6 +8,7 @@ import { AdminPanel } from "./AdminPanel";
 import { ProductEditor } from "./ProductEditor";
 import { ModelProfileEditor } from "./ModelProfileEditor";
 import { PreviewPane } from "./PreviewPane";
+import StoreControlPanel from "./StoreControlPanel";
 
 type Props = {
   onClose: () => void;
@@ -82,7 +83,7 @@ export function EditPagesPanel({ onClose }: Props) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
           <p className="text-[9px] uppercase tracking-widest text-white/30">Edit Pages</p>
           <div className="flex items-center gap-4">
-            {session.status === "authenticated" && !showAdmin && activePage !== "products" && activePage !== "models" && (
+            {session.status === "authenticated" && !showAdmin && activePage !== "products" && activePage !== "store-control" && activePage !== "models" && (
               <button
                 onClick={() => setShowPreview(true)}
                 className="text-white/30 hover:text-white text-xs uppercase tracking-widest"
@@ -90,7 +91,7 @@ export function EditPagesPanel({ onClose }: Props) {
                 Preview
               </button>
             )}
-            {session.status === "authenticated" && !showAdmin && activePage !== "products" && (
+            {session.status === "authenticated" && !showAdmin && activePage !== "products" && activePage !== "store-control" && (
               <div className="hidden md:flex items-center gap-3">
                 <button
                   onClick={async () => {
@@ -183,7 +184,10 @@ export function EditPagesPanel({ onClose }: Props) {
                     <option key={p.slug} value={p.slug} className="bg-black">{p.label}</option>
                   ))}
                   {isOwner && (
-                    <option value="products" className="bg-black">Products</option>
+                    <>
+                      <option value="products" className="bg-black">Products</option>
+                      <option value="store-control" className="bg-black">Store Control</option>
+                    </>
                   )}
                 </optgroup>
                 <optgroup label="Legal">
@@ -197,7 +201,7 @@ export function EditPagesPanel({ onClose }: Props) {
                   </optgroup>
                 )}
               </select>
-              {!showAdmin && activePage !== "products" && (
+              {!showAdmin && activePage !== "products" && activePage !== "store-control" && (
                 <>
                   <button
                     onClick={async () => {
@@ -244,6 +248,8 @@ export function EditPagesPanel({ onClose }: Props) {
                     currentUserId={session.userId}
                     onBack={() => setShowAdmin(false)}
                   />
+                ) : activePage === "store-control" ? (
+                  <StoreControlPanel />
                 ) : activePage === "products" ? (
                   <ProductEditor />
                 ) : activePage === "models" ? (
