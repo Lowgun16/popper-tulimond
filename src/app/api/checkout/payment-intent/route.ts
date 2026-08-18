@@ -54,6 +54,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Members only" }, { status: 403 });
       }
     }
+    if (drop.limit_one_per_nonmember) {
+      const constableCount = resolved.filter((r) => r.inv.type === "public").length;
+      if (constableCount > 1) {
+        return NextResponse.json(
+          { error: "Only one Constable per person during this opening." },
+          { status: 409 }
+        );
+      }
+    }
   }
 
   // Flat price for everyone.
