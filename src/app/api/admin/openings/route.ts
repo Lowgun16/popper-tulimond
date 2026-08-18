@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fromZonedTime } from "date-fns-tz";
+import { fromZonedTime, formatInTimeZone } from "date-fns-tz";
 import { requireOwner } from "@/lib/adminAuth";
 import { sql } from "@/lib/db";
 import type { DropRow } from "@/lib/drops";
@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
   const earlyAt = new Date(opensAt.getTime() - leadMin * 60000);
   const closesAt = new Date(opensAt.getTime() + windowMinutes * 60000);
   const announceAt = fromZonedTime(b.announceAtLocal, tz);
+  if (isNaN(announceAt.getTime())) return NextResponse.json({ error: "Invalid announce time" }, { status: 400 });
   // default reminder: 3:45pm ET on opening day
   const reminderAt = b.reminderLocal ? fromZonedTime(b.reminderLocal, tz) : defaultReminder(opensAt, tz);
 
@@ -44,7 +45,6 @@ export async function POST(req: NextRequest) {
 
 function defaultReminder(opensAt: Date, tz: string): Date {
   // opening day's calendar date in tz, at 15:45 local
-  const { formatInTimeZone } = require("date-fns-tz");
   const day = formatInTimeZone(opensAt, tz, "yyyy-MM-dd");
   return fromZonedTime(`${day}T15:45`, tz);
 }
