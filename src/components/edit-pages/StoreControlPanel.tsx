@@ -37,9 +37,12 @@ export default function StoreControlPanel() {
 
   async function act(id: string, action: "cancel" | "close-now") {
     if (!confirm(`${action} this opening?`)) return;
-    await fetch(`/api/admin/openings/${id}`, {
+    setBusy(true); setError(null);
+    const r = await fetch(`/api/admin/openings/${id}`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }),
     });
+    setBusy(false);
+    if (!r.ok) { setError((await r.json()).error || "Failed"); return; }
     load();
   }
 

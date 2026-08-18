@@ -11,6 +11,7 @@ function parseColorway(colorway: string): { color: string; sleeve: string } {
 }
 import type { LookbookMediaItem } from "@/lib/contentTypes";
 import { formatPrice } from "@/lib/formatPrice";
+import { itemPriceCents } from "@/lib/pricing";
 import { playCartAddSound } from "@/lib/sounds";
 
 function isVideo(item: LookbookMediaItem) { return item.type === "video"; }
@@ -19,7 +20,6 @@ interface LookbookDeepDiveProps {
   item: VersionItem;
   media: LookbookMediaItem[];
   defaultSize: string;
-  isMember: boolean;
   onExit: () => void;
   onAddToCart: (item: VersionItem, size: string) => void;
 }
@@ -28,7 +28,6 @@ export function LookbookDeepDive({
   item,
   media,
   defaultSize,
-  isMember,
   onExit,
   onAddToCart,
 }: LookbookDeepDiveProps) {
@@ -59,7 +58,7 @@ export function LookbookDeepDive({
     setTimeout(() => setAdded(false), 2000);
   }
 
-  const price = isMember ? item.memberPriceCents : item.initiationPriceCents;
+  const price = itemPriceCents(item);
   const current = media[activeIdx];
   const { color, sleeve } = parseColorway(item.colorway);
 

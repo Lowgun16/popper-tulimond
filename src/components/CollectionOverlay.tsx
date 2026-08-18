@@ -789,7 +789,6 @@ export default function CollectionOverlay({ opacity, onAddToCart, allContent, pr
           onSwitchModel={(newModelId) => {
             selectModel(newModelId);
           }}
-          isMember={false}
         />
       )}
 

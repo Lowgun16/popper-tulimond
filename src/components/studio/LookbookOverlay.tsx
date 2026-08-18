@@ -24,7 +24,6 @@ interface LookbookOverlayProps {
   modelProfiles: ModelProfile[];
   activeModelId: string;
   onSwitchModel: (modelId: string) => void;
-  isMember?: boolean;
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -36,7 +35,6 @@ export function LookbookOverlay({
   modelProfiles,
   activeModelId,
   onSwitchModel,
-  isMember = false,
 }: LookbookOverlayProps) {
   const [screen, setScreen] = useState<Screen>("grid");
   const [selectedVersion, setSelectedVersion] = useState<VersionItem | null>(null);
@@ -227,7 +225,6 @@ export function LookbookOverlay({
                 item={selectedVersion}
                 media={allMedia[selectedVersion.id] ?? []}
                 defaultSize={defaultSize}
-                isMember={isMember}
                 onExit={() => setScreen("grid")}
                 onAddToCart={handleAddToCartFromOverlay}
               />
@@ -247,7 +244,6 @@ export function LookbookOverlay({
                 versions={compareVersions}
                 media={allMedia}
                 defaultSize={defaultSize}
-                isMember={isMember}
                 onBack={() => setScreen("grid")}
                 onChangeCompare={handleChangeCompare}
                 onAddToCart={handleAddToCartFromOverlay}
