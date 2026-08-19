@@ -1,10 +1,20 @@
 import twilio from "twilio";
 
 function client() {
-  const sid = process.env.TWILIO_ACCOUNT_SID;
-  const token = process.env.TWILIO_AUTH_TOKEN;
-  if (!sid || !token) return null;
-  return twilio(sid, token);
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const apiKeySid = process.env.TWILIO_API_KEY_SID;
+  const apiKeySecret = process.env.TWILIO_API_KEY_SECRET;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+  // Preferred: scoped API Key (revocable without touching the master token).
+  if (accountSid && apiKeySid && apiKeySecret) {
+    return twilio(apiKeySid, apiKeySecret, { accountSid });
+  }
+  // Fallback: legacy Account SID + Auth Token.
+  if (accountSid && authToken) {
+    return twilio(accountSid, authToken);
+  }
+  return null;
 }
 
 export async function sendSms(to: string, body: string): Promise<boolean> {
