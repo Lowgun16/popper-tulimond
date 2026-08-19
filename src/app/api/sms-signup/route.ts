@@ -1,7 +1,7 @@
 // src/app/api/sms-signup/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import twilio from "twilio";
+import { sendSms } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   let body: { firstName?: unknown; phone?: unknown; email?: unknown; source?: unknown };
@@ -50,23 +50,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Send welcome SMS via Twilio (non-blocking — if Twilio fails, signup is still saved)
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
-  const fromNumber = process.env.TWILIO_FROM_NUMBER;
-
-  if (accountSid && authToken && fromNumber) {
-    try {
-      const client = twilio(accountSid, authToken);
-      await client.messages.create({
-        body: "You're in. Text CONSTABLE when we send you the number on the 16th. — Popper Tulimond",
-        from: fromNumber,
-        to: cleanPhone,
-      });
-    } catch (twilioErr) {
-      // Log but don't fail the request — signup is already saved
-      console.error("[sms-signup] Twilio error:", twilioErr);
-    }
-  }
+  await sendSms(cleanPhone, "You're in. We'll text you the moment the doors are about to open. — Popper Tulimond");
 
   return NextResponse.json({ ok: true });
 }

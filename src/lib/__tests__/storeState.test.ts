@@ -1,46 +1,37 @@
-import { getStorePhase, type DropRow } from "../storeState";
+import { getStorePhase } from "../storeState";
+import type { DropRow } from "../drops";
 
-const baseDrop: DropRow = {
-  id: "test",
-  drop_month: "2026-05-16",
+const base: DropRow = {
+  id: "t",
   timezone: "America/New_York",
-  open_time: "00:00",
-  early_access_time: "23:45",
-  close_time: "00:29",
+  opens_at: "2026-08-25T04:00:00Z",        // midnight EDT
+  early_access_at: "2026-08-25T03:45:00Z", // 11:45pm EDT prev day
+  closes_at: "2026-08-25T07:00:00Z",       // 3am EDT (3h window)
+  window_minutes: 180,
   available_count: 500,
   sold_count: 0,
   is_open: true,
+  status: "announced",
+  announce_at: null, announce_message: null, announce_sent_at: null,
+  reminder_at: null, reminder_sent_at: null, earlybird_sent_at: null,
+  limit_one_per_nonmember: false,
 };
 
-test("returns signup during off-period", () => {
-  const now = new Date("2026-05-14T20:00:00Z"); // afternoon on the 14th
-  expect(getStorePhase(baseDrop, now)).toBe("signup");
+test("signup before early access", () => {
+  expect(getStorePhase(base, new Date("2026-08-25T03:00:00Z"))).toBe("signup");
 });
-
-test("returns early_access at 11:45pm EST on the 15th", () => {
-  // 11:46pm EDT on May 15 = 03:46 UTC on May 16
-  const now = new Date("2026-05-16T03:46:00Z");
-  expect(getStorePhase(baseDrop, now)).toBe("early_access");
+test("early_access in the 15-min window", () => {
+  expect(getStorePhase(base, new Date("2026-08-25T03:50:00Z"))).toBe("early_access");
 });
-
-test("returns open at midnight on the 16th", () => {
-  // midnight EDT on May 16 = 04:00 UTC
-  const now = new Date("2026-05-16T04:01:00Z");
-  expect(getStorePhase(baseDrop, now)).toBe("open");
+test("open after opens_at", () => {
+  expect(getStorePhase(base, new Date("2026-08-25T04:30:00Z"))).toBe("open");
 });
-
-test("returns sold_out after close_time", () => {
-  // 12:30am EDT = 04:30 UTC
-  const now = new Date("2026-05-16T04:30:00Z");
-  expect(getStorePhase(baseDrop, now)).toBe("sold_out");
+test("sold_out after closes_at (3h window)", () => {
+  expect(getStorePhase(base, new Date("2026-08-25T07:30:00Z"))).toBe("sold_out");
 });
-
-test("returns sold_out when inventory exhausted", () => {
-  const now = new Date("2026-05-16T04:01:00Z"); // store open
-  expect(getStorePhase({ ...baseDrop, sold_count: 500 }, now)).toBe("sold_out");
+test("sold_out when inventory exhausted", () => {
+  expect(getStorePhase({ ...base, sold_count: 500 }, new Date("2026-08-25T04:30:00Z"))).toBe("sold_out");
 });
-
-test("returns sold_out when is_open is false", () => {
-  const now = new Date("2026-05-16T04:01:00Z");
-  expect(getStorePhase({ ...baseDrop, is_open: false }, now)).toBe("sold_out");
+test("sold_out when is_open false (manual close)", () => {
+  expect(getStorePhase({ ...base, is_open: false }, new Date("2026-08-25T04:30:00Z"))).toBe("sold_out");
 });

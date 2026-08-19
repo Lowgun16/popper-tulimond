@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { getCurrentDrop } from "@/lib/drops";
+import { formatInTimeZone } from "date-fns-tz";
 
 interface CartItemSummary {
   name: string;
@@ -21,10 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get the active drop for context + early access link
-    const drops = await sql`
-      SELECT * FROM initiation_drops ORDER BY drop_month DESC LIMIT 1
-    `;
-    const drop = drops[0] ?? null;
+    const drop = await getCurrentDrop();
 
     // Save intent
     await sql`
@@ -48,15 +47,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Format drop date for email
-    const rawDate = drop?.drop_month;
     let dropDateStr = "the 16th";
-    if (rawDate) {
-      const d = rawDate instanceof Date ? rawDate : new Date(rawDate);
-      dropDateStr = d.toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        timeZone: "UTC",
-      });
+    if (drop?.opens_at) {
+      dropDateStr = formatInTimeZone(new Date(drop.opens_at), drop.timezone, "MMMM d");
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://poppertulimond.com";
@@ -64,9 +57,8 @@ export async function POST(req: NextRequest) {
     // Build calendar links
     let googleCalUrl = "";
     let icsUrl = `${baseUrl}/api/calendar/drop.ics`;
-    if (drop?.drop_month) {
-      const rawDrop = drop.drop_month;
-      const dObj = rawDrop instanceof Date ? rawDrop : new Date(rawDrop);
+    if (drop?.opens_at) {
+      const dObj = new Date(drop.opens_at);
       const yr = dObj.getUTCFullYear();
       const mo = String(dObj.getUTCMonth() + 1).padStart(2, "0");
       const dy = String(dObj.getUTCDate()).padStart(2, "0");
@@ -177,7 +169,7 @@ export async function POST(req: NextRequest) {
       console.error("[checkout/reserve] Email error:", emailErr);
     }
 
-    return NextResponse.json({ success: true, dropDate: drop?.drop_month ?? null });
+    return NextResponse.json({ success: true, dropDate: drop?.opens_at ?? null });
   } catch (err) {
     console.error("[checkout/reserve] Error:", err);
     return NextResponse.json({ error: "Unable to save reservation" }, { status: 500 });

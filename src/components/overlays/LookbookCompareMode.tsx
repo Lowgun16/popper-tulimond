@@ -5,6 +5,7 @@ import Image from "next/image";
 import { VersionItem } from "@/components/overlays/LookbookVersionGrid";
 import type { LookbookMediaItem } from "@/lib/contentTypes";
 import { formatPrice } from "@/lib/formatPrice";
+import { itemPriceCents } from "@/lib/pricing";
 import { playCartAddSound } from "@/lib/sounds";
 
 function parseColorway(colorway: string): { color: string; sleeve: string } {
@@ -93,7 +94,6 @@ interface LookbookCompareModeProps {
   versions: [VersionItem, VersionItem];
   media: Record<string, LookbookMediaItem[]>;
   defaultSize: string;
-  isMember: boolean;
   onBack: () => void;
   onChangeCompare: () => void;
   onAddToCart: (item: VersionItem, size: string) => void;
@@ -103,7 +103,6 @@ export function LookbookCompareMode({
   versions,
   media,
   defaultSize,
-  isMember,
   onBack,
   onChangeCompare,
   onAddToCart,
@@ -144,8 +143,8 @@ export function LookbookCompareMode({
   }
 
   const crownedItem = crowned === left.id ? left : crowned === right.id ? right : null;
-  const crownedPrice = crownedItem ? (isMember ? crownedItem.memberPriceCents : crownedItem.initiationPriceCents) : 0;
-  const bothPrice = (isMember ? left.memberPriceCents : left.initiationPriceCents) + (isMember ? right.memberPriceCents : right.initiationPriceCents);
+  const crownedPrice = crownedItem ? itemPriceCents(crownedItem) : 0;
+  const bothPrice = itemPriceCents(left) + itemPriceCents(right);
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>

@@ -3,6 +3,8 @@ import Stripe from "stripe";
 import { sql } from "@/lib/db";
 import { getMemberSession } from "@/lib/memberAuth";
 import { v4 as uuidv4 } from "uuid";
+import { sendSms } from "@/lib/sms";
+import { getCurrentDrop } from "@/lib/drops";
 
 const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -30,15 +32,18 @@ export async function POST(req: NextRequest) {
   if (existing.length === 0) {
     // Atomic inventory decrement for non-members
     if (metadata.is_member !== "true") {
-      const decremented = await sql`
-        UPDATE initiation_drops
-        SET sold_count = sold_count + 1
-        WHERE id = (SELECT id FROM initiation_drops ORDER BY drop_month DESC LIMIT 1)
-          AND sold_count < available_count
-        RETURNING id
-      `;
-      if (decremented.length === 0) {
-        return NextResponse.json({ error: "Sold out" }, { status: 409 });
+      const drop = await getCurrentDrop();
+      if (drop !== null) {
+        const decremented = await sql`
+          UPDATE initiation_drops
+          SET sold_count = sold_count + 1
+          WHERE id = ${drop.id}
+            AND sold_count < available_count
+          RETURNING id
+        `;
+        if (decremented.length === 0) {
+          return NextResponse.json({ error: "Sold out" }, { status: 409 });
+        }
       }
     }
 
@@ -110,22 +115,8 @@ export async function POST(req: NextRequest) {
   // Send Twilio setup text (non-blocking)
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://poppertulimond.com";
   const setupUrl = `${baseUrl}/membership-setup?token=${setupToken}`;
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
-  const fromNumber = process.env.TWILIO_FROM_NUMBER;
-
-  if (accountSid && authToken && fromNumber && phone) {
-    try {
-      const twilio = (await import("twilio")).default;
-      const client = twilio(accountSid, authToken);
-      await client.messages.create({
-        body: `You're almost a member. Finish your registration: ${setupUrl} — shop the Vault anytime instead of waiting until next month.`,
-        from: fromNumber,
-        to: phone,
-      });
-    } catch (err) {
-      console.error("[orders/confirm] Twilio error:", err);
-    }
+  if (phone) {
+    await sendSms(phone, `You're almost a member. Finish your registration: ${setupUrl} — shop the Vault anytime instead of waiting until next month.`);
   }
 
   return NextResponse.json({ setupToken });

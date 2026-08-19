@@ -12,6 +12,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/lib/formatPrice";
+import { itemPriceCents } from "@/lib/pricing";
 import ReservationSheet from "@/components/ReservationSheet";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -128,18 +129,10 @@ export default function CheckoutPage() {
           return;
         }
 
-        const isMember = !!memberSession?.member;
-        let constableCount = 0;
-        const computed = items.map((item) => {
-          if (!isMember) {
-            constableCount++;
-            return {
-              ...item,
-              priceCents: constableCount === 1 ? item.initiationPriceCents : item.memberPriceCents,
-            };
-          }
-          return { ...item, priceCents: item.memberPriceCents };
-        });
+        const computed = items.map((item) => ({
+          ...item,
+          priceCents: itemPriceCents(item),
+        }));
         const total = computed.reduce((sum, i) => sum + i.priceCents, 0);
 
         setLineItems(computed);
