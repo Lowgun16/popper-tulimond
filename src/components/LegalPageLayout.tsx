@@ -91,6 +91,16 @@ export default function LegalPageLayout({ title, lastUpdated, children }: LegalP
         }}>
           © {new Date().getFullYear()} Popper Tulimond. All rights reserved.
         </p>
+        <p style={{
+          fontFamily: "var(--font-body, sans-serif)",
+          fontSize: "9px",
+          color: "rgba(240,232,215,0.35)",
+          letterSpacing: "0.12em",
+          lineHeight: 1.6,
+          marginTop: "8px",
+        }}>
+          Popper Tulimond LLC · 9550 S Eastern Ave, Ste 253, Las Vegas, NV 89123 · logan@poppertulimond.com
+        </p>
       </footer>
     </div>
   );
