@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Send welcome SMS via Twilio (non-blocking — if Twilio fails, signup is still saved)
-  await sendSms(cleanPhone, "You're in. We'll text you the moment the doors are about to open. — Popper Tulimond");
+  await sendSms(cleanPhone, "You're in. We'll text you the moment the doors are about to open. — Popper Tulimond. Reply STOP to opt out.");
 
   return NextResponse.json({ ok: true });
 }
