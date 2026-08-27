@@ -235,6 +235,14 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [], cont
               <p style={{ textAlign: "center", margin: "4px 0 0", fontFamily: "var(--font-body, sans-serif)", fontSize: "11px", color: "rgba(240,232,215,0.25)", lineHeight: 1.6 }}>
                 {content.fine_print}
               </p>
+
+              {/* SMS consent — applies when a phone number is provided (carrier requirement) */}
+              <p style={{ margin: "10px 0 0", fontFamily: "var(--font-body, sans-serif)", fontSize: "9px", color: "rgba(240,232,215,0.25)", lineHeight: 1.6 }}>
+                If you provide a phone number, you agree to receive recurring automated marketing texts (early-access alerts and drop notifications) from Popper Tulimond at that number. Consent is not a condition of purchase. Message frequency varies. Msg &amp; data rates may apply. Reply HELP for help, STOP to cancel. See our{" "}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.5)", textDecoration: "underline" }}>Privacy Policy</a>
+                {" "}and{" "}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.5)", textDecoration: "underline" }}>Terms</a>.
+              </p>
             </form>
           </>
         )}
