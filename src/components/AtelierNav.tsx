@@ -124,7 +124,7 @@ export default function AtelierNav({ opacity, onNavClick, footerOpen, onLegalCli
           ))}
 
           <div className="hidden md:flex items-center gap-2">
-            <span aria-hidden="true" style={{ color: "rgba(240,232,215,0.15)", fontSize: "12px" }}>|</span>
+            <span aria-hidden="true" style={{ color: "rgba(240,232,215,0.4)", fontSize: "12px" }}>|</span>
             <button
               type="button"
               onClick={onLegalClick}
@@ -138,7 +138,7 @@ export default function AtelierNav({ opacity, onNavClick, footerOpen, onLegalCli
           </div>
 
           <div className="hidden md:flex items-center gap-2">
-            <span aria-hidden="true" style={{ color: "rgba(240,232,215,0.15)", fontSize: "12px" }}>|</span>
+            <span aria-hidden="true" style={{ color: "rgba(240,232,215,0.4)", fontSize: "12px" }}>|</span>
             {memberSession ? (
               <button
                 type="button"
@@ -244,7 +244,7 @@ export default function AtelierNav({ opacity, onNavClick, footerOpen, onLegalCli
                   onClick={() => setRecoveryMode(true)}
                   style={{
                     background: "none", border: "none", padding: 0,
-                    color: "rgba(240,232,215,0.35)",
+                    color: "rgba(240,232,215,0.62)",
                     fontFamily: "var(--font-title, serif)",
                     fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase",
                     cursor: "pointer", textDecoration: "underline",
@@ -266,7 +266,7 @@ export default function AtelierNav({ opacity, onNavClick, footerOpen, onLegalCli
                 {recoverySent ? (
                   <p style={{
                     fontFamily: "var(--font-display, serif)",
-                    fontSize: "15px", color: "rgba(240,232,215,0.75)",
+                    fontSize: "15px", color: "rgba(240,232,215,0.88)",
                     lineHeight: 1.6,
                   }}>
                     If that number is in our system, we sent a setup link. Check your messages.
@@ -275,7 +275,7 @@ export default function AtelierNav({ opacity, onNavClick, footerOpen, onLegalCli
                   <>
                     <p style={{
                       fontFamily: "var(--font-body, sans-serif)",
-                      fontSize: "13px", color: "rgba(240,232,215,0.55)",
+                      fontSize: "13px", color: "rgba(240,232,215,0.78)",
                       lineHeight: 1.6, marginBottom: "20px",
                     }}>
                       Enter your phone number and we&apos;ll text you a link to set up this device.
@@ -323,7 +323,7 @@ export default function AtelierNav({ opacity, onNavClick, footerOpen, onLegalCli
                       onClick={() => setRecoveryMode(false)}
                       style={{
                         background: "none", border: "none", padding: 0,
-                        color: "rgba(240,232,215,0.35)",
+                        color: "rgba(240,232,215,0.62)",
                         fontFamily: "var(--font-title, serif)",
                         fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase",
                         cursor: "pointer", textDecoration: "underline",

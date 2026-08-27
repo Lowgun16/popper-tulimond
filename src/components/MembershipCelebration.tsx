@@ -226,13 +226,13 @@ export function MembershipCelebration({ onEnterVault, content, disableSound }: M
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.45, duration: 0.7 }}
         >
-          <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.65)", lineHeight: 1.85, marginBottom: 20 }}>
+          <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.82)", lineHeight: 1.85, marginBottom: 20 }}>
             {content.body_1}
           </p>
-          <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.65)", lineHeight: 1.85, marginBottom: 20 }}>
+          <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.82)", lineHeight: 1.85, marginBottom: 20 }}>
             {content.body_2}
           </p>
-          <p style={{ fontFamily: "var(--font-display, serif)", fontSize: "16px", color: "rgba(240,232,215,0.8)", lineHeight: 1.75, marginBottom: 36, fontStyle: "italic" }}>
+          <p style={{ fontFamily: "var(--font-display, serif)", fontSize: "16px", color: "rgba(240,232,215,0.9)", lineHeight: 1.75, marginBottom: 36, fontStyle: "italic" }}>
             {content.closing_line}
           </p>
         </motion.div>

@@ -77,13 +77,13 @@ export async function POST(req: NextRequest) {
       const resend = new Resend(process.env.RESEND_API_KEY);
 
       const itemLines = cartItems
-        .map((i) => `<li style="margin-bottom:6px;color:rgba(240,232,215,0.75);font-size:14px;">${i.name}${i.colorway ? ` — ${i.colorway}` : ""} / Size ${i.size}</li>`)
+        .map((i) => `<li style="margin-bottom:6px;color:rgba(240,232,215,0.88);font-size:14px;">${i.name}${i.colorway ? ` — ${i.colorway}` : ""} / Size ${i.size}</li>`)
         .join("");
 
       const calendarSection = (googleCalUrl || icsUrl) ? `
         <tr><td style="padding:24px 0;border-top:1px solid rgba(196,164,86,0.12);">
           <p style="margin:0 0 14px;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:#C4A456;font-family:Georgia,serif;">Add to Your Calendar</p>
-          <p style="margin:0 0 14px;font-family:Georgia,serif;font-size:13px;color:rgba(240,232,215,0.45);line-height:1.6;">So you don't miss your window. Your calendar app will remind you when it's time.</p>
+          <p style="margin:0 0 14px;font-family:Georgia,serif;font-size:13px;color:rgba(240,232,215,0.7);line-height:1.6;">So you don't miss your window. Your calendar app will remind you when it's time.</p>
           <table cellpadding="0" cellspacing="0"><tr>
             ${googleCalUrl ? `<td style="padding-right:12px;"><a href="${googleCalUrl}" style="display:inline-block;padding:10px 20px;background:rgba(196,164,86,0.08);border:1px solid rgba(196,164,86,0.4);color:#C4A456;font-family:Georgia,serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;text-decoration:none;">Google Calendar</a></td>` : ""}
             <td><a href="${icsUrl}" style="display:inline-block;padding:10px 20px;background:rgba(196,164,86,0.08);border:1px solid rgba(196,164,86,0.4);color:#C4A456;font-family:Georgia,serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;text-decoration:none;">Apple / iCal</a></td>
@@ -110,13 +110,13 @@ export async function POST(req: NextRequest) {
         </td></tr>
 
         <tr><td style="padding:28px 0 8px;">
-          <p style="margin:0 0 18px;font-family:Georgia,serif;font-size:15px;color:rgba(240,232,215,0.7);line-height:1.8;">
+          <p style="margin:0 0 18px;font-family:Georgia,serif;font-size:15px;color:rgba(240,232,215,0.85);line-height:1.8;">
             ${name ? `${name.split(" ")[0]}, you` : "You"} already chose your piece. That tells us what we need to know about you.
           </p>
-          <p style="margin:0 0 18px;font-family:Georgia,serif;font-size:15px;color:rgba(240,232,215,0.7);line-height:1.8;">
+          <p style="margin:0 0 18px;font-family:Georgia,serif;font-size:15px;color:rgba(240,232,215,0.85);line-height:1.8;">
             The Vault opens to new members on <strong style="color:rgba(240,232,215,0.9);">${dropDateStr}</strong>. We'll send your early access link — fifteen minutes before anyone else — so you don't miss your window on the limited spots available.
           </p>
-          <p style="margin:0 0 28px;font-family:Georgia,serif;font-size:15px;color:rgba(240,232,215,0.7);line-height:1.8;">
+          <p style="margin:0 0 28px;font-family:Georgia,serif;font-size:15px;color:rgba(240,232,215,0.85);line-height:1.8;">
             The items you chose will be waiting exactly where you left them.
           </p>
         </td></tr>
@@ -132,10 +132,10 @@ export async function POST(req: NextRequest) {
 
         <tr><td style="padding:28px 0;border-top:1px solid rgba(196,164,86,0.12);">
           <p style="margin:0 0 12px;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:#C4A456;font-family:Georgia,serif;">What Happens When You Buy</p>
-          <p style="margin:0 0 14px;font-family:Georgia,serif;font-size:14px;color:rgba(240,232,215,0.6);line-height:1.8;">
+          <p style="margin:0 0 14px;font-family:Georgia,serif;font-size:14px;color:rgba(240,232,215,0.8);line-height:1.8;">
             The moment your order is placed, your membership begins. You'll receive a private link to register your device — and from that point on, the Vault is yours. Open 24 hours a day. No more waiting for the window. No more monthly schedule.
           </p>
-          <p style="margin:0;font-family:Georgia,serif;font-size:14px;color:rgba(240,232,215,0.6);line-height:1.8;">
+          <p style="margin:0;font-family:Georgia,serif;font-size:14px;color:rgba(240,232,215,0.8);line-height:1.8;">
             Members don't wait for the door to open. Members <em>have</em> the door.
           </p>
         </td></tr>
@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
         </td></tr>
 
         <tr><td style="border-top:1px solid rgba(196,164,86,0.1);padding-top:24px;">
-          <p style="margin:0;font-size:11px;color:rgba(240,232,215,0.2);line-height:1.8;font-family:Georgia,serif;">
+          <p style="margin:0;font-size:11px;color:rgba(240,232,215,0.45);line-height:1.8;font-family:Georgia,serif;">
             We build for the man who has been building for everyone else.<br>
             — Popper Tulimond
           </p>

@@ -31,7 +31,7 @@ const sectionTitle: CSSProperties = {
 const bodyText: CSSProperties = {
   fontFamily: "var(--font-body, sans-serif)",
   fontSize: "14px",
-  color: "rgba(240,232,215,0.65)",
+  color: "rgba(240,232,215,0.82)",
   lineHeight: "1.85",
   letterSpacing: "0.02em",
 };
@@ -52,7 +52,7 @@ export default function AboutOverlay({ isOpen, onClose, content }: AboutOverlayP
       }}>
         <span dangerouslySetInnerHTML={{ __html: content.headline }} />
       </h1>
-      <p style={{ ...eyebrow, color: "rgba(240,232,215,0.35)", marginBottom: "40px" }}
+      <p style={{ ...eyebrow, color: "rgba(240,232,215,0.62)", marginBottom: "40px" }}
         dangerouslySetInnerHTML={{ __html: content.subheadline }} />
 
       {/* Gold divider */}

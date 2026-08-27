@@ -319,7 +319,7 @@ export function ChooseModelModal({
                     fontSize: "13px",
                     fontWeight: 300,
                     fontStyle: "italic",
-                    color: "rgba(240,232,215,0.7)",
+                    color: "rgba(240,232,215,0.85)",
                     textAlign: "center",
                     marginBottom: 12,
                     letterSpacing: "0.02em",

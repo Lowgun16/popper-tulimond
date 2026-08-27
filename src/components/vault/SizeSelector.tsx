@@ -36,7 +36,7 @@ export default function SizeSelector({ sizes, onAddToCart, disabled }: SizeSelec
               width: 40, height: 36,
               background: selected === size ? "rgba(196,164,86,0.15)" : "rgba(255,255,255,0.04)",
               border: `1px solid ${selected === size ? GOLD : "rgba(255,255,255,0.12)"}`,
-              color: selected === size ? GOLD : "rgba(240,232,215,0.55)",
+              color: selected === size ? GOLD : "rgba(240,232,215,0.78)",
               fontFamily: "var(--font-title, serif)",
               fontSize: "10px",
               letterSpacing: "0.1em",

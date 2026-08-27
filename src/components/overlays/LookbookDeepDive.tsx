@@ -141,7 +141,7 @@ export function LookbookDeepDive({
         </p>
 
         {item.story && (
-          <p style={{ fontFamily: "var(--font-display, serif)", fontSize: "12px", fontWeight: 300, fontStyle: "italic", color: "rgba(240,232,215,0.6)", lineHeight: 1.6, margin: "12px 0" }}>
+          <p style={{ fontFamily: "var(--font-display, serif)", fontSize: "12px", fontWeight: 300, fontStyle: "italic", color: "rgba(240,232,215,0.8)", lineHeight: 1.6, margin: "12px 0" }}>
             {item.story}
           </p>
         )}

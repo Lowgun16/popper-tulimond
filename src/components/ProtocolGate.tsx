@@ -97,7 +97,7 @@ export default function ProtocolGate({ isOpen, onClose, onViewProtocol, onReques
                   width: "100%", padding: "13px",
                   background: "none",
                   border: "1px solid rgba(255,255,255,0.1)",
-                  color: "rgba(240,232,215,0.5)",
+                  color: "rgba(240,232,215,0.75)",
                   fontFamily: "var(--font-title, serif)",
                   fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase",
                   cursor: "pointer",

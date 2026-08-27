@@ -75,7 +75,7 @@ function MembershipSetupContent() {
   if (!token && !preview) {
     return (
       <div style={{ minHeight: "100dvh", background: DARK, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-        <p style={{ color: "rgba(240,232,215,0.4)", fontFamily: "var(--font-body, sans-serif)" }}>
+        <p style={{ color: "rgba(240,232,215,0.68)", fontFamily: "var(--font-body, sans-serif)" }}>
           Invalid setup link. Contact us to get a new one.
         </p>
       </div>
@@ -106,10 +106,10 @@ function MembershipSetupContent() {
             <h1 style={{ fontFamily: "var(--font-display, serif)", fontSize: "28px", fontWeight: 300, color: "rgba(240,232,215,0.95)", marginBottom: 16, lineHeight: 1.3 }}>
               You&apos;re in. One last step.
             </h1>
-            <p style={{ fontFamily: "var(--font-body, sans-serif)", color: "rgba(240,232,215,0.6)", fontSize: "15px", lineHeight: 1.75, marginBottom: 12 }}>
+            <p style={{ fontFamily: "var(--font-body, sans-serif)", color: "rgba(240,232,215,0.8)", fontSize: "15px", lineHeight: 1.75, marginBottom: 12 }}>
               Register your device with Face ID or Touch ID. Ten seconds, and the Vault is yours — open anytime, forever.
             </p>
-            <p style={{ fontFamily: "var(--font-body, sans-serif)", color: "rgba(240,232,215,0.4)", fontSize: "13px", lineHeight: 1.7, marginBottom: 32 }}>
+            <p style={{ fontFamily: "var(--font-body, sans-serif)", color: "rgba(240,232,215,0.68)", fontSize: "13px", lineHeight: 1.7, marginBottom: 32 }}>
               No passwords. No logins. Your face or fingerprint is your key.
             </p>
             <button
@@ -131,7 +131,7 @@ function MembershipSetupContent() {
                 {errorMsg}
               </p>
             )}
-            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "11px", color: "rgba(240,232,215,0.2)", lineHeight: 1.6 }}>
+            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "11px", color: "rgba(240,232,215,0.45)", lineHeight: 1.6 }}>
               This link expires in 7 days.
             </p>
           </div>
@@ -145,7 +145,7 @@ export default function MembershipSetupPage() {
   return (
     <Suspense fallback={
       <div style={{ minHeight: "100dvh", background: DARK, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: "rgba(240,232,215,0.4)", fontFamily: "var(--font-body, sans-serif)" }}>Loading...</p>
+        <p style={{ color: "rgba(240,232,215,0.68)", fontFamily: "var(--font-body, sans-serif)" }}>Loading...</p>
       </div>
     }>
       <MembershipSetupContent />

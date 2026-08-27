@@ -88,7 +88,7 @@ export default function ContactOverlay({ isOpen, onClose, content }: ContactOver
           <p style={{
             fontFamily: "var(--font-body, sans-serif)",
             fontSize: "13px",
-            color: "rgba(240,232,215,0.4)",
+            color: "rgba(240,232,215,0.68)",
             lineHeight: "1.7",
             fontStyle: "italic",
           }} dangerouslySetInnerHTML={{ __html: content.note }} />

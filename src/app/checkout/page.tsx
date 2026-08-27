@@ -169,7 +169,7 @@ export default function CheckoutPage() {
         <div
           style={{
             maxWidth: 440,
-            color: "rgba(240,232,215,0.7)",
+            color: "rgba(240,232,215,0.85)",
             fontFamily: "var(--font-body, sans-serif)",
             textAlign: "center",
           }}
@@ -204,7 +204,7 @@ export default function CheckoutPage() {
           justifyContent: "center",
         }}
       >
-        <p style={{ color: "rgba(240,232,215,0.4)", fontFamily: "var(--font-body, sans-serif)" }}>
+        <p style={{ color: "rgba(240,232,215,0.68)", fontFamily: "var(--font-body, sans-serif)" }}>
           Preparing checkout...
         </p>
       </div>
@@ -253,7 +253,7 @@ export default function CheckoutPage() {
             >
               <span
                 style={{
-                  color: "rgba(240,232,215,0.7)",
+                  color: "rgba(240,232,215,0.85)",
                   fontFamily: "var(--font-body, sans-serif)",
                   fontSize: "14px",
                 }}

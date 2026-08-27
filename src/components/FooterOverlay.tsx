@@ -50,7 +50,7 @@ export default function FooterOverlay({ isOpen, onClose, onLegalOpen }: FooterOv
                   fontSize: "8px",
                   letterSpacing: "0.3em",
                   textTransform: "uppercase",
-                  color: "rgba(240,232,215,0.6)",
+                  color: "rgba(240,232,215,0.8)",
                   padding: "4px 0",
                 }}
               >
@@ -72,13 +72,13 @@ export default function FooterOverlay({ isOpen, onClose, onLegalOpen }: FooterOv
                         fontSize: "11px",
                         letterSpacing: "0.25em",
                         textTransform: "uppercase",
-                        color: "rgba(240,232,215,0.6)",
+                        color: "rgba(240,232,215,0.8)",
                         textDecoration: "none",
                         padding: 0,
                         transition: "color 0.2s",
                       }}
                       onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = GOLD)}
-                      onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "rgba(240,232,215,0.6)")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "rgba(240,232,215,0.8)")}
                     >
                       {link.label}
                     </button>
@@ -90,7 +90,7 @@ export default function FooterOverlay({ isOpen, onClose, onLegalOpen }: FooterOv
             <p style={{
               fontFamily: "var(--font-body, sans-serif)",
               fontSize: "9px",
-              color: "rgba(240,232,215,0.5)",
+              color: "rgba(240,232,215,0.75)",
               letterSpacing: "0.15em",
               marginTop: "24px",
             }}>
@@ -99,7 +99,7 @@ export default function FooterOverlay({ isOpen, onClose, onLegalOpen }: FooterOv
             <p style={{
               fontFamily: "var(--font-body, sans-serif)",
               fontSize: "9px",
-              color: "rgba(240,232,215,0.35)",
+              color: "rgba(240,232,215,0.62)",
               letterSpacing: "0.12em",
               lineHeight: 1.6,
               marginTop: "8px",

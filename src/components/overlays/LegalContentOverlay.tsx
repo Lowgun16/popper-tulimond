@@ -38,7 +38,7 @@ const body: CSSProperties = {
   fontFamily: "var(--font-body, sans-serif)",
   fontSize: "14px",
   lineHeight: "1.85",
-  color: "rgba(240,232,215,0.65)",
+  color: "rgba(240,232,215,0.82)",
 };
 
 function LegalTextContent({ content }: { content: LegalContent }) {

@@ -71,6 +71,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Brighter form placeholders — the browser default gray is too dim on our dark surfaces */
+input::placeholder,
+textarea::placeholder {
+  color: rgba(240, 232, 215, 0.55);
+  opacity: 1; /* Firefox lowers placeholder opacity by default */
+}
+
 /* ─────────────────────────────────────────
    Typography Scale
 ───────────────────────────────────────── */

@@ -131,7 +131,7 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
                 </p>
                 <p style={{
                   fontFamily: "var(--font-body, sans-serif)",
-                  fontSize: "12px", color: "rgba(240,232,215,0.35)",
+                  fontSize: "12px", color: "rgba(240,232,215,0.62)",
                   marginTop: "12px",
                 }}>
                   Don't be late.
@@ -211,14 +211,14 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
                 <p style={{
                   fontFamily: "var(--font-body, sans-serif)",
                   fontSize: "9px",
-                  color: "rgba(240,232,215,0.25)",
+                  color: "rgba(240,232,215,0.5)",
                   marginTop: "14px",
                   lineHeight: 1.6,
                 }}>
                   By submitting, you agree to receive recurring automated marketing texts (early-access alerts and drop notifications) from Popper Tulimond at the number provided. Consent is not a condition of purchase. Message frequency varies. Msg &amp; data rates may apply. Reply HELP for help, STOP to cancel. See our{" "}
-                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.5)", textDecoration: "underline" }}>Privacy Policy</a>
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.75)", textDecoration: "underline" }}>Privacy Policy</a>
                   {" "}and{" "}
-                  <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.5)", textDecoration: "underline" }}>Terms</a>.
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.75)", textDecoration: "underline" }}>Terms</a>.
                 </p>
               </form>
             )}

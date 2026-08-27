@@ -17,7 +17,7 @@ export default function OrderConfirmation({ name, orderId, items, totalCents, sh
       <Text style={{ fontSize: 22, fontWeight: 300, color: "rgba(240,232,215,0.95)", marginBottom: 8 }}>
         Your order is confirmed.
       </Text>
-      <Text style={{ fontSize: 13, color: "rgba(240,232,215,0.5)", marginBottom: 32 }}>
+      <Text style={{ fontSize: 13, color: "rgba(240,232,215,0.75)", marginBottom: 32 }}>
         Order #{orderId.slice(0, 8).toUpperCase()}
       </Text>
 
@@ -36,7 +36,7 @@ export default function OrderConfirmation({ name, orderId, items, totalCents, sh
         Total: {fmt(totalCents)}
       </Text>
 
-      <Text style={{ fontSize: 12, color: "rgba(240,232,215,0.4)", lineHeight: 1.7 }}>
+      <Text style={{ fontSize: 12, color: "rgba(240,232,215,0.68)", lineHeight: 1.7 }}>
         Shipping to: {shippingAddress.line1}, {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postal_code}
       </Text>
     </EmailLayout>

@@ -218,7 +218,7 @@ export default function VaultOverlay({
                       <p style={{
                         fontFamily: "var(--font-body, sans-serif)",
                         fontSize: "11px",
-                        color: "rgba(240,232,215,0.65)",
+                        color: "rgba(240,232,215,0.82)",
                         letterSpacing: "0.1em",
                         textTransform: "uppercase",
                         marginBottom: "4px",

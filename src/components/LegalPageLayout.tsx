@@ -44,7 +44,7 @@ export default function LegalPageLayout({ title, lastUpdated, children }: LegalP
             fontSize: "9px",
             letterSpacing: "0.3em",
             textTransform: "uppercase",
-            color: "rgba(240,232,215,0.4)",
+            color: "rgba(240,232,215,0.68)",
             textDecoration: "none",
           }}
         >
@@ -70,7 +70,7 @@ export default function LegalPageLayout({ title, lastUpdated, children }: LegalP
           fontFamily: "var(--font-body, sans-serif)",
           fontSize: "14px",
           lineHeight: "1.85",
-          color: "rgba(240,232,215,0.65)",
+          color: "rgba(240,232,215,0.82)",
           whiteSpace: "pre-line",
         }}>
           {children}
@@ -86,7 +86,7 @@ export default function LegalPageLayout({ title, lastUpdated, children }: LegalP
         <p style={{
           fontFamily: "var(--font-body, sans-serif)",
           fontSize: "10px",
-          color: "rgba(240,232,215,0.5)",
+          color: "rgba(240,232,215,0.75)",
           letterSpacing: "0.15em",
         }}>
           © {new Date().getFullYear()} Popper Tulimond. All rights reserved.
@@ -94,7 +94,7 @@ export default function LegalPageLayout({ title, lastUpdated, children }: LegalP
         <p style={{
           fontFamily: "var(--font-body, sans-serif)",
           fontSize: "9px",
-          color: "rgba(240,232,215,0.35)",
+          color: "rgba(240,232,215,0.62)",
           letterSpacing: "0.12em",
           lineHeight: 1.6,
           marginTop: "8px",

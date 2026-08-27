@@ -229,7 +229,7 @@ export function LookbookCompareMode({
               {crownedItem.story && (
                 <>
                   <p style={{ fontFamily: "var(--font-title, serif)", fontSize: "8px", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", margin: "4px 0 4px" }}>The Story</p>
-                  <p style={{ fontFamily: "var(--font-display, serif)", fontSize: "12px", fontWeight: 300, fontStyle: "italic", color: "rgba(240,232,215,0.55)", lineHeight: 1.6, margin: 0 }}>
+                  <p style={{ fontFamily: "var(--font-display, serif)", fontSize: "12px", fontWeight: 300, fontStyle: "italic", color: "rgba(240,232,215,0.78)", lineHeight: 1.6, margin: 0 }}>
                     {crownedItem.story}
                   </p>
                 </>

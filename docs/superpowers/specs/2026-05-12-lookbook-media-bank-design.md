@@ -98,8 +98,8 @@ Side-by-side comparison of two versions. Three states:
 
 ## Add Both to Cart — Behavior
 
-- Adds both versions to cart using whichever size is currently selected for each (defaults to the model's size, but the customer may have changed it)
-- Size remains fully editable in cart as well
+- Adds both versions to cart using whichever size is currently selected for each (defaults to the model's size, but the customer may have changed either independently)
+- Each item's size is independently editable in the cart — e.g. Short Sleeve in Medium and Long Sleeve in Large
 - "Add Both" available in: State ② below the primary Add to Cart, and State ③ as the gentle nudge
 
 ---

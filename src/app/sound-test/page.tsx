@@ -127,7 +127,7 @@ export default function SoundTestPage() {
         style={{
           fontFamily: "var(--font-body, sans-serif)",
           fontSize: "13px",
-          color: "rgba(240,232,215,0.35)",
+          color: "rgba(240,232,215,0.62)",
           marginBottom: 8,
           textAlign: "center",
         }}
@@ -204,7 +204,7 @@ export default function SoundTestPage() {
                   style={{
                     fontFamily: "var(--font-body, sans-serif)",
                     fontSize: "12px",
-                    color: "rgba(240,232,215,0.45)",
+                    color: "rgba(240,232,215,0.7)",
                     margin: 0,
                     lineHeight: 1.5,
                   }}
@@ -235,7 +235,7 @@ export default function SoundTestPage() {
         style={{
           fontFamily: "var(--font-body, sans-serif)",
           fontSize: "11px",
-          color: "rgba(240,232,215,0.18)",
+          color: "rgba(240,232,215,0.42)",
           marginTop: 48,
           textAlign: "center",
         }}

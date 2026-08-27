@@ -115,10 +115,10 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [], cont
             <h2 style={{ fontFamily: "var(--font-display, serif)", fontSize: "24px", fontWeight: 300, color: "rgba(240,232,215,0.95)", marginBottom: 20, lineHeight: 1.35 }}>
               {content.success_headline}
             </h2>
-            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.6)", lineHeight: 1.75, marginBottom: 12 }}>
+            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.8)", lineHeight: 1.75, marginBottom: 12 }}>
               {content.success_body}
             </p>
-            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.6)", lineHeight: 1.75, marginBottom: 32 }}>
+            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "15px", color: "rgba(240,232,215,0.8)", lineHeight: 1.75, marginBottom: 32 }}>
               {dropDate
                 ? `The Vault opens ${dropDate}. We'll send your early access link — fifteen minutes before anyone else.`
                 : `We'll send your early access link the evening before the Vault opens.`}
@@ -129,7 +129,7 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [], cont
                   Your selection is saved
                 </p>
                 {cartItems.map((item, i) => (
-                  <p key={i} style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "13px", color: "rgba(240,232,215,0.55)", margin: "0 0 4px" }}>
+                  <p key={i} style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "13px", color: "rgba(240,232,215,0.78)", margin: "0 0 4px" }}>
                     {item.name}{item.colorway ? ` — ${item.colorway}` : ""} / {item.size}
                   </p>
                 ))}
@@ -159,10 +159,10 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [], cont
               {content.headline}
             </h2>
 
-            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "14px", color: "rgba(240,232,215,0.6)", lineHeight: 1.75, marginBottom: 10 }}>
+            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "14px", color: "rgba(240,232,215,0.8)", lineHeight: 1.75, marginBottom: 10 }}>
               {content.body_1}
             </p>
-            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "14px", color: "rgba(240,232,215,0.6)", lineHeight: 1.75, marginBottom: 28 }}>
+            <p style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "14px", color: "rgba(240,232,215,0.8)", lineHeight: 1.75, marginBottom: 28 }}>
               {content.body_2}
             </p>
 
@@ -172,7 +172,7 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [], cont
                   We'll hold your selection
                 </p>
                 {cartItems.map((item, i) => (
-                  <p key={i} style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "13px", color: "rgba(240,232,215,0.5)", margin: "0 0 3px" }}>
+                  <p key={i} style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "13px", color: "rgba(240,232,215,0.75)", margin: "0 0 3px" }}>
                     {item.name}{item.colorway ? ` — ${item.colorway}` : ""} / Size {item.size}
                   </p>
                 ))}
@@ -232,16 +232,16 @@ export default function ReservationSheet({ isOpen, onClose, cartItems = [], cont
                 {status === "loading" ? "Reserving..." : content.cta_text}
               </button>
 
-              <p style={{ textAlign: "center", margin: "4px 0 0", fontFamily: "var(--font-body, sans-serif)", fontSize: "11px", color: "rgba(240,232,215,0.25)", lineHeight: 1.6 }}>
+              <p style={{ textAlign: "center", margin: "4px 0 0", fontFamily: "var(--font-body, sans-serif)", fontSize: "11px", color: "rgba(240,232,215,0.5)", lineHeight: 1.6 }}>
                 {content.fine_print}
               </p>
 
               {/* SMS consent — applies when a phone number is provided (carrier requirement) */}
-              <p style={{ margin: "10px 0 0", fontFamily: "var(--font-body, sans-serif)", fontSize: "9px", color: "rgba(240,232,215,0.25)", lineHeight: 1.6 }}>
+              <p style={{ margin: "10px 0 0", fontFamily: "var(--font-body, sans-serif)", fontSize: "9px", color: "rgba(240,232,215,0.5)", lineHeight: 1.6 }}>
                 If you provide a phone number, you agree to receive recurring automated marketing texts (early-access alerts and drop notifications) from Popper Tulimond at that number. Consent is not a condition of purchase. Message frequency varies. Msg &amp; data rates may apply. Reply HELP for help, STOP to cancel. See our{" "}
-                <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.5)", textDecoration: "underline" }}>Privacy Policy</a>
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.75)", textDecoration: "underline" }}>Privacy Policy</a>
                 {" "}and{" "}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.5)", textDecoration: "underline" }}>Terms</a>.
+                <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.75)", textDecoration: "underline" }}>Terms</a>.
               </p>
             </form>
           </>
