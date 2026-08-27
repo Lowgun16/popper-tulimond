@@ -207,7 +207,7 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
                   {submitting ? "..." : "Get Early Access"}
                 </button>
 
-                {/* TCPA compliance — required by law */}
+                {/* TCPA / carrier SMS consent — required for toll-free verification */}
                 <p style={{
                   fontFamily: "var(--font-body, sans-serif)",
                   fontSize: "9px",
@@ -215,7 +215,10 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
                   marginTop: "14px",
                   lineHeight: 1.6,
                 }}>
-                  By submitting, you consent to receive recurring automated marketing text messages from Popper Tulimond at the number provided. Message & data rates may apply. Reply STOP to unsubscribe at any time.
+                  By submitting, you agree to receive recurring automated marketing texts (early-access alerts and drop notifications) from Popper Tulimond at the number provided. Consent is not a condition of purchase. Message frequency varies. Msg &amp; data rates may apply. Reply HELP for help, STOP to cancel. See our{" "}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.5)", textDecoration: "underline" }}>Privacy Policy</a>
+                  {" "}and{" "}
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.5)", textDecoration: "underline" }}>Terms</a>.
                 </p>
               </form>
             )}
