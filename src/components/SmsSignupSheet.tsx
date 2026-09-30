@@ -33,12 +33,14 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!firstName.trim()) { setError("First name is required."); return; }
     if (!phone.trim()) { setError("Phone number is required."); return; }
+    if (!agreed) { setError("Please check the box to agree to receive texts."); return; }
     setSubmitting(true);
     setError(null);
 
@@ -66,6 +68,7 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
     setFirstName("");
     setPhone("");
     setEmail("");
+    setAgreed(false);
     setSubmitted(false);
     setError(null);
     onClose();
@@ -183,13 +186,35 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
                   />
                 </div>
 
+                {/* Explicit, unchecked SMS consent checkbox — required for A2P/carrier web-form opt-in */}
+                <label style={{
+                  display: "flex", gap: "10px", alignItems: "flex-start",
+                  marginBottom: "16px", cursor: "pointer",
+                  fontFamily: "var(--font-body, sans-serif)",
+                  fontSize: "10px", color: "rgba(240,232,215,0.6)", lineHeight: 1.6,
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    style={{ marginTop: "2px", flexShrink: 0, width: "16px", height: "16px", accentColor: GOLD }}
+                    aria-label="Agree to receive recurring marketing text messages"
+                  />
+                  <span>
+                    Yes — text me. I agree to receive recurring automated marketing texts (early-access alerts and drop notifications) from Popper Tulimond at the number provided. Consent is not a condition of purchase. Message frequency varies. Msg &amp; data rates may apply. Reply HELP for help, STOP to cancel. See our{" "}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.8)", textDecoration: "underline" }}>Privacy Policy</a>
+                    {" "}and{" "}
+                    <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.8)", textDecoration: "underline" }}>Terms</a>.
+                  </span>
+                </label>
+
                 {error && (
                   <p style={{ fontSize: "12px", color: "#e05555", marginBottom: "12px" }}>{error}</p>
                 )}
 
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || !agreed || !firstName.trim() || !phone.trim()}
                   style={{
                     width: "100%",
                     padding: "14px",
@@ -200,26 +225,12 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
                     fontSize: "10px",
                     letterSpacing: "0.25em",
                     textTransform: "uppercase",
-                    cursor: submitting ? "not-allowed" : "pointer",
-                    opacity: submitting ? 0.6 : 1,
+                    cursor: (submitting || !agreed || !firstName.trim() || !phone.trim()) ? "not-allowed" : "pointer",
+                    opacity: (submitting || !agreed || !firstName.trim() || !phone.trim()) ? 0.5 : 1,
                   }}
                 >
                   {submitting ? "..." : "Get Early Access"}
                 </button>
-
-                {/* TCPA / carrier SMS consent — required for toll-free verification */}
-                <p style={{
-                  fontFamily: "var(--font-body, sans-serif)",
-                  fontSize: "9px",
-                  color: "rgba(240,232,215,0.5)",
-                  marginTop: "14px",
-                  lineHeight: 1.6,
-                }}>
-                  By submitting, you agree to receive recurring automated marketing texts (early-access alerts and drop notifications) from Popper Tulimond at the number provided. Consent is not a condition of purchase. Message frequency varies. Msg &amp; data rates may apply. Reply HELP for help, STOP to cancel. See our{" "}
-                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.75)", textDecoration: "underline" }}>Privacy Policy</a>
-                  {" "}and{" "}
-                  <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(240,232,215,0.75)", textDecoration: "underline" }}>Terms</a>.
-                </p>
               </form>
             )}
           </motion.div>
