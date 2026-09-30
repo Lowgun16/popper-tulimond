@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Validate source
-  if (source !== "protocol_cta" && source !== "blocked_purchase") {
+  if (source !== "protocol_cta" && source !== "blocked_purchase" && source !== "join_page") {
     return NextResponse.json(
       { ok: false, error: "Invalid source" },
       { status: 400 }
