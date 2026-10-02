@@ -20,7 +20,6 @@ const inputStyle: CSSProperties = {
 export default function JoinForm() {
   const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -40,7 +39,6 @@ export default function JoinForm() {
         body: JSON.stringify({
           firstName: firstName.trim(),
           phone: phone.trim(),
-          email: email.trim() || null,
           source: "join_page",
         }),
       });
@@ -77,7 +75,6 @@ export default function JoinForm() {
       <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "18px" }}>
         <input type="text" placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required style={inputStyle} aria-label="First name" />
         <input type="tel" placeholder="Phone number" value={phone} onChange={(e) => setPhone(e.target.value)} required style={inputStyle} aria-label="Phone number" />
-        <input type="email" placeholder="Email (optional)" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} aria-label="Email (optional)" />
       </div>
 
       {/* Explicit, unchecked SMS consent — publicly readable for carrier/A2P verification */}

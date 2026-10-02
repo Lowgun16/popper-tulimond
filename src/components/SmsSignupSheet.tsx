@@ -30,7 +30,6 @@ const inputStyle: CSSProperties = {
 export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupSheetProps) {
   const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [agreed, setAgreed] = useState(false);
@@ -48,7 +47,7 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
       const res = await fetch("/api/sms-signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName: firstName.trim(), phone: phone.trim(), email: email.trim() || null, source }),
+        body: JSON.stringify({ firstName: firstName.trim(), phone: phone.trim(), source }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -67,7 +66,6 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
   const handleClose = () => {
     setFirstName("");
     setPhone("");
-    setEmail("");
     setAgreed(false);
     setSubmitted(false);
     setError(null);
@@ -175,14 +173,6 @@ export default function SmsSignupSheet({ isOpen, onClose, source }: SmsSignupShe
                     required
                     style={inputStyle}
                     aria-label="Phone number"
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email (optional)"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={inputStyle}
-                    aria-label="Email address (optional)"
                   />
                 </div>
 

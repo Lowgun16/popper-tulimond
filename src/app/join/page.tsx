@@ -75,8 +75,8 @@ export default function JoinPage() {
             marginTop: "24px",
           }}
         >
-          We text only about store openings and early access. No spam. Reply STOP
-          anytime to opt out.
+          We only text — we never email, and we never spam. You&apos;ll rarely hear
+          from us, and only when it matters. Reply STOP anytime to opt out.
         </p>
       </div>
     </main>
