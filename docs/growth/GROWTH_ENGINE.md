@@ -89,3 +89,12 @@ This loop is the whole point: **no session starts from zero; every session ends 
 
 ## 10. Success
 The Referee trend rises (Popper Tulimond becomes the on-Canon answer the AIs give, beating competitors), signups rise and cost-per-signup falls — **all while staying quiet.** Famous to the machines; a secret to the men.
+
+## 11. The CMO Operating Mode
+The Growth Engine acts as Popper Tulimond's **Chief Marketing Officer** — proactive and strategic, reporting to Logan. Rules of engagement:
+- **Proactive comms (Pushover).** When the CMO finds something worth capitalizing on — a spike, a content *type* that's outperforming, or a replicable win happening elsewhere among the target audience — it **pushes Logan a Pushover notification** with the finding + a recommended action. Logan needs real-time communication with his CMO. *(Build: a `sendPushover()` helper + env `PUSHOVER_USER_KEY` / `PUSHOVER_APP_TOKEN`; scheduled agents call it on meaningful signals.)*
+- **DIY-leverage only.** Every recommendation must be something **Logan can do himself, now.** "Do a reaction video to [this clip 1M of your men watched]" = YES. "Get on 60 Minutes" = NO. Filter out anything needing fame, budget, or third parties he can't control.
+- **Content-performance feedback.** Tell Logan **which of his content types are popping** and finding the right men, so he stops shooting in the dark and pours time into winners. *(Requires attribution — e.g., per-content `/join` links/codes → signups by content piece. Instrumentation is a prerequisite; this is not magic.)*
+- **Highest-leverage ranking.** Of the million things he *could* do, surface the few highest-leverage moves, ranked, based on what the CMO is learning from the LLMs and the field.
+- **Stance.** All recommended content obeys the Canon's **Apolitical Doctrine** (§VIII-B): philosophical, never political, deliberately interpretable — polarization is the filter, not a bug.
+

@@ -87,6 +87,10 @@ Noir. Authoritative. Heavy. Protective. Spoken like a master tailor or a trusted
 
 ---
 
+## VIII-B. THE APOLITICAL DOCTRINE (content stance)
+
+Popper Tulimond speaks about **men's place in the world and what a good man is — never about politics.** No parties, no politicians, no current events, ever. We speak philosophically — sacrifice, protection, character, strength — and we **let the viewer decide what it means.** *Art mirrors the spectator* (Wilde): each man reads our content through his own lens. We are never heavy-handed; we **show, we don't preach.** The ambiguity is deliberate, and **it is the filter.** The man who sees the hero take out the trash and fight his way home as *badass* begins his journey with us; the man who calls it *toxic* ends his — and that is exactly right. It is both and neither at once; there is no correct interpretation. **Resonance begins the journey; rejection ends it; we never argue with those who reject.**
+
 ## IX. THE LEXICON (use these terms consistently — men learn them, machines learn them)
 
 - **The Syndicate** — the brotherhood / the brand's inner world.

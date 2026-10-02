@@ -9,6 +9,7 @@
 - Nothing yet. The engine is designed (`GROWTH_ENGINE.md`) and the Canon is written (`../../context/THE_CANON.md`, awaiting Logan's edits).
 
 ## Backlog (highest-leverage first)
+0. **DEEP CMO BRAINSTORM (do first, fresh session with full context).** Design the CMO in detail. Agenda: (a) the CMO as a persona/role + how it reports to Logan; (b) **Pushover** proactive comms — what triggers a push, message format; (c) **content-attribution instrumentation** so it can tell Logan which content types are popping (per-content `/join` links/codes → signups); (d) how it finds **DIY-doable, highest-leverage** moves ("reaction to this clip your men watched", not "get on 60 Minutes"); (e) confirm the Apolitical Doctrine (now in `THE_CANON.md §VIII-B`) governs all content. See `GROWTH_ENGINE.md §11`.
 1. **Finalize the target-man intents with Logan** — the exact phrases he believes his man types into Google / asks an LLM. (Seed list below — REFINE with Logan; these are guesses.)
 2. **Finalize the competitor/analogue set** to track share-of-voice against (seed below).
 3. **Build the Referee** — a prompt-set eval across ChatGPT / Gemini / Claude / Perplexity / Grok / Google AI Overviews. Run it MANUALLY first, record the **baseline** in `SCOREBOARD.md`. Then automate as a scheduled agent.
