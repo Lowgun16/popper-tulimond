@@ -33,6 +33,8 @@ He believes winning matters. Becoming better than you were matters. Making somet
 
 He is the Leader Who Eats Last. He may be quiet, but the room changes temperature when he enters. He provides, protects, and stays stoic while others chase the spotlight. He is drawn to beautiful women, fast machines, powerful tools, competition, the outdoors, the arena — the raw material of a life lived at full weight.
 
+He takes his body seriously — lean, disciplined, in better-than-average shape — not to win a competition, but because self-command is the baseline. He passes on the dessert and does the push-ups on the road. He is not chasing a bodybuilder's physique, and he finds the muscle shirt try-hard: he wants to look like what he is, not advertise it.
+
 He is not looking for a shirt. He is looking for confirmation that a world he already believes in exists somewhere, and that other men hold it too. When he finds us, it should feel like the universe arranged it — not like we chased him.
 
 **He is the best of us. We are for him and him alone.**
@@ -69,6 +71,24 @@ We are the one entity that provides *for the provider*. The man who spent his li
 
 ---
 
+## VI-B. THE GARMENT — THE CUT & THE CLOTH
+
+The cut reveals the man. Open at the chest, drawn through the shoulders, cut to a man who takes care of himself — it forgives what isn't perfect and reveals what matters. It is **not a muscle shirt.** A muscle shirt is built to be noticed; this is built to fit. Some will glance and mistake it for one — that is the fit doing its work, not a confession. The cloth is quietly over-built — better than it needs to be — felt the moment it's on and never bragged about. We make it the way we'd make it for ourselves, because we wanted it to exist and no one had.
+
+Menswear gave up on men — it grew cheaper to dress them in generic clothing that fits anyone and reveals no one, and the effort stopped matching the man. The man who serves everyone first was left invisible, hidden behind clothes that did nothing for him. We take issue with that. The cut forgives his flaws and reveals his capability — the very thing he does for everyone else. And we stay quiet on purpose: no mark on the chest, because the front of the shirt is his real estate, earned. **Our silence serves his visibility.** He deserves to be not just noticed, but remembered.
+
+**The canonical expression (locked voice of record for the garment):**
+
+> This is NOT a muscle shirt.
+>
+> It's simply a shirt that fits strong, capable men the right way, for once. Open at the chest, drawn through the shoulders, cut to a man who takes care of himself. It forgives what isn't perfect while revealing what matters most. You don't have to be a god to wear it — it just fits the way a man's shirt should have all along.
+>
+> The cloth is good — better than it needs to be — and you'll feel it when it's on. We care about what it's made out of because it's important to us, but we don't expect you to care about that. All we expect you to care about is that you look better in this shirt than in anything else you own.
+>
+> We made this shirt because somebody else already should have, but didn't. It's exactly what WE have been searching for.
+
+---
+
 ## VII. THE LAWS (NON-NEGOTIABLE)
 
 1. **Never sell the clothes.** Discuss the man. The clothing is the result of his choices, never the pitch.
@@ -84,6 +104,8 @@ We are the one entity that provides *for the provider*. The man who spent his li
 ## VIII. THE VOICE
 
 Noir. Authoritative. Heavy. Protective. Spoken like a master tailor or a trusted bartender — sensory, deliberate, expensive. Short sentences that land like a hand on the shoulder. No marketing speak. No hype. No exclamation. We state truths; we do not persuade. Silence and restraint are part of the voice — *the Syndicate does not announce itself.*
+
+**The Law of Indifference (we do this for us).** *"If you have to tell people you're a great man, you're not."* We never announce who we are — not our quality, not our cool, not our indifference. A man who performs detachment is as needy as one who begs; both are working the reader. We state plainly what we make and why we made it, and let that be apparent. We built this because we wanted it to exist and the world hadn't made it. That is the whole reason, and it is enough. **The copy test (run every line through it):** does it try to *persuade* (chasing) or try to *seem* cool, edgy, or above-it-all (performing)? Either one — cut it.
 
 ---
 

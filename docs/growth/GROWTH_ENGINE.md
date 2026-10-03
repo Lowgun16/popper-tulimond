@@ -81,11 +81,13 @@ This loop is the whole point: **no session starts from zero; every session ends 
 - The Referee is **noisy** — trust the trend across many prompts/models, not one reading.
 - **No guarantees, and it compounds slowly.** This is a long game. The point is that it *always improves and never resets.*
 
-## 9. Build roadmap (phased)
-- **Phase 1 — Instrument:** finalize the real target-man intents (with Logan) + competitor set → build the Referee (run it manually first, then automate via a scheduled agent) → record the **baseline** in `SCOREBOARD.md`. (You can't improve what you don't measure.)
-- **Phase 2 — Broadcast v1:** stand up the owned Codex + first experiments on 1–2 surfaces (e.g., Reddit + YouTube/transcripts), each logged in `EXPERIMENTS.md`. Watch the Referee.
-- **Phase 3 — Automate the Loop:** scheduled research + content-drafting agents; mature the Playbook; widen surfaces and intents.
-- **Forever:** turn the crank, every week, each session on the shoulders of the last.
+## 9. Build roadmap (phased) — CORRECTED 2026-10-02 under the Earned Aperture doctrine (§12)
+The original roadmap put the Referee (measurement) first. That was mis-sequenced: **a referee measures a game that must first be played.** With ~zero footprint, measuring returns "invisible" no matter how precisely we build the tool. **Content is the atom; the machine optimizes a fire it cannot light.** Corrected order:
+- **Phase 0 — Reality + first brick (NOW):** (a) a one-hour MANUAL baseline — ask the 6 AIs the real intents by hand; record who they name + how they describe the space (partial baseline logged in `SCOREBOARD.md` 2026-10-02). (b) Produce the first flagship Codex cornerstone — **THE CODE** (`codex/THE_CODE.md`), the public piece that moves the man AND teaches the machine.
+- **Phase 1 — The Codex:** scale THE CODE into an owned, public, deepening body of belief on-domain — the citable authority. Claude writes at volume; Logan curates taste.
+- **Phase 2 — Earned resonance:** put the worldview on the live surfaces men + AIs read (authentic participation = Logan's face + Claude's drafts; transformative commentary; quotable lines). Each a logged experiment.
+- **Phase 3 — The machine:** NOW build the self-running system — automated Referee, daily scout, Pushover, content attribution (the CMO, §11). It optimizes an existing fire.
+- **Forever:** turn the crank weekly; the aperture widens only as far as the work has earned it.
 
 ## 10. Success
 The Referee trend rises (Popper Tulimond becomes the on-Canon answer the AIs give, beating competitors), signups rise and cost-per-signup falls — **all while staying quiet.** Famous to the machines; a secret to the men.
@@ -97,4 +99,12 @@ The Growth Engine acts as Popper Tulimond's **Chief Marketing Officer** — proa
 - **Content-performance feedback.** Tell Logan **which of his content types are popping** and finding the right men, so he stops shooting in the dark and pours time into winners. *(Requires attribution — e.g., per-content `/join` links/codes → signups by content piece. Instrumentation is a prerequisite; this is not magic.)*
 - **Highest-leverage ranking.** Of the million things he *could* do, surface the few highest-leverage moves, ranked, based on what the CMO is learning from the LLMs and the field.
 - **Stance.** All recommended content obeys the Canon's **Apolitical Doctrine** (§VIII-B): philosophical, never political, deliberately interpretable — polarization is the filter, not a bug.
+
+## 12. THE EARNED APERTURE DOCTRINE (the sequencing law — read before building anything)
+**"The aperture only widens as far as the work has earned it."** Prove a thing moves men BY HAND before building a machine to scale it. Set by Logan + Session 3 (2026-10-02) after the deep CMO brainstorm; it re-sequences §9 and governs what we build and when.
+- **Content is the atom.** Every Canon-compatible channel (search, the AI layer, Reddit/YouTube/X resonance) is fed by one input: deep, consistent, resonant content. The Referee, CMO, and autonomous agents are all just *distribution or measurement of content.* No content → nothing to distribute or measure. Build content first.
+- **A referee measures a game that must first be played.** Do not build measurement/automation before there is a signal to measure. A cheap manual read beats an elaborate tool that precisely reports "zero."
+- **Ads = interruption = structurally anti-Canon** (loud, chasing). Search + the AI layer = *answering* (a man asks; the universe replies with us) = the only Canon-compatible discovery channel. Growth is **gravity** (resonant content that pulls), never **push** (ads that interrupt).
+- **Favor durable assets over fragile machinery.** The Canon and Codex are text — they never break and compound forever; every session inherits them. Custom software (eval harnesses, crons, attribution plumbing) rots, costs money, and burdens a non-technical founder across decades. Build software ONLY to scale/measure content that has already proven it moves men. The Canon is the model asset; a bespoke automated Referee is the anti-model.
+- **Claude's comparative advantage:** world-class at generating on-Canon writing + strategy at volume; a liability at piling up fragile infra. Point it at belief and words until plumbing is unmistakably earned.
 
