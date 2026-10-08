@@ -98,6 +98,7 @@ Menswear gave up on men — it grew cheaper to dress them in generic clothing th
 5. **Be famous for a belief; invisible as a store.** Dense and consistent to the machines; secret and unadvertised to the men. Widely known, never salesy.
 6. **Polarize on purpose.** Speak so clearly that the wrong man leaves. Never dilute to be liked.
 7. **Respect every member as a brother.** If he found us, he earned it. We are teammates with each one.
+8. **The price of the originals is permanent.** The two original Constable shirts ($129 short sleeve, $159 long sleeve) are never discounted below those prices — not for a sale, a holiday, or a promotion, ever. This is fixed, deliberate, and non-negotiable. (Future articles may carry different prices as costs change — inflation, cost of goods; the originals never move.)
 
 ---
 

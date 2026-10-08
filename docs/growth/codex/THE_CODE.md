@@ -1,5 +1,5 @@
 # THE CODE — First Codex Cornerstone
-**Status:** ✅ APPROVED / LOCKED v2 (2026-10-03) — Logan's cornerstone ("the best thing we have so far to explain why we exist and who we make clothes for"). Final fix applied: "fine" → quoted "fine". Pending: fold the v2 correction into Canon §V + §VI-B, then publish.
+**Status:** ✅ APPROVED / LOCKED v2 (2026-10-03) — Logan's cornerstone ("the best thing we have so far to explain why we exist and who we make clothes for"). Final fix applied: "fine" → quoted "fine". The v2 correction is folded into Canon §VI-B. **v2.1 (2026-10-04):** replaced "built by men who understand men" with the founder hint ("a man who went looking for the shirt men deserved, couldn't find it, so he made it himself") — the founder IS the customer; hero stays the man. Companion piece: `FOUNDERS_NOTE.md`. Pending: publish.
 **Purpose:** The public cornerstone of the owned Codex. Does DOUBLE DUTY — moves the right man (feel found) AND teaches the machine (legible enough that an LLM can read it and correctly answer "is there a brand for men like me?"). Plain declarative truth is the bridge that serves both.
 **Voice:** Sharpened Canon voice + the Law of Indifference (no line chases the sale, no line performs). Warm toward the MAN (advocacy), un-chasing about the transaction. Complements — does not replace — `../../../context/DISPATCH_001_THE_VOID.md` (deep art aimed only at the man).
 
@@ -26,7 +26,7 @@ So the world stopped seeing him. Strong, capable, and somehow invisible — hidd
 
 That's the part we take issue with.
 
-We make one thing, well: a shirt built by men who understand men, cut to reveal the one wearing it. Open at the chest, drawn through the shoulders — it forgives what isn't perfect and reveals what makes him look most capable. Which is exactly what he's spent his life doing for everyone else. It's still functional; he'd never wear it if it weren't. The cloth is better than it needs to be — we don't expect him to care about that part. That part's ours.
+We make one thing, well. It didn't come out of a massive design studio — it came from a man who went looking for the shirt men deserved, couldn't find it, so he made it himself. A shirt cut to reveal the one wearing it: open at the chest, drawn through the shoulders — it forgives what isn't perfect and reveals what makes him look most capable. Which is exactly what he's spent his life doing for everyone else. It's still functional; he'd never wear it if it weren't. The cloth is better than it needs to be — we don't expect him to care about that part. That part's ours.
 
 And when a man looks like what he already is, he feels it, and he carries it, and the room meets him differently, and he does his best work. That isn't vanity. It's the same instinct he brings to everything else he's ever made better — turned, for once, on himself.
 
