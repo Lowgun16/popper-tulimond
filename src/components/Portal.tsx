@@ -1,11 +1,12 @@
 // src/components/Portal.tsx
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAnimate } from "framer-motion";
 import { usePortalTransforms } from "@/hooks/usePortalTransforms";
 import PortalBackground from "@/components/PortalBackground";
 import CollectionOverlay from "@/components/CollectionOverlay";
+import SealedLetterOverlay from "@/components/SealedLetterOverlay";
 import type { LookbookContext } from "@/components/studio/studioTypes";
 import type { AllPageContent, ModelProfile } from "@/lib/contentTypes";
 import type { ProductOverride } from "@/lib/productOverrides";
@@ -22,6 +23,18 @@ export default function Portal({ onAddToCart, allContent, productOverrides, mode
   const t = usePortalTransforms();
   const [scope, animate] = useAnimate();
   const shakeRanRef = useRef(false);
+  const [letterOpen, setLetterOpen] = useState(false);
+
+  // The letter hands a man inside by quietly pulling the existing scroll engine:
+  // scroll to the bottom → the one-way ratchet locks him into the interior →
+  // the obsidian letter fades away and he's standing in the speakeasy.
+  const handleEnterFromLetter = useCallback(() => {
+    document.body.style.overflow = "";
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "auto" });
+    });
+    window.setTimeout(() => setLetterOpen(false), 700);
+  }, []);
 
   // ── Scroll reset — force top of page on every load ────────────────────
   // Prevents browser scroll restoration from dropping the user mid-portal.
@@ -63,10 +76,14 @@ export default function Portal({ onAddToCart, allContent, productOverrides, mode
           insideOpacity={t.insideOpacity}
           insideFilter={t.insideFilter}
           showInside={t.showInside}
+          onLetterTap={() => setLetterOpen(true)}
+          letterHidden={letterOpen || t.showInside}
         />
 
         {/* Model Stage + all overlays/nav — owned by CollectionOverlay */}
         <CollectionOverlay opacity={t.navOpacity} onAddToCart={onAddToCart} allContent={allContent} productOverrides={productOverrides} modelProfiles={modelProfiles} isAdmin={isAdmin} />
+
+        <SealedLetterOverlay open={letterOpen} onEnter={handleEnterFromLetter} />
 
       </div>
     </div>
