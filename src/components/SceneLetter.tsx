@@ -6,11 +6,11 @@
 // storefront layer; TUNE them on-device against the real photo.
 const POS = {
   desktop: {
-    env: { left: "21%", top: "86%", width: "4.5%", rotate: "-12deg" },
+    env: { left: "21%", top: "89%", width: "4.5%", rotate: "-12deg" },
     bulb: { left: "77%", top: "12%", size: "7%" },
   },
   mobile: {
-    env: { left: "42%", top: "71%", width: "7%", rotate: "-12deg" },
+    env: { left: "42%", top: "74%", width: "7%", rotate: "-12deg" },
     bulb: { left: "77%", top: "45%", size: "11%" },
   },
 } as const;
