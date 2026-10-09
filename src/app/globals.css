@@ -207,6 +207,26 @@ textarea::placeholder {
 }
 
 /* ─────────────────────────────────────────
+   The Letter — bulb flicker + seal twinkle (5s heartbeat)
+   Applied via inline style animation (purge-immune, same as the dots above).
+───────────────────────────────────────── */
+@keyframes pt-bulb-flicker {
+  0%, 87%, 100% { opacity: 0.40; }
+  88%           { opacity: 0.95; }
+  89%           { opacity: 0.25; }
+  90%           { opacity: 0.85; }
+  91%           { opacity: 0.45; }
+  92%           { opacity: 0.80; }
+  94%           { opacity: 0.40; }
+}
+@keyframes pt-seal-twinkle {
+  0%, 90%, 100% { opacity: 0;    transform: translate(-50%, -50%) scale(0.5); }
+  93%           { opacity: 0.95; transform: translate(-50%, -50%) scale(1.0); }
+  96%           { opacity: 0.25; transform: translate(-50%, -50%) scale(0.85); }
+  99%           { opacity: 0;    transform: translate(-50%, -50%) scale(0.6); }
+}
+
+/* ─────────────────────────────────────────
    Divider Utility
 ───────────────────────────────────────── */
 .divider-gold {

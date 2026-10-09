@@ -3,6 +3,7 @@
 
 import { motion, type MotionValue } from "framer-motion";
 import Image from "next/image";
+import SceneLetter from "@/components/SceneLetter";
 
 // Door position fractions — must match DOOR constants in usePortalTransforms.ts.
 // originX/originY are Framer Motion's internal transform-origin (not CSS transform-origin).
@@ -21,6 +22,8 @@ interface Props {
   insideOpacity: MotionValue<number>;
   insideFilter: MotionValue<string>;
   showInside: boolean;
+  onLetterTap: () => void;
+  letterHidden: boolean;
 }
 
 export default function PortalBackground({
@@ -32,6 +35,8 @@ export default function PortalBackground({
   insideOpacity,
   insideFilter,
   showInside,
+  onLetterTap,
+  letterHidden,
 }: Props) {
   return (
     <>
@@ -106,6 +111,7 @@ export default function PortalBackground({
             priority
             aria-hidden="true"
           />
+          <SceneLetter variant="mobile" onTap={onLetterTap} hidden={letterHidden} />
         </motion.div>
       </div>
 
@@ -129,6 +135,7 @@ export default function PortalBackground({
             priority
             aria-hidden="true"
           />
+          <SceneLetter variant="desktop" onTap={onLetterTap} hidden={letterHidden} />
         </motion.div>
       </div>
 
