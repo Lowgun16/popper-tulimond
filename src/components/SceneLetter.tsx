@@ -6,12 +6,12 @@
 // storefront layer; TUNE them on-device against the real photo.
 const POS = {
   desktop: {
-    env: { left: "57%", top: "81%", width: "7.5%", rotate: "-14deg" },
-    bulb: { left: "70.5%", top: "40%", size: "10%" },
+    env: { left: "40%", top: "95%", width: "4.5%", rotate: "-12deg" },
+    bulb: { left: "77%", top: "12%", size: "6%" },
   },
   mobile: {
-    env: { left: "58%", top: "84%", width: "14%", rotate: "-14deg" },
-    bulb: { left: "72%", top: "47%", size: "17%" },
+    env: { left: "42%", top: "76%", width: "9%", rotate: "-12deg" },
+    bulb: { left: "77%", top: "45%", size: "9%" },
   },
 } as const;
 
@@ -77,6 +77,7 @@ export default function SceneLetter({
             aria-hidden="true"
             draggable={false}
             className="relative block w-full select-none"
+            style={{ filter: "brightness(0.64) contrast(0.95) saturate(0.85)" }}
           />
           {/* seal twinkle — glints just after the bulb flickers */}
           <span
