@@ -210,14 +210,17 @@ textarea::placeholder {
    The Letter — bulb flicker + seal twinkle (5s heartbeat)
    Applied via inline style animation (purge-immune, same as the dots above).
 ───────────────────────────────────────── */
-@keyframes pt-bulb-flicker {
-  0%, 87%, 100% { opacity: 0.40; }
-  88%           { opacity: 0.95; }
-  89%           { opacity: 0.25; }
-  90%           { opacity: 0.85; }
-  91%           { opacity: 0.45; }
-  92%           { opacity: 0.80; }
-  94%           { opacity: 0.40; }
+/* A dying bulb: mostly normal (0), then a brief stutter where a dark veil
+   dims it toward out and catches back — "almost going out, but not." */
+@keyframes pt-bulb-dim {
+  0%, 85%, 100% { opacity: 0; }
+  86%           { opacity: 0.78; }
+  87.5%         { opacity: 0.12; }
+  89%           { opacity: 0.90; }
+  90.5%         { opacity: 0.25; }
+  92%           { opacity: 0.70; }
+  93.5%         { opacity: 0.08; }
+  95%           { opacity: 0; }
 }
 @keyframes pt-seal-twinkle {
   0%, 90%, 100% { opacity: 0;    transform: translate(-50%, -50%) scale(0.5); }

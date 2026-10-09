@@ -6,12 +6,12 @@
 // storefront layer; TUNE them on-device against the real photo.
 const POS = {
   desktop: {
-    env: { left: "40%", top: "95%", width: "4.5%", rotate: "-12deg" },
-    bulb: { left: "77%", top: "12%", size: "6%" },
+    env: { left: "21%", top: "86%", width: "4.5%", rotate: "-12deg" },
+    bulb: { left: "77%", top: "12%", size: "7%" },
   },
   mobile: {
-    env: { left: "42%", top: "76%", width: "9%", rotate: "-12deg" },
-    bulb: { left: "77%", top: "45%", size: "9%" },
+    env: { left: "42%", top: "71%", width: "7%", rotate: "-12deg" },
+    bulb: { left: "77%", top: "45%", size: "11%" },
   },
 } as const;
 
@@ -40,8 +40,8 @@ export default function SceneLetter({
           aspectRatio: "1 / 1",
           transform: "translate(-50%, -50%)",
           background:
-            "radial-gradient(circle, rgba(255,196,110,0.5) 0%, rgba(255,196,110,0) 70%)",
-          animation: "pt-bulb-flicker 5s ease-in-out infinite",
+            "radial-gradient(circle, rgba(15,14,13,0.95) 0%, rgba(15,14,13,0.55) 45%, rgba(15,14,13,0) 72%)",
+          animation: "pt-bulb-dim 5s ease-in-out infinite",
         }}
       />
 
