@@ -2,8 +2,16 @@
 
 > Read `GROWTH_ENGINE.md` first — especially **§12 THE EARNED APERTURE DOCTRINE** and the **CORRECTED §9 roadmap**. Update this file at the END of every growth session.
 
-**Last updated:** 2026-10-02 (Session 3)
-**Phase:** 0 — Reality + first brick. Corrected from the old "Instrument / Referee-first" plan under the Earned Aperture doctrine: **content is the atom; build substance by hand before building the machine.**
+**Last updated:** 2026-10-09 (Session 3 close)
+**Phase:** 0 → 1 — Reality + first brick → the Codex. **Content is going live.**
+
+## ⭐ SHIPPED SINCE (2026-10-09) — the first signal is in the world
+- **THE WHY is LIVE** at www.poppertulimond.com/why — a crawlable, machine-legible page, **hidden from humans** (no link anywhere; discoverable only via the sitemap). The first real signal into the AI layer.
+- **THE SEALED LETTER (Stage 2)** — the hidden *on-site* human door to THE WHY (envelope by the door → tap → fly-in → THE WHY → step inside) — is **built and in preview** (branch `feat/the-letter`), pending Logan's final envelope-placement OK → merge to prod.
+- **THE WHY + THE CODE are LOCKED** (`codex/`). Founder-as-face decided (Logan = the face). `vercel.json` pins the stable Webpack build (dodges a Vercel Turbopack + next/font deploy bug — keep it).
+- **NEXT = BUILD THE CMO** (see "CMO blueprint" below + GROWTH_ENGINE §11/§12). First cranks, honoring Earned Aperture: publish THE CODE + the garment/"not a muscle shirt" content as crawlable pages → build the Referee + record the baseline → then the CMO organs, as earned. Full handoff: `memory/project_next_session.md`.
+
+**Phase 0 origin (kept for context):** corrected from the old "Instrument / Referee-first" plan under the Earned Aperture doctrine: **content is the atom; build substance by hand before building the machine.**
 
 ## What changed this session (2026-10-02) — the breakthrough
 1. **Canon sharpened** (`../../context/THE_CANON.md`): added the man's body to §III (disciplined, athletic, "finds the muscle shirt try-hard"); new **§VI-B The Garment — The Cut & The Cloth** (anti-muscle-shirt doctrine + the locked public paragraph); new **Law of Indifference** in §VIII ("if you have to tell people you're a great man, you're not" + the chase/perform copy test).
